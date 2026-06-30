@@ -181,7 +181,7 @@ function EventCard({ event }: { event: EventDetails }) {
               duration: 0.85,
               ease: [0.25, 1, 0.5, 1],
             }}
-            className="absolute left-0 top-0 w-1/2 h-full bg-[#FDFAF7] border border-[#A36662]/15 border-r-0 rounded-l-[32px] overflow-hidden z-20 flex flex-col justify-between p-4"
+            className="absolute left-0 top-0 w-1/2 h-full bg-[#FDFAF7] border border-[#A36662]/15 border-r-0 rounded-l-[32px] overflow-hidden z-20 p-4"
           >
             {/* Left side gold borders */}
             <div className="absolute inset-2.5 border border-[#A36662]/15 border-r-0 rounded-l-[24px] pointer-events-none" />
@@ -191,19 +191,40 @@ function EventCard({ event }: { event: EventDetails }) {
             <div className="text-[10px] text-[#A36662]/20 font-serif absolute top-4 left-4 pointer-events-none">❖</div>
             <div className="text-[10px] text-[#A36662]/20 font-serif absolute bottom-4 left-4 pointer-events-none">❖</div>
 
-            {/* Split Wreath/Monogram Left Side */}
-            <div className="absolute right-[-15px] top-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-[#D5B03A]/70 bg-[#FDFAF7] flex items-center justify-end pr-1 shadow-sm z-30">
-              <span className="text-[9px] text-[#D5B03A] font-bold">❖</span>
-            </div>
-
-            {/* Cover Text Left Side */}
-            <div className="flex-1 flex flex-col justify-center items-end pr-3 select-none relative z-10">
-              <span className="font-cormorant text-[0.55rem] sm:text-[0.6rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-2 font-bold">
+            {/* Repositioned Cover Text (Above the Ribbon) */}
+            <div className="absolute right-4 top-[18%] select-none z-10 text-right flex flex-col items-end">
+              <span className="font-cormorant text-[0.55rem] sm:text-[0.6rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1 font-bold">
                 INVITATION
               </span>
-              <h3 className="font-distrela text-lg sm:text-2xl text-[#7A1C2C] font-bold text-right leading-none">
+              <h3 className="font-distrela text-lg sm:text-2xl text-[#7A1C2C] font-bold leading-none">
                 {firstWord}
               </h3>
+            </div>
+
+            {/* Left Ribbon Band and Bow Half (Center Height) */}
+            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-8 bg-[#A36662] z-30 shadow-[0_2px_4px_rgba(163,102,98,0.15)] flex items-center justify-end">
+              {/* Gold ribbon stripes */}
+              <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-[#D5B03A]/45" />
+              <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#D5B03A]/45" />
+
+              {/* Left Bow Loop */}
+              <div className="absolute right-[-8px] top-[0px] w-6 h-8 rounded-full border-[1.5px] border-[#D5B03A] bg-[#A36662] rotate-[-15deg] shadow-sm z-40" />
+              
+              {/* Left Ribbon V-tail */}
+              <div 
+                className="absolute right-[-4px] top-[18px] w-3.5 h-6 bg-[#A36662] rotate-[35deg] origin-top-left z-35" 
+                style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%)" }}
+              />
+
+              {/* Left Bow Center Knot half */}
+              <div className="absolute right-[-3px] top-[8px] w-1.5 h-4 bg-[#D5B03A] rounded-l-sm z-50 shadow-[1px_0_2px_rgba(0,0,0,0.15)]" />
+            </div>
+
+            {/* Repositioned Cover Date (Below the Ribbon) */}
+            <div className="absolute right-4 bottom-[18%] select-none z-10 text-right">
+              <span className="font-cormorant text-[0.7rem] sm:text-[0.75rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
+                {event.dateTime.includes("Nov 27") ? "NOV 27" : event.dateTime.includes("Nov 28") ? "NOV 28" : "NOV 29"}
+              </span>
             </div>
           </motion.div>
 
@@ -220,7 +241,7 @@ function EventCard({ event }: { event: EventDetails }) {
               duration: 0.85,
               ease: [0.25, 1, 0.5, 1],
             }}
-            className="absolute right-0 top-0 w-1/2 h-full bg-[#FDFAF7] border border-[#A36662]/15 border-l-0 rounded-r-[32px] overflow-hidden z-20 flex flex-col justify-between p-4"
+            className="absolute right-0 top-0 w-1/2 h-full bg-[#FDFAF7] border border-[#A36662]/15 border-l-0 rounded-r-[32px] overflow-hidden z-20 p-4"
           >
             {/* Right side gold borders */}
             <div className="absolute inset-2.5 border border-[#A36662]/15 border-l-0 rounded-r-[24px] pointer-events-none" />
@@ -230,19 +251,40 @@ function EventCard({ event }: { event: EventDetails }) {
             <div className="text-[10px] text-[#A36662]/20 font-serif absolute top-4 right-4 pointer-events-none">❖</div>
             <div className="text-[10px] text-[#A36662]/20 font-serif absolute bottom-4 right-4 pointer-events-none">❖</div>
 
-            {/* Split Wreath/Monogram Right Side */}
-            <div className="absolute left-[-15px] top-1/2 -translate-y-1/2 w-8 h-8 rounded-full border border-[#D5B03A]/70 bg-[#FDFAF7] flex items-center justify-start pl-1 shadow-sm z-30">
-              <span className="text-[9px] text-[#D5B03A] font-bold">❖</span>
-            </div>
-
-            {/* Cover Text Right Side */}
-            <div className="flex-1 flex flex-col justify-center items-start pl-3 select-none relative z-10">
-              <span className="font-cormorant text-[0.55rem] sm:text-[0.6rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-2 font-bold">
+            {/* Repositioned Cover Text (Above the Ribbon) */}
+            <div className="absolute left-4 top-[18%] select-none z-10 text-left flex flex-col items-start">
+              <span className="font-cormorant text-[0.55rem] sm:text-[0.6rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1 font-bold">
                 TO ATTEND
               </span>
-              <h3 className="font-distrela text-lg sm:text-2xl text-[#7A1C2C] font-bold text-left leading-none">
+              <h3 className="font-distrela text-lg sm:text-2xl text-[#7A1C2C] font-bold leading-none">
                 {secondWord}
               </h3>
+            </div>
+
+            {/* Right Ribbon Band and Bow Half (Center Height) */}
+            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-8 bg-[#A36662] z-30 shadow-[0_2px_4px_rgba(163,102,98,0.15)] flex items-center justify-start">
+              {/* Gold ribbon stripes */}
+              <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-[#D5B03A]/45" />
+              <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#D5B03A]/45" />
+
+              {/* Right Bow Loop */}
+              <div className="absolute left-[-8px] top-[0px] w-6 h-8 rounded-full border-[1.5px] border-[#D5B03A] bg-[#A36662] rotate-[15deg] shadow-sm z-40" />
+              
+              {/* Right Ribbon V-tail */}
+              <div 
+                className="absolute left-[-4px] top-[18px] w-3.5 h-6 bg-[#A36662] rotate-[-35deg] origin-top-right z-35" 
+                style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%)" }}
+              />
+
+              {/* Right Bow Center Knot half */}
+              <div className="absolute left-[-3px] top-[8px] w-1.5 h-4 bg-[#D5B03A] rounded-r-sm z-50 shadow-[-1px_0_2px_rgba(0,0,0,0.15)]" />
+            </div>
+
+            {/* Repositioned Cover Date (Below the Ribbon) */}
+            <div className="absolute left-4 bottom-[18%] select-none z-10 text-left">
+              <span className="font-cormorant text-[0.7rem] sm:text-[0.75rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
+                2026
+              </span>
             </div>
           </motion.div>
 
