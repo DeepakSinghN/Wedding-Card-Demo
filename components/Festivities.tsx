@@ -125,27 +125,27 @@ function EventCard({ event }: { event: EventDetails }) {
             </div>
 
             {/* 3. Event Title */}
-            <div className="w-full text-center">
-              <h3 className="font-distrela text-2xl sm:text-[1.7rem] text-[#7A1C2C] font-bold tracking-wide leading-none">
+            <div className="w-full text-center ">
+              <h3 className="font-distrela text-3xl sm:text-[1.9rem] text-[#7A1C2C] font-bold tracking-wide leading-tight">
                 {event.title}
               </h3>
             </div>
 
             {/* 4. Timing & Location Details */}
-            <div className="text-center w-full px-2 select-none flex-grow flex flex-col justify-center gap-1 sm:gap-2">
-              <p className="font-cormorant text-xs sm:text-sm text-[#A36662] font-semibold leading-none">
+            <div className="text-center w-full px-2 select-none flex-grow flex flex-col justify-center gap-1.5 sm:gap-2.5">
+              <p className="font-cormorant text-sm sm:text-base text-[#A36662] font-semibold leading-normal">
                 {event.dateTime}
               </p>
-              <p className="font-cormorant italic text-sm sm:text-base text-[#8F5E52] leading-tight font-semibold">
+              <p className="font-cormorant italic text-[1.1rem] sm:text-[1.25rem] text-[#8F5E52] leading-relaxed font-bold">
                 {event.location}
               </p>
 
               {/* Dress Code Block */}
-              <div className="w-full border-t border-[#A36662]/10 pt-2 flex flex-col items-center justify-center">
-                <span className="font-sans text-[0.55rem] uppercase tracking-wider text-[#A36662]/70 font-bold block select-none">
+              <div className="w-full border-t border-[#A36662]/10 pt-2.5 flex flex-col items-center justify-center">
+                <span className="font-sans text-[0.65rem] sm:text-[0.7rem] uppercase tracking-wider text-[#A36662]/75 font-bold block select-none">
                   Dress Code
                 </span>
-                <span className="font-cormorant font-bold text-xs sm:text-sm text-[#7A1C2C] mt-0.5">
+                <span className="font-cormorant font-bold text-sm sm:text-[1.05rem] text-[#7A1C2C] mt-0.5">
                   {event.dressCode}
                 </span>
               </div>
@@ -157,9 +157,9 @@ function EventCard({ event }: { event: EventDetails }) {
                 href={event.mapLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#8F5E52] hover:bg-[#764b41] text-white font-sans font-bold uppercase tracking-[0.2em] text-[0.6rem] sm:text-[0.65rem] text-center shadow-md transition-all duration-300 transform active:scale-95"
+                className="flex items-center justify-center gap-2 px-8 py-3 rounded-full bg-[#8F5E52] hover:bg-[#764b41] text-white font-sans font-bold uppercase tracking-[0.2em] text-[0.65rem] sm:text-[0.7rem] text-center shadow-md transition-all duration-300 transform active:scale-95"
               >
-                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -192,17 +192,17 @@ function EventCard({ event }: { event: EventDetails }) {
             <div className="text-[10px] text-[#A36662]/20 font-serif absolute bottom-4 left-4 pointer-events-none">❖</div>
 
             {/* Repositioned Cover Text (Above the Ribbon) */}
-            <div className="absolute right-4 top-[18%] select-none z-10 text-right flex flex-col items-end">
-              <span className="font-cormorant text-[0.55rem] sm:text-[0.6rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1 font-bold">
+            <div className="absolute right-5 top-[16%] select-none z-10 text-right flex flex-col items-end">
+              <span className="font-cormorant text-[0.65rem] sm:text-[0.75rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1.5 font-bold">
                 INVITATION
               </span>
-              <h3 className="font-distrela text-lg sm:text-2xl text-[#7A1C2C] font-bold leading-none">
+              <h3 className="font-distrela text-xl sm:text-3xl text-[#7A1C2C] font-bold leading-none">
                 {firstWord}
               </h3>
             </div>
 
             {/* Left Cream Ribbon Band and Bow Half */}
-            <div 
+            <div
               style={{
                 backgroundImage: "linear-gradient(to bottom, #E8DFD8 0%, #FAF4EF 25%, #FCF9F6 50%, #FAF4EF 75%, #E8DFD8 100%)",
                 boxShadow: "0 3px 8px rgba(163, 102, 98, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9)"
@@ -214,35 +214,35 @@ function EventCard({ event }: { event: EventDetails }) {
               <div className="absolute bottom-[3px] left-0 right-0 h-[1px] bg-[#D5B03A]/60" />
 
               {/* Left Bow Loop */}
-              <div 
+              <div
                 style={{
                   backgroundImage: "linear-gradient(to bottom, #EAE1DA 0%, #FCF9F6 50%, #E3D8CE 100%)",
                   boxShadow: "inset 0 2px 3px rgba(255, 255, 255, 0.9), inset 0 -3px 6px rgba(163, 102, 98, 0.15), 0 3px 6px rgba(163, 102, 98, 0.12)"
                 }}
-                className="absolute right-[-8px] top-[0px] w-6 h-8 rounded-full border-[1.5px] border-[#D5B03A]/85 rotate-[-15deg] z-40" 
+                className="absolute right-[-8px] top-[0px] w-6 h-8 rounded-full border-[1.5px] border-[#D5B03A]/85 rotate-[-15deg] z-40"
               />
-              
+
               {/* Left Ribbon V-tail */}
-              <div 
-                className="absolute right-[-4px] top-[18px] w-3.5 h-6 rotate-[35deg] origin-top-left z-35" 
-                style={{ 
+              <div
+                className="absolute right-[-4px] top-[18px] w-3.5 h-6 rotate-[35deg] origin-top-left z-35"
+                style={{
                   clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%)",
                   backgroundImage: "linear-gradient(to bottom, #EAE1DA, #D8CCC2)"
                 }}
               />
 
               {/* Left Bow Center Knot half */}
-              <div 
+              <div
                 style={{
                   backgroundImage: "linear-gradient(to bottom, #D5B03A, #BFA030, #D5B03A)"
                 }}
-                className="absolute right-[-3px] top-[8px] w-1.5 h-4 rounded-l-sm border-[1px] border-r-0 border-[#D5B03A] z-50 shadow-[1px_0_2px_rgba(0,0,0,0.15)]" 
+                className="absolute right-[-3px] top-[8px] w-1.5 h-4 rounded-l-sm border-[1px] border-r-0 border-[#D5B03A] z-50 shadow-[1px_0_2px_rgba(0,0,0,0.15)]"
               />
             </div>
 
             {/* Repositioned Cover Date (Below the Ribbon) */}
-            <div className="absolute right-4 bottom-[18%] select-none z-10 text-right">
-              <span className="font-cormorant text-[0.7rem] sm:text-[0.75rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
+            <div className="absolute right-5 bottom-[16%] select-none z-10 text-right">
+              <span className="font-cormorant text-[0.8rem] sm:text-[0.9rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
                 {event.dateTime.includes("Nov 27") ? "NOV 27" : event.dateTime.includes("Nov 28") ? "NOV 28" : "NOV 29"}
               </span>
             </div>
@@ -272,17 +272,17 @@ function EventCard({ event }: { event: EventDetails }) {
             <div className="text-[10px] text-[#A36662]/20 font-serif absolute bottom-4 right-4 pointer-events-none">❖</div>
 
             {/* Repositioned Cover Text (Above the Ribbon) */}
-            <div className="absolute left-4 top-[18%] select-none z-10 text-left flex flex-col items-start">
-              <span className="font-cormorant text-[0.55rem] sm:text-[0.6rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1 font-bold">
+            <div className="absolute left-5 top-[16%] select-none z-10 text-left flex flex-col items-start">
+              <span className="font-cormorant text-[0.65rem] sm:text-[0.75rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1.5 font-bold">
                 TO ATTEND
               </span>
-              <h3 className="font-distrela text-lg sm:text-2xl text-[#7A1C2C] font-bold leading-none">
+              <h3 className="font-distrela text-xl sm:text-3xl text-[#7A1C2C] font-bold leading-none">
                 {secondWord}
               </h3>
             </div>
 
             {/* Right Cream Ribbon Band and Bow Half */}
-            <div 
+            <div
               style={{
                 backgroundImage: "linear-gradient(to bottom, #E8DFD8 0%, #FAF4EF 25%, #FCF9F6 50%, #FAF4EF 75%, #E8DFD8 100%)",
                 boxShadow: "0 3px 8px rgba(163, 102, 98, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9)"
@@ -294,35 +294,35 @@ function EventCard({ event }: { event: EventDetails }) {
               <div className="absolute bottom-[3px] left-0 right-0 h-[1px] bg-[#D5B03A]/60" />
 
               {/* Right Bow Loop */}
-              <div 
+              <div
                 style={{
                   backgroundImage: "linear-gradient(to bottom, #EAE1DA 0%, #FCF9F6 50%, #E3D8CE 100%)",
                   boxShadow: "inset 0 2px 3px rgba(255, 255, 255, 0.9), inset 0 -3px 6px rgba(163, 102, 98, 0.15), 0 3px 6px rgba(163, 102, 98, 0.12)"
                 }}
-                className="absolute left-[-8px] top-[0px] w-6 h-8 rounded-full border-[1.5px] border-[#D5B03A]/85 rotate-[15deg] z-40" 
+                className="absolute left-[-8px] top-[0px] w-6 h-8 rounded-full border-[1.5px] border-[#D5B03A]/85 rotate-[15deg] z-40"
               />
-              
+
               {/* Right Ribbon V-tail */}
-              <div 
-                className="absolute left-[-4px] top-[18px] w-3.5 h-6 rotate-[-35deg] origin-top-right z-35" 
-                style={{ 
+              <div
+                className="absolute left-[-4px] top-[18px] w-3.5 h-6 rotate-[-35deg] origin-top-right z-35"
+                style={{
                   clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%)",
                   backgroundImage: "linear-gradient(to bottom, #EAE1DA, #D8CCC2)"
                 }}
               />
 
               {/* Right Bow Center Knot half */}
-              <div 
+              <div
                 style={{
                   backgroundImage: "linear-gradient(to bottom, #D5B03A, #BFA030, #D5B03A)"
                 }}
-                className="absolute left-[-3px] top-[8px] w-1.5 h-4 rounded-r-sm border-[1px] border-l-0 border-[#D5B03A] z-50 shadow-[-1px_0_2px_rgba(0,0,0,0.15)]" 
+                className="absolute left-[-3px] top-[8px] w-1.5 h-4 rounded-r-sm border-[1px] border-l-0 border-[#D5B03A] z-50 shadow-[-1px_0_2px_rgba(0,0,0,0.15)]"
               />
             </div>
 
             {/* Repositioned Cover Date (Below the Ribbon) */}
-            <div className="absolute left-4 bottom-[18%] select-none z-10 text-left">
-              <span className="font-cormorant text-[0.7rem] sm:text-[0.75rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
+            <div className="absolute left-5 bottom-[16%] select-none z-10 text-left">
+              <span className="font-cormorant text-[0.8rem] sm:text-[0.9rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
                 2026
               </span>
             </div>
