@@ -125,7 +125,7 @@ function EventCard({ event }: { event: EventDetails }) {
             </div>
 
             {/* 3. Event Title */}
-            <div className="w-full text-center ">
+            <div className="w-full text-center py-0.5">
               <h3 className="font-distrela text-3xl sm:text-[1.9rem] text-[#7A1C2C] font-bold tracking-wide leading-tight">
                 {event.title}
               </h3>
@@ -193,10 +193,10 @@ function EventCard({ event }: { event: EventDetails }) {
 
             {/* Repositioned Cover Text (Above the Ribbon) */}
             <div className="absolute right-5 top-[16%] select-none z-10 text-right flex flex-col items-end">
-              <span className="font-cormorant text-[0.65rem] sm:text-[0.75rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1.5 font-bold">
+              <span className="font-cormorant text-[0.75rem] sm:text-[0.8rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1.5 font-bold">
                 INVITATION
               </span>
-              <h3 className="font-distrela text-xl sm:text-3xl text-[#7A1C2C] font-bold leading-none">
+              <h3 className="font-cormorant text-2xl sm:text-3xl text-[#7A1C2C] font-bold leading-none">
                 {firstWord}
               </h3>
             </div>
@@ -242,7 +242,7 @@ function EventCard({ event }: { event: EventDetails }) {
 
             {/* Repositioned Cover Date (Below the Ribbon) */}
             <div className="absolute right-5 bottom-[16%] select-none z-10 text-right">
-              <span className="font-cormorant text-[0.8rem] sm:text-[0.9rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
+              <span className="font-cormorant text-[0.9rem] sm:text-[0.95rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
                 {event.dateTime.includes("Nov 27") ? "NOV 27" : event.dateTime.includes("Nov 28") ? "NOV 28" : "NOV 29"}
               </span>
             </div>
@@ -273,10 +273,10 @@ function EventCard({ event }: { event: EventDetails }) {
 
             {/* Repositioned Cover Text (Above the Ribbon) */}
             <div className="absolute left-5 top-[16%] select-none z-10 text-left flex flex-col items-start">
-              <span className="font-cormorant text-[0.65rem] sm:text-[0.75rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1.5 font-bold">
+              <span className="font-cormorant text-[0.75rem] sm:text-[0.8rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1.5 font-bold">
                 TO ATTEND
               </span>
-              <h3 className="font-distrela text-xl sm:text-3xl text-[#7A1C2C] font-bold leading-none">
+              <h3 className="font-distrela text-2xl sm:text-3xl text-[#7A1C2C] font-bold leading-none">
                 {secondWord}
               </h3>
             </div>
@@ -322,7 +322,7 @@ function EventCard({ event }: { event: EventDetails }) {
 
             {/* Repositioned Cover Date (Below the Ribbon) */}
             <div className="absolute left-5 bottom-[16%] select-none z-10 text-left">
-              <span className="font-cormorant text-[0.8rem] sm:text-[0.9rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
+              <span className="font-cormorant text-[0.9rem] sm:text-[0.95rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
                 2026
               </span>
             </div>
