@@ -178,8 +178,8 @@ function EventCard({ event }: { event: EventDetails }) {
               rotateY: isOpen ? -145 : 0,
             }}
             transition={{
-              duration: 0.85,
-              ease: [0.25, 1, 0.5, 1],
+              duration: 1.4,
+              ease: [0.16, 1, 0.3, 1],
             }}
             className="absolute left-0 top-0 w-1/2 h-full bg-[#FDFAF7] border border-[#A36662]/15 border-r-0 rounded-l-[32px] overflow-hidden z-20 p-4"
           >
@@ -192,11 +192,11 @@ function EventCard({ event }: { event: EventDetails }) {
             <div className="text-[10px] text-[#A36662]/20 font-serif absolute bottom-4 left-4 pointer-events-none">❖</div>
 
             {/* Repositioned Cover Text (Above the Ribbon) */}
-            <div className="absolute right-5 top-[16%] select-none z-10 text-right flex flex-col items-end">
+            <div className="absolute right-5 top-[20%] select-none z-10 text-right flex flex-col items-end">
               <span className="font-cormorant text-[0.75rem] sm:text-[0.8rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1.5 font-bold">
                 INVITATION
               </span>
-              <h3 className="font-cormorant text-2xl sm:text-3xl text-[#7A1C2C] font-bold leading-none">
+              <h3 className="font-cormorant text-3xl sm:text-4xl text-[#7A1C2C] font-bold leading-none">
                 {firstWord}
               </h3>
             </div>
@@ -241,8 +241,8 @@ function EventCard({ event }: { event: EventDetails }) {
             </div>
 
             {/* Repositioned Cover Date (Below the Ribbon) */}
-            <div className="absolute right-5 bottom-[16%] select-none z-10 text-right">
-              <span className="font-cormorant text-[0.9rem] sm:text-[0.95rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
+            <div className="absolute right-5 bottom-[20%] select-none z-10 text-right">
+              <span className="font-cormorant text-[1rem] sm:text-[0.95rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
                 {event.dateTime.includes("Nov 27") ? "NOV 27" : event.dateTime.includes("Nov 28") ? "NOV 28" : "NOV 29"}
               </span>
             </div>
@@ -258,8 +258,8 @@ function EventCard({ event }: { event: EventDetails }) {
               rotateY: isOpen ? 145 : 0,
             }}
             transition={{
-              duration: 0.85,
-              ease: [0.25, 1, 0.5, 1],
+              duration: 1.4,
+              ease: [0.16, 1, 0.3, 1],
             }}
             className="absolute right-0 top-0 w-1/2 h-full bg-[#FDFAF7] border border-[#A36662]/15 border-l-0 rounded-r-[32px] overflow-hidden z-20 p-4"
           >
@@ -272,11 +272,11 @@ function EventCard({ event }: { event: EventDetails }) {
             <div className="text-[10px] text-[#A36662]/20 font-serif absolute bottom-4 right-4 pointer-events-none">❖</div>
 
             {/* Repositioned Cover Text (Above the Ribbon) */}
-            <div className="absolute left-5 top-[16%] select-none z-10 text-left flex flex-col items-start">
+            <div className="absolute left-5 top-[20%] select-none z-10 text-left flex flex-col items-start">
               <span className="font-cormorant text-[0.75rem] sm:text-[0.8rem] tracking-[0.25em] text-[#A36662]/80 uppercase mb-1.5 font-bold">
                 TO ATTEND
               </span>
-              <h3 className="font-distrela text-2xl sm:text-3xl text-[#7A1C2C] font-bold leading-none">
+              <h3 className="font-cormorant text-3xl sm:text-4xl text-[#7A1C2C] font-bold leading-none">
                 {secondWord}
               </h3>
             </div>
@@ -321,8 +321,8 @@ function EventCard({ event }: { event: EventDetails }) {
             </div>
 
             {/* Repositioned Cover Date (Below the Ribbon) */}
-            <div className="absolute left-5 bottom-[16%] select-none z-10 text-left">
-              <span className="font-cormorant text-[0.9rem] sm:text-[0.95rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
+            <div className="absolute left-5 bottom-[20%] select-none z-10 text-left">
+              <span className="font-cormorant text-[1rem] sm:text-[0.95rem] tracking-[0.2em] text-[#A36662] uppercase font-bold">
                 2026
               </span>
             </div>
