@@ -72,7 +72,7 @@ export default function ParallaxHeader({
         className={`font-cormorant italic text-[clamp(2.5rem,5.2vw,4.5rem)] text-[#7A1C2C] tracking-wide leading-none font-bold mt-2 z-10 flex flex-wrap justify-center gap-x-[0.25em] ${titleClassName}`}
       >
         {titleWords.map((word, idx) => (
-          <span key={idx} className="overflow-hidden inline-block py-1">
+          <span key={idx} className="inline-block py-1">
             <motion.span
               initial={{ y: "100%" }}
               whileInView={{ y: 0 }}
