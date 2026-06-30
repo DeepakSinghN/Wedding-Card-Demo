@@ -178,7 +178,7 @@ function EventCard({ event }: { event: EventDetails }) {
               rotateY: isOpen ? -145 : 0,
             }}
             transition={{
-              duration: 1.4,
+              duration: 3,
               ease: [0.16, 1, 0.3, 1],
             }}
             className="absolute left-0 top-0 w-1/2 h-full bg-[#FDFAF7] border border-[#A36662]/15 border-r-0 rounded-l-[32px] overflow-hidden z-20 p-4"
@@ -258,7 +258,7 @@ function EventCard({ event }: { event: EventDetails }) {
               rotateY: isOpen ? 145 : 0,
             }}
             transition={{
-              duration: 1.4,
+              duration: 3,
               ease: [0.16, 1, 0.3, 1],
             }}
             className="absolute right-0 top-0 w-1/2 h-full bg-[#FDFAF7] border border-[#A36662]/15 border-l-0 rounded-r-[32px] overflow-hidden z-20 p-4"
