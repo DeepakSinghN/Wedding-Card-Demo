@@ -164,6 +164,7 @@ const LotusMedallion = ({ isBlooming, onClick }: { isBlooming: boolean; onClick:
 };
 
 export default function RSVP() {
+  const sectionRef = useRef<HTMLDivElement>(null);
   const [envelopeState, setEnvelopeState] = useState<EnvelopeState>("sealed");
   const [isBlooming, setIsBlooming] = useState(false);
 
@@ -224,6 +225,19 @@ export default function RSVP() {
     setErrors({});
     setEnvelopeState("folding");
 
+    // Scroll to center the RSVP section in the viewport to avoid jumping to the footer
+    const section = sectionRef.current;
+    if (section) {
+      const lenis = (window as any).lenis;
+      const rect = section.getBoundingClientRect();
+      const scrollTop = window.scrollY + rect.top;
+      if (lenis) {
+        lenis.scrollTo(scrollTop, { duration: 0.8 });
+      } else {
+        window.scrollTo({ top: scrollTop, behavior: "smooth" });
+      }
+    }
+
     // Let the envelope seal close, wax seal stamp down, and fly away
     setTimeout(() => {
       setEnvelopeState("sent");
@@ -231,7 +245,7 @@ export default function RSVP() {
   };
 
   return (
-    <section className="w-full bg-[#FAF4EF] relative py-20 px-6 border-t border-[#A36662]/5 overflow-hidden flex flex-col items-center justify-center min-h-screen">
+    <section ref={sectionRef} className="w-full bg-[#FAF4EF] relative py-20 px-6 border-t border-[#A36662]/5 overflow-hidden flex flex-col items-center justify-center min-h-screen">
       {/* Decorative luxurious inner border frame */}
       <div className="absolute inset-4 md:inset-8 border border-[#A36662]/5 rounded-[28px] pointer-events-none z-30" />
       <div className="absolute inset-5 md:inset-9 border border-dashed border-[#A36662]/8 rounded-[26px] pointer-events-none z-30" />
