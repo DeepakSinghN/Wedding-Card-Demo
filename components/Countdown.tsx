@@ -70,9 +70,7 @@ export default function Countdown({ active }: CountdownProps) {
         }
       }}
     >
-      {/* Decorative luxurious inner border frame */}
-      <div className="absolute inset-4 md:inset-8 border border-[#A36662]/5 rounded-[28px] pointer-events-none" />
-      <div className="absolute inset-5 md:inset-9 border border-dashed border-[#A36662]/8 rounded-[26px] pointer-events-none" />
+
 
       {/* Premium Card Container with Backlight Glow Aura */}
       <div className="relative w-full max-w-xl z-10 flex justify-center items-center">

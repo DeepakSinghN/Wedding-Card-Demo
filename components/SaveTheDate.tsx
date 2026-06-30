@@ -44,9 +44,7 @@ export default function SaveTheDate({ onAllRevealed }: SaveTheDateProps = {}) {
       {/* Celebration Confetti Popper */}
       <Confetti trigger={confettiActive} />
 
-      {/* Decorative luxurious inner border frame */}
-      <div className="absolute inset-4 md:inset-8 border border-[#A36662]/5 rounded-[28px] pointer-events-none" />
-      <div className="absolute inset-5 md:inset-9 border border-dashed border-[#A36662]/8 rounded-[26px] pointer-events-none" />
+
 
       {/* Heading Block */}
       <ScrollReveal animation="fade-in-down" className="flex flex-col items-center text-center z-10 w-full max-w-xl gap-2 md:gap-3 mb-10">

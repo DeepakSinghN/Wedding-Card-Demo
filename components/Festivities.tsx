@@ -354,9 +354,7 @@ export default function Festivities() {
     <section
       className="w-full bg-[#FAF4EF] relative flex flex-col items-center justify-center overflow-hidden py-24 px-6 border-t border-[#A36662]/5 min-h-screen"
     >
-      {/* Decorative luxurious inner border frame */}
-      <div className="absolute inset-4 md:inset-8 border border-[#A36662]/5 rounded-[28px] pointer-events-none z-30" />
-      <div className="absolute inset-5 md:inset-9 border border-dashed border-[#A36662]/8 rounded-[26px] pointer-events-none z-30" />
+
 
       {/* Center Heading Block */}
       <ParallaxHeader
