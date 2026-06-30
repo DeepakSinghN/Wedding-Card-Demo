@@ -3,6 +3,7 @@
 import React, { useRef } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import ParallaxHeader from "./ParallaxHeader";
 
 export default function Venue() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -113,14 +114,13 @@ export default function Venue() {
       <div className="absolute inset-5 md:inset-9 border border-dashed border-[#A36662]/8 rounded-[26px] pointer-events-none z-30" />
 
       {/* Center Heading Block */}
-      <div className="flex flex-col items-center text-center w-full max-w-xl mx-auto gap-1 md:gap-2 pt-8 pb-4 px-6 z-30 select-none">
-        <span className="font-cormorant tracking-[0.25em] text-[0.8rem] md:text-[0.9rem] text-[#A36662] uppercase font-semibold">
-          The Celebration
-        </span>
-        <h2 className="font-distrela text-[clamp(2.5rem,5.2vw,4.5rem)] text-[#7A1C2C] tracking-wide leading-none font-bold mt-2">
-          The Venue
-        </h2>
-      </div>
+      <ParallaxHeader
+        category="The Celebration"
+        title="The Venue"
+        backgroundText="VENUE"
+        titleClassName="font-distrela"
+        className="pt-8 pb-4 px-6 z-30"
+      />
 
       {/* 3-Tiered Animation Card Container */}
       {/* Tier 1: Parallax Scroll Entry */}

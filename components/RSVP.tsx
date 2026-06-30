@@ -3,6 +3,7 @@
 import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import ParallaxHeader from "./ParallaxHeader";
 
 type EnvelopeState = "sealed" | "unfolding" | "open" | "folding" | "sent";
 
@@ -183,18 +184,11 @@ export default function RSVP() {
   // Validation States
   const [errors, setErrors] = useState<{ name?: string; phone?: string; attending?: string }>({});
 
-  const handleBreakSeal = () => {
-    setEnvelopeState("unfolding");
-    setTimeout(() => {
-      setEnvelopeState("open");
-    }, 900); // match unfolding animation
-  };
-
   const handleBloom = () => {
     setIsBlooming(true);
     setTimeout(() => {
-      handleBreakSeal();
-    }, 600); // Wait for bloom to finish before unfolding flap
+      setEnvelopeState("open");
+    }, 600); // Go straight to open form card!
   };
 
   const handleIncrement = () => {
@@ -243,14 +237,13 @@ export default function RSVP() {
       <div className="absolute inset-5 md:inset-9 border border-dashed border-[#A36662]/8 rounded-[26px] pointer-events-none z-30" />
 
       {/* Heading Block */}
-      <div className="flex flex-col items-center text-center w-full max-w-xl mx-auto gap-1 md:gap-2 pb-6 px-6 z-30 select-none">
-        <span className="font-cormorant tracking-[0.25em] text-[0.8rem] md:text-[0.9rem] text-[#A36662] uppercase font-semibold">
-          Guest Registry
-        </span>
-        <h2 className="font-distrela text-[clamp(2.5rem,5.2vw,4.5rem)] text-[#7A1C2C] tracking-wide leading-none font-bold mt-2">
-          RSVP
-        </h2>
-      </div>
+      <ParallaxHeader
+        category="Guest Registry"
+        title="RSVP"
+        backgroundText="INVITATION"
+        titleClassName="font-distrela"
+        className="pb-6 px-6 z-30"
+      />
 
       <div className="w-full max-w-[340px] sm:max-w-[380px] md:max-w-[400px] flex justify-center z-10 min-h-[620px] relative">
         <AnimatePresence mode="wait">
@@ -262,7 +255,7 @@ export default function RSVP() {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              transition={{ duration: 0.4 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
               className="w-full bg-[#FDFAF7] border border-[#A36662]/15 rounded-[32px] p-6 flex flex-col items-center justify-center shadow-[0_20px_50px_rgba(163,102,98,0.18)] hover:shadow-[0_35px_70px_rgba(163,102,98,0.26)] transition-shadow duration-300 relative aspect-[9/16]"
             >
               {/* Background Texture Image Layer */}
@@ -298,34 +291,14 @@ export default function RSVP() {
             </motion.div>
           )}
 
-          {/* State 2: UNFOLDING SIMULATION */}
-          {envelopeState === "unfolding" && (
-            <motion.div
-              key="unfolding"
-              initial={{ scale: 1 }}
-              animate={{ scale: 1.02 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8 }}
-              className="w-full bg-[#FDFAF7] border border-[#A36662]/15 rounded-[32px] flex items-center justify-center shadow-xl relative aspect-[3/4]"
-            >
-              {/* Unfolding wax seal breaking animation */}
-              <motion.div
-                initial={{ scale: 1, opacity: 1 }}
-                animate={{ scale: 1.6, opacity: 0 }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="w-24 h-24 rounded-full bg-gradient-to-br from-[#D4AF37] via-[#F3E5AB] to-[#AA7C11] flex items-center justify-center border-2 border-[#AA7C11]"
-              />
-            </motion.div>
-          )}
-
           {/* State 3: GUEST LEDGER CARD (Open Envelope) */}
           {envelopeState === "open" && (
             <motion.div
               key="open-ledger"
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               className="w-full bg-[#FDFAF7] border border-[#A36662]/15 rounded-[32px] p-4 sm:p-5 shadow-[0_25px_60px_rgba(163,102,98,0.2)] relative"
             >
               {/* Background Texture Image Layer */}
@@ -570,7 +543,7 @@ export default function RSVP() {
                 className="w-24 h-24 rounded-full bg-gradient-to-br from-[#D4AF37] via-[#F3E5AB] to-[#AA7C11] border-[3px] border-[#AA7C11] flex flex-col items-center justify-center shadow-md"
               >
                 <span className="font-distrela text-2xl text-[#7A1C2C] font-black select-none">
-                  A & S
+                  M & A
                 </span>
               </motion.div>
             </motion.div>
@@ -624,7 +597,7 @@ export default function RSVP() {
                   Warmest Regards,
                 </span>
                 <span className="font-cormorant font-bold text-sm text-[#7A1C2C] mt-0.5 select-none">
-                  Aditya & Shreya
+                  Meenal & Avinash
                 </span>
               </div>
             </motion.div>

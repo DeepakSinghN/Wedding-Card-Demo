@@ -3,6 +3,7 @@
 import React, { useRef, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import ParallaxHeader from "./ParallaxHeader";
 
 interface EventDetails {
   id: string;
@@ -358,14 +359,12 @@ export default function Festivities() {
       <div className="absolute inset-5 md:inset-9 border border-dashed border-[#A36662]/8 rounded-[26px] pointer-events-none z-30" />
 
       {/* Center Heading Block */}
-      <div className="flex flex-col items-center text-center w-full max-w-xl mx-auto gap-1 md:gap-2 pb-8 px-6 z-30 select-none">
-        <span className="font-cormorant tracking-[0.25em] text-[0.8rem] md:text-[0.9rem] text-[#A36662] uppercase font-semibold">
-          The Celebration
-        </span>
-        <h2 className="font-cormorant italic text-[clamp(2.5rem,5.2vw,4.5rem)] text-[#7A1C2C] tracking-wide leading-none font-bold mt-2">
-          Festivities
-        </h2>
-      </div>
+      <ParallaxHeader
+        category="The Celebration"
+        title="Festivities"
+        backgroundText="EVENTS"
+        className="pb-8 px-6 z-30"
+      />
 
       {/* Vertical Cards List Column Wrapper */}
       <div className="w-full max-w-[340px] sm:max-w-[410px] md:max-w-[460px] flex flex-col gap-10 md:gap-14 items-center z-10 relative">

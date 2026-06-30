@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform, MotionValue } from "framer-motion";
 import { Backlight } from "./ui/backlight";
+import ParallaxHeader from "./ParallaxHeader";
 
 interface CardData {
   id: number;
@@ -33,16 +34,8 @@ const Card = ({
   range: [number, number];
   targetScale: number;
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Track local scroll progress for photo zoom parallax
-  const { scrollYProgress: cardScroll } = useScroll({
-    target: containerRef,
-    offset: ["start end", "start start"],
-  });
-
-  // Zoom photo image down as card enters screen
-  const imageScale = useTransform(cardScroll, [0, 1], [1.2, 1]);
+  // Zoom photo image down as card enters screen (using shared parent progress to avoid layout thrashing)
+  const imageScale = useTransform(progress, [range[0] - 0.25, range[0]], [1.2, 1.0], { clamp: true });
 
   // Scale down card as subsequent cards stack on top of it
   const scale = useTransform(progress, range, [1, targetScale]);
@@ -52,7 +45,6 @@ const Card = ({
 
   return (
     <div
-      ref={containerRef}
       className="w-full min-h-[60vh] md:min-h-[75vh] flex justify-center items-start sticky top-[20vh] md:top-[23vh]"
       style={{
         // Padding offset ensures previous cards' tops remain visible
@@ -118,19 +110,14 @@ export default function Gallery() {
       <div className="absolute inset-4 md:inset-8 border border-[#A36662]/5 rounded-[28px] pointer-events-none z-30" />
       <div className="absolute inset-5 md:inset-9 border border-dashed border-[#A36662]/8 rounded-[26px] pointer-events-none z-30" />
 
-      {/* Sticky Header Wrapper spanning full w idth */}
+      {/* Sticky Header Wrapper spanning full width */}
       <div className="w-full sticky top-0 z-30 bg-[#FAF4EF]">
-        <div className="flex flex-col items-center text-center w-full max-w-xl mx-auto gap-1 md:gap-2 pt-12 pb-4 md:pt-16 md:pb-4 px-6">
-          {/* OUR STORY (Uppercase letter-spaced serif style) */}
-          <span className="font-cormorant tracking-[0.25em] text-[0.8rem] md:text-[0.9rem] text-[#A36662] uppercase font-semibold">
-            Our Story
-          </span>
-
-          {/* Forever Us (Luxury Serif tracking style) */}
-          <h2 className="font-cormorant italic text-[clamp(2.5rem,5.2vw,4.5rem)] text-[#7A1C2C] tracking-wide leading-none font-bold mt-2">
-            Forever Us
-          </h2>
-        </div>
+        <ParallaxHeader
+          category="Our Story"
+          title="Forever Us"
+          backgroundText="GALLERY"
+          className="pt-12 pb-4 md:pt-16 md:pb-4 px-6"
+        />
       </div>
 
       {/* Cards Stack Parent List */}

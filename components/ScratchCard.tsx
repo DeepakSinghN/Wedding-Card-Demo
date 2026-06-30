@@ -99,8 +99,9 @@ export default function ScratchCard({
   const [isHovered, setIsHovered] = useState(false);
 
   // Upgrade refs
-  const scratchStrokes = useRef<{ x: number; y: number }[][]>([]);
   const sparkles = useRef<{ x: number; y: number; vx: number; vy: number; size: number; opacity: number }[]>([]);
+  const offscreenCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const offscreenCtxRef = useRef<CanvasRenderingContext2D | null>(null);
   const hoverCoordsRef = useRef<{ x: number; y: number } | null>(null);
   const synthRef = useRef<ScratchAudioSynthesizer | null>(null);
   const isAnimatingRef = useRef(false);
@@ -159,6 +160,17 @@ export default function ScratchCard({
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
 
+    // Initialize offscreen canvas for scratch mask blitting
+    const offscreen = document.createElement("canvas");
+    offscreen.width = width * dpr;
+    offscreen.height = height * dpr;
+    const offscreenCtx = offscreen.getContext("2d");
+    if (offscreenCtx) {
+      offscreenCtx.scale(dpr, dpr);
+    }
+    offscreenCanvasRef.current = offscreen;
+    offscreenCtxRef.current = offscreenCtx;
+
     // Dynamic Redraw Function
     const redraw = () => {
       ctx.globalCompositeOperation = "source-over";
@@ -203,28 +215,9 @@ export default function ScratchCard({
 
       // Erase scratched paths smoothly
       ctx.globalCompositeOperation = "destination-out";
-      ctx.strokeStyle = "rgba(0,0,0,1)";
-      ctx.lineWidth = 44; // diameter of stroke (double the old 22px arc radius)
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.fillStyle = "rgba(0,0,0,1)";
-
-      scratchStrokes.current.forEach((stroke) => {
-        if (stroke.length === 0) return;
-        
-        ctx.beginPath();
-        ctx.moveTo(stroke[0].x, stroke[0].y);
-        for (let i = 1; i < stroke.length; i++) {
-          ctx.lineTo(stroke[i].x, stroke[i].y);
-        }
-        
-        if (stroke.length === 1) {
-          ctx.arc(stroke[0].x, stroke[0].y, 22, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
-          ctx.stroke();
-        }
-      });
+      if (offscreenCanvasRef.current) {
+        ctx.drawImage(offscreenCanvasRef.current, 0, 0, width, height);
+      }
 
       // Draw active sparkles
       ctx.globalCompositeOperation = "source-over";
@@ -309,12 +302,6 @@ export default function ScratchCard({
       const coords = getCoords(e);
       if (!coords) return;
 
-      // Add coordinate to active stroke
-      const currentStroke = scratchStrokes.current[scratchStrokes.current.length - 1];
-      if (currentStroke) {
-        currentStroke.push(coords);
-      }
-
       // Synthesize scratch sound modulated by cursor speed
       const now = Date.now();
       let speed = 0;
@@ -325,6 +312,29 @@ export default function ScratchCard({
         const dt = now - lastTimeRef.current;
         if (dt > 0) speed = dist / dt;
       }
+
+      // Draw segment onto offscreen canvas mask
+      const offCtx = offscreenCtxRef.current;
+      if (offCtx) {
+        offCtx.globalCompositeOperation = "source-over";
+        offCtx.strokeStyle = "rgba(0,0,0,1)";
+        offCtx.lineWidth = 44;
+        offCtx.lineCap = "round";
+        offCtx.lineJoin = "round";
+        offCtx.fillStyle = "rgba(0,0,0,1)";
+
+        if (lastPosRef.current) {
+          offCtx.beginPath();
+          offCtx.moveTo(lastPosRef.current.x, lastPosRef.current.y);
+          offCtx.lineTo(coords.x, coords.y);
+          offCtx.stroke();
+        } else {
+          offCtx.beginPath();
+          offCtx.arc(coords.x, coords.y, 22, 0, Math.PI * 2);
+          offCtx.fill();
+        }
+      }
+
       lastPosRef.current = coords;
       lastTimeRef.current = now;
 
@@ -359,28 +369,32 @@ export default function ScratchCard({
 
     const handleStart = (e: MouseEvent | TouchEvent) => {
       isDrawingRef.current = true;
+      lastPosRef.current = null;
       if (synthRef.current) {
         synthRef.current.init();
       }
-      scratchStrokes.current.push([]);
       handleDraw(e);
     };
 
     const checkScratchAmount = () => {
       if (isScratched) return;
 
-      const imgData = ctx.getImageData(0, 0, width * dpr, height * dpr);
+      const offCanvas = offscreenCanvasRef.current;
+      const offCtx = offscreenCtxRef.current;
+      if (!offCanvas || !offCtx) return;
+
+      const imgData = offCtx.getImageData(0, 0, width * dpr, height * dpr);
       const data = imgData.data;
-      let transparent = 0;
+      let scratched = 0;
       const total = data.length / 4;
 
       for (let i = 0; i < data.length; i += 4) {
-        if (data[i + 3] === 0) {
-          transparent++;
+        if (data[i + 3] > 0) {
+          scratched++;
         }
       }
 
-      const percent = (transparent / total) * 100;
+      const percent = (scratched / total) * 100;
       if (percent > 45) { // If 45%+ scratched, reveal the entire card automatically
         setIsScratched(true);
         if (typeof navigator !== "undefined" && navigator.vibrate) {

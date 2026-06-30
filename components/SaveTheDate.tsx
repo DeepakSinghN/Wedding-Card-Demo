@@ -17,7 +17,6 @@ export default function SaveTheDate({ onAllRevealed }: SaveTheDateProps = {}) {
     day: false,
     year: false,
   });
-  const [isLocked, setIsLocked] = useState(false);
   const [confettiActive, setConfettiActive] = useState(false);
 
   const allRevealed = revealed.month && revealed.day && revealed.year;
@@ -36,86 +35,6 @@ export default function SaveTheDate({ onAllRevealed }: SaveTheDateProps = {}) {
 
     return () => clearTimeout(timer);
   }, [allRevealed, onAllRevealed]);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || allRevealed) {
-      setIsLocked(false);
-      return;
-    }
-
-    let timer: NodeJS.Timeout;
-
-    const handleScroll = () => {
-      const section = sectionRef.current;
-      if (!section) return;
-
-      const rect = section.getBoundingClientRect();
-      if (rect.top <= window.innerHeight * 0.75 && rect.top > -rect.height) {
-        window.removeEventListener("scroll", handleScroll);
-        section.scrollIntoView({ behavior: "smooth", block: "center" });
-        timer = setTimeout(() => {
-          setIsLocked(true);
-        }, 600);
-      }
-    };
-
-    handleScroll();
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      if (timer) clearTimeout(timer);
-    };
-  }, [allRevealed]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && (window as any).lenis) {
-      if (isLocked) {
-        (window as any).lenis.stop();
-      } else {
-        (window as any).lenis.start();
-      }
-    }
-
-    if (!isLocked) {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-      return;
-    }
-
-    // Lock scrolling styles
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
-
-    const preventScroll = (e: TouchEvent | WheelEvent) => {
-      if (e.target instanceof HTMLElement && (e.target.tagName === "CANVAS" || e.target.closest(".scratch-card-container"))) {
-        return;
-      }
-      e.preventDefault();
-    };
-
-    const preventKeys = (e: KeyboardEvent) => {
-      const keys = ["Space", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "End", "Home"];
-      if (keys.includes(e.code)) {
-        e.preventDefault();
-      }
-    };
-
-    window.addEventListener("wheel", preventScroll, { passive: false });
-    window.addEventListener("touchmove", preventScroll, { passive: false });
-    window.addEventListener("keydown", preventKeys, { passive: false });
-
-    return () => {
-      if (typeof window !== "undefined" && (window as any).lenis) {
-        (window as any).lenis.start();
-      }
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-      window.removeEventListener("wheel", preventScroll);
-      window.removeEventListener("touchmove", preventScroll);
-      window.removeEventListener("keydown", preventKeys);
-    };
-  }, [isLocked]);
 
   return (
     <section

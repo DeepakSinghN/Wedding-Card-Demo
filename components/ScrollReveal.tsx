@@ -29,9 +29,10 @@ export default function ScrollReveal({
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-        } else {
-          // Reset visibility when element leaves viewport to create a scroll reveal loop
-          setIsVisible(false);
+          // Only animate once: disconnect observer immediately after trigger to stop CPU load
+          if (ref.current) {
+            observer.unobserve(ref.current);
+          }
         }
       },
       {

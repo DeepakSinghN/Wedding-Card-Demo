@@ -6,26 +6,63 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function FloatingControls() {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const explicitActionRef = useRef(false);
 
   // Initialize audio securely on the client
   useEffect(() => {
-    // Royalty-free soft instrumental ambient loop (SoundHelix theme)
-    audioRef.current = new Audio("https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3");
-    audioRef.current.loop = true;
-    audioRef.current.volume = 0.45; // comfortable background volume level
+    // Initialize with local Kesariya wedding song (URL encoded space characters)
+    const audio = new Audio("/Song/kesariya%20for%20wedding%20card.m4a");
+    audio.preload = "auto";
+    audio.loop = true;
+    audio.volume = 0.45; // comfortable background volume level
+    audioRef.current = audio;
+
+    const playAudio = () => {
+      if (explicitActionRef.current) return;
+      audio.play()
+        .then(() => {
+          setIsPlaying(true);
+        })
+        .catch((err) => {
+          console.log("Autoplay blocked, waiting for user interaction:", err);
+        });
+    };
+
+    const handleInteraction = (e: Event) => {
+      // Don't auto-play if the user is explicitly clicking the mute toggle button
+      const target = e.target as HTMLElement;
+      if (target && target.closest("button")?.getAttribute("id") === "audio-toggle-btn") {
+        return;
+      }
+      playAudio();
+    };
+
+    // Attempt direct autoplay immediately on mount
+    playAudio();
+
+    // Fallback: trigger play on first touch, click, or scroll
+    window.addEventListener("click", handleInteraction, { once: true });
+    window.addEventListener("touchstart", handleInteraction, { once: true });
+    window.addEventListener("keydown", handleInteraction, { once: true });
 
     return () => {
+      window.removeEventListener("click", handleInteraction);
+      window.removeEventListener("touchstart", handleInteraction);
+      window.removeEventListener("keydown", handleInteraction);
       if (audioRef.current) {
         audioRef.current.pause();
-        audioRef.current = null;
       }
+      audioRef.current = null;
     };
   }, []);
 
-  const toggleAudio = () => {
+  const toggleAudio = (e: React.MouseEvent) => {
+    e.stopPropagation(); // prevent bubbling to window interaction listeners
     if (!audioRef.current) return;
 
-    if (isPlaying) {
+    explicitActionRef.current = true; // User has explicitly interacted with the mute button
+
+    if (!audioRef.current.paused) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
@@ -33,56 +70,16 @@ export default function FloatingControls() {
         .then(() => setIsPlaying(true))
         .catch((err) => {
           console.warn("Audio playback blocked or failed:", err);
-          // Try to interact directly to allow browser policy bypass
         });
     }
   };
 
   return (
     <>
-      {/* 1. Bottom-Left Pill: CHAT TO GET YOURS */}
-      <div className="fixed bottom-6 left-6 z-40">
-        <motion.a
-          href="https://wa.me/910000000000" // Placeholder WhatsApp link
-          target="_blank"
-          rel="noopener noreferrer"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 px-5 py-3 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-sans text-xs font-bold uppercase tracking-wider shadow-[0_8px_20px_rgba(16,185,129,0.35)] transition-all duration-300 pointer-events-auto border border-emerald-400/20"
-        >
-          {/* Chat / WhatsApp SVG Icon */}
-          <svg className="w-4.5 h-4.5 fill-current" viewBox="0 0 24 24">
-            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.965C16.528 1.977 14.07 1.953 11.986 1.953c-5.437 0-9.865 4.371-9.87 9.8-.002 1.764.464 3.488 1.349 5.023l-.99 3.616 3.73-.974 1.452.882z" />
-          </svg>
-          CHAT TO GET YOURS
-        </motion.a>
-      </div>
-
-      {/* 2. Right-Edge Tab: BUY NOW FOR YOURSELF */}
-      <div className="fixed right-0 top-1/2 -translate-y-1/2 z-40 select-none">
-        <motion.a
-          href="https://instagram.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          whileHover={{ x: -4 }}
-          className="flex items-center gap-2.5 px-3 py-5 rounded-l-2xl bg-gradient-to-b from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-[-4px_6px_16px_rgba(16,185,129,0.3)] transition-all duration-300"
-        >
-          {/* Vertical Text wrapper */}
-          <span 
-            className="font-sans text-[0.62rem] font-bold uppercase tracking-[0.2em] whitespace-nowrap"
-            style={{ 
-              writingMode: "vertical-rl", 
-              transform: "rotate(180deg)" 
-            }}
-          >
-            BUY NOW FOR YOURSELF
-          </span>
-        </motion.a>
-      </div>
-
-      {/* 3. Bottom-Right: Audio/Mute Toggle */}
+      {/* Bottom-Right: Audio/Mute Toggle */}
       <div className="fixed bottom-6 right-6 z-40">
         <motion.button
+          id="audio-toggle-btn"
           type="button"
           onClick={toggleAudio}
           whileHover={{ scale: 1.06 }}
