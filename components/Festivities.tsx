@@ -90,8 +90,8 @@ function EventCard({ event }: { event: EventDetails }) {
       className="w-full flex justify-center"
     >
       {/* Continuous float animation wrapper */}
-      <div 
-        className="w-[290px] h-[450px] sm:w-[350px] sm:h-[490px] animate-float relative" 
+      <div
+        className="w-[290px] h-[450px] sm:w-[350px] sm:h-[490px] animate-float relative"
         style={{ animationDuration: `${event.floatDuration}s` }}
       >
         <div
@@ -201,23 +201,43 @@ function EventCard({ event }: { event: EventDetails }) {
               </h3>
             </div>
 
-            {/* Left Ribbon Band and Bow Half (Center Height) */}
-            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-8 bg-[#A36662] z-30 shadow-[0_2px_4px_rgba(163,102,98,0.15)] flex items-center justify-end">
-              {/* Gold ribbon stripes */}
-              <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-[#D5B03A]/45" />
-              <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#D5B03A]/45" />
+            {/* Left Cream Ribbon Band and Bow Half */}
+            <div 
+              style={{
+                backgroundImage: "linear-gradient(to bottom, #E8DFD8 0%, #FAF4EF 25%, #FCF9F6 50%, #FAF4EF 75%, #E8DFD8 100%)",
+                boxShadow: "0 3px 8px rgba(163, 102, 98, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9)"
+              }}
+              className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-8 z-30 flex items-center justify-end"
+            >
+              {/* Gold ribbon stitching */}
+              <div className="absolute top-[3px] left-0 right-0 h-[1px] bg-[#D5B03A]/60" />
+              <div className="absolute bottom-[3px] left-0 right-0 h-[1px] bg-[#D5B03A]/60" />
 
               {/* Left Bow Loop */}
-              <div className="absolute right-[-8px] top-[0px] w-6 h-8 rounded-full border-[1.5px] border-[#D5B03A] bg-[#A36662] rotate-[-15deg] shadow-sm z-40" />
+              <div 
+                style={{
+                  backgroundImage: "linear-gradient(to bottom, #EAE1DA 0%, #FCF9F6 50%, #E3D8CE 100%)",
+                  boxShadow: "inset 0 2px 3px rgba(255, 255, 255, 0.9), inset 0 -3px 6px rgba(163, 102, 98, 0.15), 0 3px 6px rgba(163, 102, 98, 0.12)"
+                }}
+                className="absolute right-[-8px] top-[0px] w-6 h-8 rounded-full border-[1.5px] border-[#D5B03A]/85 rotate-[-15deg] z-40" 
+              />
               
               {/* Left Ribbon V-tail */}
               <div 
-                className="absolute right-[-4px] top-[18px] w-3.5 h-6 bg-[#A36662] rotate-[35deg] origin-top-left z-35" 
-                style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%)" }}
+                className="absolute right-[-4px] top-[18px] w-3.5 h-6 rotate-[35deg] origin-top-left z-35" 
+                style={{ 
+                  clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%)",
+                  backgroundImage: "linear-gradient(to bottom, #EAE1DA, #D8CCC2)"
+                }}
               />
 
               {/* Left Bow Center Knot half */}
-              <div className="absolute right-[-3px] top-[8px] w-1.5 h-4 bg-[#D5B03A] rounded-l-sm z-50 shadow-[1px_0_2px_rgba(0,0,0,0.15)]" />
+              <div 
+                style={{
+                  backgroundImage: "linear-gradient(to bottom, #D5B03A, #BFA030, #D5B03A)"
+                }}
+                className="absolute right-[-3px] top-[8px] w-1.5 h-4 rounded-l-sm border-[1px] border-r-0 border-[#D5B03A] z-50 shadow-[1px_0_2px_rgba(0,0,0,0.15)]" 
+              />
             </div>
 
             {/* Repositioned Cover Date (Below the Ribbon) */}
@@ -261,23 +281,43 @@ function EventCard({ event }: { event: EventDetails }) {
               </h3>
             </div>
 
-            {/* Right Ribbon Band and Bow Half (Center Height) */}
-            <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-8 bg-[#A36662] z-30 shadow-[0_2px_4px_rgba(163,102,98,0.15)] flex items-center justify-start">
-              {/* Gold ribbon stripes */}
-              <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-[#D5B03A]/45" />
-              <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-[#D5B03A]/45" />
+            {/* Right Cream Ribbon Band and Bow Half */}
+            <div 
+              style={{
+                backgroundImage: "linear-gradient(to bottom, #E8DFD8 0%, #FAF4EF 25%, #FCF9F6 50%, #FAF4EF 75%, #E8DFD8 100%)",
+                boxShadow: "0 3px 8px rgba(163, 102, 98, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9)"
+              }}
+              className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-8 z-30 flex items-center justify-start"
+            >
+              {/* Gold ribbon stitching */}
+              <div className="absolute top-[3px] left-0 right-0 h-[1px] bg-[#D5B03A]/60" />
+              <div className="absolute bottom-[3px] left-0 right-0 h-[1px] bg-[#D5B03A]/60" />
 
               {/* Right Bow Loop */}
-              <div className="absolute left-[-8px] top-[0px] w-6 h-8 rounded-full border-[1.5px] border-[#D5B03A] bg-[#A36662] rotate-[15deg] shadow-sm z-40" />
+              <div 
+                style={{
+                  backgroundImage: "linear-gradient(to bottom, #EAE1DA 0%, #FCF9F6 50%, #E3D8CE 100%)",
+                  boxShadow: "inset 0 2px 3px rgba(255, 255, 255, 0.9), inset 0 -3px 6px rgba(163, 102, 98, 0.15), 0 3px 6px rgba(163, 102, 98, 0.12)"
+                }}
+                className="absolute left-[-8px] top-[0px] w-6 h-8 rounded-full border-[1.5px] border-[#D5B03A]/85 rotate-[15deg] z-40" 
+              />
               
               {/* Right Ribbon V-tail */}
               <div 
-                className="absolute left-[-4px] top-[18px] w-3.5 h-6 bg-[#A36662] rotate-[-35deg] origin-top-right z-35" 
-                style={{ clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%)" }}
+                className="absolute left-[-4px] top-[18px] w-3.5 h-6 rotate-[-35deg] origin-top-right z-35" 
+                style={{ 
+                  clipPath: "polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%)",
+                  backgroundImage: "linear-gradient(to bottom, #EAE1DA, #D8CCC2)"
+                }}
               />
 
               {/* Right Bow Center Knot half */}
-              <div className="absolute left-[-3px] top-[8px] w-1.5 h-4 bg-[#D5B03A] rounded-r-sm z-50 shadow-[-1px_0_2px_rgba(0,0,0,0.15)]" />
+              <div 
+                style={{
+                  backgroundImage: "linear-gradient(to bottom, #D5B03A, #BFA030, #D5B03A)"
+                }}
+                className="absolute left-[-3px] top-[8px] w-1.5 h-4 rounded-r-sm border-[1px] border-l-0 border-[#D5B03A] z-50 shadow-[-1px_0_2px_rgba(0,0,0,0.15)]" 
+              />
             </div>
 
             {/* Repositioned Cover Date (Below the Ribbon) */}
