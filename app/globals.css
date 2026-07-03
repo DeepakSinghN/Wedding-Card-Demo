@@ -31,6 +31,18 @@
   --maroon: #7A1C2C;
   --gold: #D4AF37;
   --cream: #FAF4EF;
+
+  /* ── Rakhi card design tokens (--rakhi-* namespace) ─────────────────────
+     Change these to retheme the entire greeting card. */
+  --rakhi-maroon:        #7A1F3D;  /* deep rani-pink / maroon — primary */
+  --rakhi-gold:          #F5A623;  /* marigold gold — accent */
+  --rakhi-saffron:       #FFD36E;  /* lighter saffron — secondary accent */
+  --rakhi-thread-red:    #C0392B;  /* rakhi thread red */
+  --rakhi-cream:         #FFF8F0;  /* background / text on dark */
+  --rakhi-blush:         #FFE4E4;  /* soft blush tint */
+  --rakhi-text-primary:  #4A1525;  /* body text on cream background */
+  --rakhi-text-secondary:#8B4A5A;  /* muted text */
+  /* ─────────────────────────────────────────────────────────────────────── */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -71,6 +83,41 @@ body {
   /* Default font color */
   font-family: var(--font-cormorant), serif;
   overflow-x: hidden;
+}
+
+/* ── Hero section background ──────────────────────────────────────────────── */
+.hero-bg {
+  background: linear-gradient(
+    165deg,
+    var(--rakhi-cream) 0%,
+    #fff0f4 45%,
+    var(--rakhi-blush) 100%
+  );
+}
+
+/* ── Slow-rotating mandala watermark ──────────────────────────────────────── */
+.hero-mandala {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Ccircle cx='100' cy='100' r='90' fill='none' stroke='%237A1F3D' stroke-width='0.6' stroke-dasharray='4 6'/%3E%3Ccircle cx='100' cy='100' r='70' fill='none' stroke='%23F5A623' stroke-width='0.4' stroke-dasharray='3 8'/%3E%3Ccircle cx='100' cy='100' r='50' fill='none' stroke='%237A1F3D' stroke-width='0.4' stroke-dasharray='2 6'/%3E%3Ccircle cx='100' cy='100' r='30' fill='none' stroke='%23F5A623' stroke-width='0.5' stroke-dasharray='2 4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 420px 420px;
+  opacity: 0.06;
+  animation: mandalaSpin 60s linear infinite;
+}
+
+@keyframes mandalaSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-mandala { animation: none; }
+  @keyframes mandalaSpin {}
+}
+
+/* ── CTA button hover state ────────────────────────────────────────────────── */
+.cta-button:hover {
+  background: var(--rakhi-thread-red) !important;
+  border-color: var(--rakhi-thread-red) !important;
 }
 
 /* Custom premium styles */

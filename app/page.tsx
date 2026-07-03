@@ -1,91 +1,150 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { AnimatePresence } from "framer-motion";
-import Hero from "../components/Hero";
-import IntroStory from "../components/IntroStory";
-import SaveTheDate from "../components/SaveTheDate";
-import Countdown from "../components/Countdown";
-import Gallery from "../components/Gallery";
-import Venue from "../components/Venue";
-import Festivities from "../components/Festivities";
-import RSVP from "../components/RSVP";
-import Footer from "../components/Footer";
-import FloatingControls from "../components/FloatingControls";
-import FlowerPetals from "../components/FlowerPetals";
-import ScrollReveal from "../components/ScrollReveal";
-import ShlokaLoader from "../components/ShlokaLoader";
+import { useState } from "react";
+import Hero from "@/components/Rakhi-card/Hero";
+import Story from "@/components/Rakhi-card/Story";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
-  const [isRevealed, setIsRevealed] = useState(false);
-  const [showLoader, setShowLoader] = useState(true);
+  const [coords, setCoords] = useState<{
+    startX: number;
+    startY: number;
+    endX: number;
+    endY: number;
+  } | null>(null);
 
-  useEffect(() => {
-    // Lock scrolling initially for on-load screen
-    if (typeof window !== "undefined" && (window as any).lenis) {
-      (window as any).lenis.stop();
-    }
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
+  // 1. Measure and calculate start & end coordinates for the butterfly path
+  useGSAP(() => {
+    const calculatePositions = () => {
+      const startEl = document.getElementById("butterfly-start-anchor");
+      const endEl = document.getElementById("butterfly-end-anchor");
+      
+      if (startEl && endEl) {
+        const startRect = startEl.getBoundingClientRect();
+        const endRect = endEl.getBoundingClientRect();
+        const scrollY = window.scrollY;
+
+        setCoords({
+          startX: startRect.left + window.scrollX,
+          startY: startRect.top + scrollY,
+          endX: endRect.left + window.scrollX,
+          endY: endRect.top + scrollY,
+        });
+      }
+    };
+
+    // Delay calculation slightly so Next.js paint and layout calculations are stable
+    const timer = setTimeout(() => {
+      calculatePositions();
+    }, 150);
+
+    // Dynamic responsiveness: recalculate on window resize or ScrollTrigger refresh
+    window.addEventListener("resize", calculatePositions);
+    ScrollTrigger.addEventListener("refresh", calculatePositions);
 
     return () => {
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
+      clearTimeout(timer);
+      window.removeEventListener("resize", calculatePositions);
+      ScrollTrigger.removeEventListener("refresh", calculatePositions);
     };
   }, []);
 
-  const handleEnter = () => {
-    setShowLoader(false);
-    // Delay unlocking scroll to let the intro video fade off completely (2.0 seconds total)
-    setTimeout(() => {
-      if (typeof window !== "undefined" && (window as any).lenis) {
-        (window as any).lenis.start();
+  // 2. Animate the butterfly entrance, flight path, and local roaming
+  useGSAP(() => {
+    if (!coords) return;
+
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    if (prefersReduced) {
+      // Direct placement at final spot with no motion
+      gsap.set("#global-butterfly-path", {
+        opacity: 1,
+        scale: 1.33,
+        x: coords.endX - coords.startX,
+        y: coords.endY - coords.startY,
+      });
+      return;
+    }
+
+    // ── Butterfly Entrance ──
+    // Wait for the recipient name card entrance (1.65s delay)
+    gsap.fromTo(
+      "#global-butterfly-path",
+      {
+        opacity: 0,
+        scale: 0,
+        rotate: -25,
+      },
+      {
+        opacity: 1,
+        scale: 1,
+        rotate: 0,
+        delay: 1.65,
+        duration: 0.75,
+        ease: "back.out(1.6)",
       }
-      document.body.style.overflow = "";
-      document.documentElement.style.overflow = "";
-    }, 2000);
-  };
+    );
+
+    // ── Butterfly Flight Path ──
+    // Animates along the scroll as the Story section overlaps the Hero section
+    gsap.fromTo(
+      "#global-butterfly-path",
+      {
+        x: 0,
+        y: 0,
+        scale: 1,
+      },
+      {
+        scrollTrigger: {
+          trigger: "#rakhi-next-section",
+          start: "top bottom",
+          end: "top top",
+          scrub: true,
+        },
+        x: coords.endX - coords.startX,
+        y: coords.endY - coords.startY,
+        scale: 1.33,
+        ease: "power1.inOut",
+      }
+    );
+  }, [coords]);
 
   return (
-    <main className="w-full min-h-screen bg-[#FAF4EF] flex flex-col items-center relative">
-      <AnimatePresence>
-        {showLoader && <ShlokaLoader onEnter={handleEnter} />}
-      </AnimatePresence>
-
-      {/* 1. Hero Section */}
+    <main className="w-full relative">
+      {/* Hero section — sticky, pins at viewport top */}
       <Hero />
 
-      {/* 2. Intro Story Section */}
-      <ScrollReveal animation="fade-in" duration={1.2} className="w-full h-screen">
-        <IntroStory />
-      </ScrollReveal>
+      {/* Story section — rolls up and covers the Hero section smoothly */}
+      <Story />
 
-      {/* 3. Save the Date Section */}
-      <SaveTheDate onAllRevealed={() => setIsRevealed(true)} />
-
-      {/* 4. Dedicated Countdown Section */}
-      <Countdown active={isRevealed} />
-
-      {/* 5. Interactive Stacking Gallery Section */}
-      <Gallery />
-
-      {/* 6. Cinematic Parallax Venue Section */}
-      <Venue />
-
-      {/* 7. Festivities Section */}
-      <Festivities />
-
-      {/* 8. Royal Seal RSVP Section */}
-      <RSVP />
-
-      {/* 9. Bollywood Romance Footer */}
-      <Footer />
-
-      {/* Floating Audio Controls & CTA Buttons */}
-      <FloatingControls />
-
-      {/* Falling Flower Petals Overlay */}
-      <FlowerPetals />
+      {/* Global animated butterfly that transitions between sections */}
+      {coords && (
+        <div
+          id="global-butterfly-path"
+          className="absolute pointer-events-none z-30"
+          style={{
+            left: coords.startX,
+            top: coords.startY,
+            width: "48px",
+            height: "48px",
+            transformOrigin: "center center",
+          }}
+        >
+          <div id="global-butterfly-roam" className="w-full h-full">
+            <DotLottieReact
+              src="https://lottie.host/f10f2406-a975-4765-94ce-c02294ef7f45/sMIOyPrNwR.lottie"
+              loop
+              autoplay
+            />
+          </div>
+        </div>
+      )}
     </main>
   );
 }

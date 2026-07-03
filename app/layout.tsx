@@ -1,27 +1,40 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Dancing_Script, Geist } from "next/font/google";
-import SmoothScroll from "../components/SmoothScroll";
+import { Playfair_Display, Poppins, Great_Vibes } from "next/font/google";
+import SmoothScroll from "../components/wedding-card/SmoothScroll";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
-
-const cormorant = Cormorant_Garamond({
+// ── Display font: warm festive serif for headlines ──────────────────────────
+const playfair = Playfair_Display({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "600", "700", "900"],
   style: ["normal", "italic"],
-  variable: "--font-cormorant",
+  variable: "--font-display",
 });
 
-const dancingScript = Dancing_Script({
+// ── Body font: clean readable sans ──────────────────────────────────────────
+const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-dancing",
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-body",
+});
+
+// ── Script font: cursive handwriting for signatures/coda ────────────────────
+const greatVibes = Great_Vibes({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-script",
 });
 
 export const metadata: Metadata = {
-  title: "Meenal & Avinash | Wedding Invitation",
-  description: "Together with their families, Meenal and Avinash invite you to join their wedding celebration.",
+  title: "Happy Raksha Bandhan 🪢",
+  description: "A heartfelt digital Raksha Bandhan greeting card — because some threads cross any distance.",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({
@@ -32,10 +45,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased", cormorant.variable, dancingScript.variable, "font-sans", geist.variable)}
+      className={cn(
+        "h-full antialiased",
+        playfair.variable,
+        poppins.variable,
+        greatVibes.variable
+      )}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-[#FAF4EF]" suppressHydrationWarning>
+      {/* Body uses rakhi-cream as the base background */}
+      <body
+        className="min-h-full flex flex-col"
+        style={{ background: "var(--rakhi-cream)", color: "var(--rakhi-text-primary)" }}
+        suppressHydrationWarning
+      >
         <SmoothScroll>
           {children}
         </SmoothScroll>
