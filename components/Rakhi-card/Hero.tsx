@@ -38,47 +38,49 @@ export interface HeroCollageProps {
   photos?: HeroPhoto[];
 }
 
+const DEFAULT_PHOTOS: HeroPhoto[] = [
+  {
+    id: "focal",
+    src: CARD_CONTENT.photo3,
+    caption: "Always together 🌸",
+    size: "focal",
+    position: { top: "2%", left: "calc(50% - 95px)" },
+    rotation: -2,
+    zIndex: 2,
+  },
+  {
+    id: "left",
+    src: CARD_CONTENT.photo1,
+    caption: "Double trouble 🪢",
+    size: "medium",
+    position: { top: "32%", left: "5%" },
+    rotation: 6,
+    zIndex: 3,
+  },
+  {
+    id: "right",
+    src: CARD_CONTENT.photo2,
+    caption: "Mischief makers 🍂",
+    size: "large",
+    position: { top: "35%", right: "5%" },
+    rotation: -5,
+    zIndex: 3,
+  },
+  {
+    id: "accent",
+    src: CARD_CONTENT.photo1,
+    caption: "Childhood steps 🌸",
+    size: "small",
+    position: { top: "64%", left: "30%" },
+    rotation: -4,
+    zIndex: 1,
+  }
+];
+
 export default function Hero({
   name = CARD_CONTENT.recipientName,
   subtitle = CARD_CONTENT.tagline,
-  photos = [
-    {
-      id: "focal",
-      src: CARD_CONTENT.photo3,
-      caption: "Always together 🌸",
-      size: "focal",
-      position: { top: "2%", left: "calc(50% - 95px)" },
-      rotation: -2,
-      zIndex: 2,
-    },
-    {
-      id: "left",
-      src: CARD_CONTENT.photo1,
-      caption: "Double trouble 🪢",
-      size: "medium",
-      position: { top: "32%", left: "5%" },
-      rotation: 6,
-      zIndex: 3,
-    },
-    {
-      id: "right",
-      src: CARD_CONTENT.photo2,
-      caption: "Mischief makers 🍂",
-      size: "large",
-      position: { top: "35%", right: "5%" },
-      rotation: -5,
-      zIndex: 3,
-    },
-    {
-      id: "accent",
-      src: CARD_CONTENT.photo1,
-      caption: "Childhood steps 🌸",
-      size: "small",
-      position: { top: "64%", left: "30%" },
-      rotation: -4,
-      zIndex: 1,
-    }
-  ]
+  photos = DEFAULT_PHOTOS
 }: HeroCollageProps) {
   const prefersReduced = useReducedMotion();
   const containerRef = useRef<HTMLElement>(null);
