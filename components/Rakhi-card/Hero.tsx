@@ -14,7 +14,7 @@ gsap.registerPlugin(ScrollTrigger, MotionPathPlugin, SplitText);
 
 const CARD_CONTENT = {
   headlineLines: ["HAPPY", "RAKSHA", "BANDHAN"],
-  recipientName: "NEHA",
+  recipientName: "Komal",
   tagline: "Wishing you a wonderful Rakhi filled with happiness, love, laughter, and unforgettable beautiful memories. ❤️",
   ctaLabel: "Open Your Rakhi ✨",
   photo1: "/Rakhi-card-media/photo-1.webp",
@@ -593,10 +593,10 @@ export default function Hero({
       <div className="w-full h-full relative overflow-visible flex flex-col items-center pt-[10vh] px-4">
 
         {/* Title Area */}
-        <div ref={titleAreaRef} className="text-center w-full select-none mb-4 z-30 relative">
+        <div ref={titleAreaRef} className="text-center w-full select-none mb-4 z-30 relative ">
           <h1
             ref={titleRef}
-            className="text-[4.0rem] text-[var(--rakhi-maroon)] leading-[1.1] font-normal tracking-wide pointer-events-auto overflow-hidden inline-block"
+            className="text-[4.0rem] text-[var(--rakhi-maroon)] leading-[1.1] font-normal tracking-wide pointer-events-auto overflow-hidden inline-block py-2"
             style={{
               fontFamily: "var(--font-cherry-bomb-one, 'Cherry Bomb One', cursive)",
               transform: "translateZ(0)",

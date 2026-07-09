@@ -89,7 +89,7 @@ export default function MemoryFilmstrip() {
             style={{ fontFamily: "var(--font-body, Poppins, sans-serif)" }}>
             RETRO MOMENTS
           </p>
-          <h2 className="scroll-animate-text text-4xl mb-4 text-[#7A1F3D]"
+          <h2 className="scroll-animate-text text-4xl mb-4 text-[#7A1F3D] "
             style={{ fontFamily: "var(--font-script, 'Great Vibes', cursive)" }}>
             The Memory Reel
           </h2>

@@ -254,7 +254,7 @@ export default function ReportCard({
           {/* Ribbons */}
           <div className="absolute bottom-[-12px] left-2.5 w-2.5 h-8 bg-[#BF953F] rotate-[15deg] origin-top clip-ribbon" />
           <div className="absolute bottom-[-12px] right-2.5 w-2.5 h-8 bg-[#AA771C] rotate-[-15deg] origin-top clip-ribbon" />
-          
+
           {/* Circular Badge */}
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#BF953F] via-[#FCF6BA] to-[#AA771C] border border-[#7A1F3D]/20 flex items-center justify-center shadow">
             <Award className="w-3.5 h-3.5 text-[#7A1F3D]" />
@@ -305,7 +305,7 @@ export default function ReportCard({
                   <span className="text-sm font-semibold text-stone-800 font-sans whitespace-nowrap">
                     {grade.category}
                   </span>
-                  
+
                   {/* Ledger Dotted Leader Line */}
                   <div className="flex-1 border-b border-dotted border-stone-300 min-w-[20px] translate-y-[2px]" />
 
@@ -354,7 +354,7 @@ export default function ReportCard({
 
         {/* 3. Certificate Footer with signature and stamp */}
         <div className="w-full flex justify-between items-end mt-4 pt-6 border-t border-amber-800/10">
-          
+
           {/* Footnote */}
           <div className="text-left max-w-[220px] select-none">
             <p className="text-[8px] font-bold text-stone-400 font-sans tracking-widest uppercase mb-0.5">
@@ -368,7 +368,7 @@ export default function ReportCard({
           {/* Cursive Signature */}
           <div className="flex flex-col items-center">
             <p
-              className="text-[1.8rem] text-[#7A1F3D] leading-none mb-1 select-none"
+              className="text-[1.4rem] text-[#7A1F3D] leading-none mb-1 select-none"
               style={{ fontFamily: "var(--font-script), Great Vibes, cursive" }}
             >
               {signatureName}
