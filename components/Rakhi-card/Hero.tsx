@@ -1,157 +1,132 @@
 "use client";
 
-/**
- * Hero.tsx — Raksha Bandhan greeting card hero section.
- *
- * DESIGN: Gift-card layout divided by a decorative ribbon cross:
- *   ┌───────────────┬──╮───────────────────────┐
- *   │  HAPPY        │  │   [PHOTO 1]           │
- *   │  RAKSHA       │  │                       │
- *   │  BANDHAN      │  │                       │
- *   │  [NAME]       │  │                       │
- *   ├───────────────┼──╋─ribbon cross──────────┤
- *   │  [PHOTO 2]    │ bow │   [PHOTO 3]        │
- *   │               │  │   "tagline"           │
- *   └───────────────┴──╯───────────────────────┘
- *
- * BANGER ANIMATION SEQUENCE (GSAP + motion):
- *   0.00s  Background fades in
- *   0.10s  Vertical ribbon draws top→bottom
- *   0.20s  Horizontal ribbon draws left→right
- *   0.50s  Bow drops + spring-bounces into center
- *   0.70s  Photo 1 — clip-path iris-open reveal + scale
- *   0.85s  Photo 2 — clip-path wipe-up reveal
- *   1.00s  Photo 3 — clip-path wipe-up reveal
- *   1.10s  Headline lines explode in one-by-one (scale 3→1 + blur)
- *   1.55s  Recipient name punches in with a scale overshoot
- *   1.80s  Tagline fades up
- *   1.90s  CTA scales in + pulse loop starts
- *
- * Edit CARD_CONTENT below to customise all copy.
- */
-
-import { useRef, useState, useCallback } from "react";
-import { motion, useReducedMotion, AnimatePresence } from "motion/react";
+import { useRef, useState, useCallback, useEffect } from "react";
+import { motion, useReducedMotion, AnimatePresence, useMotionValue, useTransform, useSpring } from "motion/react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import confetti from "canvas-confetti";
-import { ChevronDown, Volume2, VolumeX } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { MotionPathPlugin } from "gsap/MotionPathPlugin";
+import SplitText from "gsap/src/SplitText";
+import { Volume2, VolumeX } from "lucide-react";
 import Image from "next/image";
 
-// Register GSAP ScrollTrigger plugin
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, MotionPathPlugin, SplitText);
 
-// ─── EDIT THESE ───────────────────────────────────────────────────────────────
 const CARD_CONTENT = {
   headlineLines: ["HAPPY", "RAKSHA", "BANDHAN"],
   recipientName: "NEHA",
-  tagline: "with love, always.",
+  tagline: "Wishing you a wonderful Rakhi filled with happiness, love, laughter, and unforgettable beautiful memories. ❤️",
   ctaLabel: "Open Your Rakhi ✨",
-
-  // Replace these paths with your own photos in /public
   photo1: "/Rakhi-card-media/photo-1.webp",
   photo2: "/Rakhi-card-media/photo-2.jpg",
   photo3: "/Rakhi-card-media/photo-3.jpg",
 };
-// ──────────────────────────────────────────────────────────────────────────────
 
-// ─── Ribbon BOW SVG ──────────────────────────────────────────────────────────
-function RibbonBow() {
-  return (
-    <svg
-      viewBox="0 0 120 80"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-full h-full"
-      aria-hidden="true"
-    >
-      {/* Left loop */}
-      <path
-        d="M60 40 C40 15, 5 12, 10 32 C14 48, 45 50, 60 40Z"
-        fill="var(--rakhi-thread-red)"
-        stroke="var(--rakhi-maroon)"
-        strokeWidth="0.8"
-      />
-      <path
-        d="M60 40 C42 22, 18 20, 20 33 C22 43, 46 46, 60 40Z"
-        fill="var(--rakhi-maroon)"
-        opacity="0.35"
-      />
-      {/* Right loop */}
-      <path
-        d="M60 40 C80 15, 115 12, 110 32 C106 48, 75 50, 60 40Z"
-        fill="var(--rakhi-thread-red)"
-        stroke="var(--rakhi-maroon)"
-        strokeWidth="0.8"
-      />
-      <path
-        d="M60 40 C78 22, 102 20, 100 33 C98 43, 74 46, 60 40Z"
-        fill="var(--rakhi-maroon)"
-        opacity="0.35"
-      />
-      {/* Left tail */}
-      <path
-        d="M60 40 C50 52, 25 68, 15 78"
-        stroke="var(--rakhi-thread-red)"
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
-      {/* Right tail */}
-      <path
-        d="M60 40 C70 52, 95 68, 105 78"
-        stroke="var(--rakhi-thread-red)"
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
-      {/* Centre knot */}
-      <ellipse cx="60" cy="40" rx="9" ry="7" fill="var(--rakhi-maroon)" />
-      <ellipse cx="60" cy="40" rx="6" ry="4.5" fill="var(--rakhi-thread-red)" />
-      <circle cx="60" cy="40" r="2.5" fill="var(--rakhi-gold)" />
-    </svg>
-  );
+export interface HeroPhoto {
+  id: string;
+  src: string;
+  caption: string;
+  size: "focal" | "large" | "medium" | "small";
+  position: { top: string; left?: string; right?: string };
+  rotation: number;
+  zIndex: number;
 }
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-export default function Hero() {
+export interface HeroCollageProps {
+  name?: string;
+  subtitle?: string;
+  photos?: HeroPhoto[];
+}
+
+export default function Hero({
+  name = CARD_CONTENT.recipientName,
+  subtitle = CARD_CONTENT.tagline,
+  photos = [
+    {
+      id: "focal",
+      src: CARD_CONTENT.photo3,
+      caption: "Always together 🌸",
+      size: "focal",
+      position: { top: "2%", left: "calc(50% - 95px)" },
+      rotation: -2,
+      zIndex: 2,
+    },
+    {
+      id: "left",
+      src: CARD_CONTENT.photo1,
+      caption: "Double trouble 🪢",
+      size: "medium",
+      position: { top: "32%", left: "5%" },
+      rotation: 6,
+      zIndex: 3,
+    },
+    {
+      id: "right",
+      src: CARD_CONTENT.photo2,
+      caption: "Mischief makers 🍂",
+      size: "large",
+      position: { top: "35%", right: "5%" },
+      rotation: -5,
+      zIndex: 3,
+    },
+    {
+      id: "accent",
+      src: CARD_CONTENT.photo1,
+      caption: "Childhood steps 🌸",
+      size: "small",
+      position: { top: "64%", left: "30%" },
+      rotation: -4,
+      zIndex: 1,
+    }
+  ]
+}: HeroCollageProps) {
   const prefersReduced = useReducedMotion();
   const containerRef = useRef<HTMLElement>(null);
 
-  // Ribbon path refs for GSAP stroke-draw
-  const vRibbonRef = useRef<HTMLDivElement>(null);
-  const hRibbonRef = useRef<HTMLDivElement>(null);
-  const bowRef = useRef<HTMLDivElement>(null);
-
-  // Photo + text panel refs
-  const photo1Ref = useRef<HTMLDivElement>(null);
-  const photo2Ref = useRef<HTMLDivElement>(null);
-  const photo3Ref = useRef<HTMLDivElement>(null);
-  const textPanelRef = useRef<HTMLDivElement>(null);
-  const taglineRef = useRef<HTMLParagraphElement>(null);
-  const ctaRef = useRef<HTMLButtonElement>(null);
+  const titleAreaRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const subtitleRef = useRef<HTMLParagraphElement>(null);
+  const photoRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const collageContainerRef = useRef<HTMLDivElement>(null);
+  const envelopeRef = useRef<HTMLDivElement>(null);
+  const sealRef = useRef<HTMLButtonElement>(null);
+  const flapRef = useRef<HTMLDivElement>(null);
+  const shardRefs = useRef<HTMLDivElement[]>([]);
+  const glowRef = useRef<HTMLDivElement>(null);
 
   const [muted, setMuted] = useState(true);
-  const [ctaPulsing, setCtaPulsing] = useState(false);
-  const confettiFired = useRef(false);
+  const [isOpening, setIsOpening] = useState(false);
 
-  // ── Confetti ───────────────────────────────────────────────────────────────
-  const fireConfetti = useCallback(() => {
-    if (confettiFired.current || prefersReduced) return;
-    confettiFired.current = true;
-    confetti({
-      particleCount: 55,
-      spread: 75,
-      origin: { x: 0.5, y: 0.4 },
-      colors: ["#F5A623", "#FFD36E", "#7A1F3D", "#FFF8F0", "#C0392B"],
-      startVelocity: 28,
-      gravity: 1.1,
-      scalar: 0.9,
-      ticks: 200,
-    });
-  }, [prefersReduced]);
+  // ── Scroll Lock on Mount ──────────────────────────────────────────────────
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
 
-  // ── CTA scroll ────────────────────────────────────────────────────────────
+    let lenisTimer: NodeJS.Timeout;
+
+    const lockLenis = () => {
+      const lenis = (window as unknown as Record<string, unknown>).lenis as { stop: () => void } | undefined;
+      if (lenis?.stop) {
+        lenis.stop();
+      } else {
+        lenisTimer = setTimeout(lockLenis, 50);
+      }
+    };
+
+    lockLenis();
+
+    return () => {
+      clearTimeout(lenisTimer);
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      const lenis = (window as unknown as Record<string, unknown>).lenis as { start: () => void } | undefined;
+      if (lenis?.start) {
+        lenis.start();
+      }
+    };
+  }, []);
+
+  // ── Scroll to next section ────────────────────────────────────────────────
   const handleCta = useCallback(() => {
     const next = document.getElementById("rakhi-next-section");
     if (!next) return;
@@ -159,151 +134,286 @@ export default function Hero() {
       scrollTo: (t: Element, o: object) => void;
     } | undefined;
     if (lenis?.scrollTo) {
-      lenis.scrollTo(next, { duration: 1.2 });
+      // Slowed down to 2.8s for a graceful reveal!
+      lenis.scrollTo(next, { duration: 2.8 });
     } else {
-      next.scrollIntoView({ behavior: "smooth" });
+      // Fallback smooth scroll using GSAP to control speed
+      gsap.to([document.documentElement, document.body], {
+        scrollTop: next.offsetTop,
+        duration: 2.8,
+        ease: "power2.inOut"
+      });
     }
   }, []);
 
-  // ── GSAP master timeline ──────────────────────────────────────────────────
-  useGSAP(
-    () => {
-      if (prefersReduced) {
-        // instant reveal for reduced-motion users
-        gsap.set(
-          [vRibbonRef.current, hRibbonRef.current, bowRef.current,
-          photo1Ref.current, photo2Ref.current, photo3Ref.current,
-          textPanelRef.current, taglineRef.current, ctaRef.current,
-          ".hero-line", ".hero-name"],
-          { opacity: 1, clipPath: "inset(0% 0% 0% 0%)", scale: 1, y: 0, x: 0, filter: "none" }
-        );
-        setCtaPulsing(true);
+
+
+  // ── Envelope Wax Seal Opening Trigger ─────────────────────────────────────
+  const handleOpenSeal = useCallback(() => {
+    if (isOpening) return;
+    setIsOpening(true);
+
+    try {
+      const nextSection = document.getElementById("rakhi-next-section");
+      if (!nextSection) {
+        setIsOpening(false);
         return;
       }
 
-      // ── Initial hidden states ───────────────────────────────────────────
-      gsap.set(vRibbonRef.current, { scaleY: 0, transformOrigin: "top center" });
-      gsap.set(hRibbonRef.current, { scaleX: 0, transformOrigin: "center left" });
-      gsap.set(bowRef.current, { opacity: 0, scale: 0, y: -40 });
-      gsap.set(photo1Ref.current, { clipPath: "inset(100% 0% 0% 0%)", opacity: 0 });
-      gsap.set(photo2Ref.current, { clipPath: "inset(100% 0% 0% 0%)", opacity: 0 });
-      gsap.set(photo3Ref.current, { clipPath: "inset(100% 0% 0% 0%)", opacity: 0 });
-      gsap.set(".hero-line", { opacity: 0, scale: 3, filter: "blur(16px)", y: -20 });
-      gsap.set(".hero-name", { opacity: 0, scale: 4, filter: "blur(20px)" });
-      gsap.set(taglineRef.current, { opacity: 0, y: 14 });
-      gsap.set(ctaRef.current, { opacity: 0, scale: 0.8 });
+      if (!envelopeRef.current || !flapRef.current || !sealRef.current || !glowRef.current) {
+        setIsOpening(false);
+        return;
+      }
 
-      const tl = gsap.timeline({
-        onComplete: () => {
-          fireConfetti();
-          setCtaPulsing(true);
-        },
+      // 1. Check prefers-reduced-motion fallback
+      if (prefersReduced) {
+        gsap.to(envelopeRef.current, {
+          opacity: 0,
+          y: 60,
+          duration: 0.35,
+          onComplete: () => {
+            // Unlock scroll and navigate immediately
+            document.body.style.overflow = "";
+            document.documentElement.style.overflow = "";
+            const lenis = (window as unknown as Record<string, unknown>).lenis as { start: () => void } | undefined;
+            if (lenis?.start) {
+              lenis.start();
+            }
+            handleCta();
+
+            // Reset button state for robustness after scroll-away
+            setTimeout(() => {
+              setIsOpening(false);
+              if (envelopeRef.current) gsap.set(envelopeRef.current, { opacity: 1, y: 0, scale: 1 });
+              if (flapRef.current) gsap.set(flapRef.current, { rotationX: 0 });
+              if (sealRef.current) gsap.set(sealRef.current, { opacity: 1, scale: 1 });
+              if (glowRef.current) gsap.set(glowRef.current, { opacity: 0 });
+            }, 1500);
+          }
+        });
+        return;
+      }
+
+      // 2. Build Wax Seal break and flap peel-open timeline
+      const tl = gsap.timeline();
+
+      // Step A: Quick "impact" squash & stretch on click
+      tl.to(sealRef.current, {
+        scaleY: 0.82,
+        scaleX: 1.15,
+        duration: 0.08,
+        ease: "power2.in",
+      });
+      tl.to(sealRef.current, {
+        scaleY: 1,
+        scaleX: 1,
+        duration: 0.1,
+        ease: "power1.out",
       });
 
-      // Step 1 (0.10s): Vertical ribbon draws top→bottom
-      tl.to(vRibbonRef.current, {
-        scaleY: 1, duration: 0.55, ease: "power3.out",
-      }, 0.1);
+      // Step B: Seal crack / shatter
+      tl.addLabel("crack");
 
-      // Step 2 (0.20s): Horizontal ribbon draws left→right
-      tl.to(hRibbonRef.current, {
-        scaleX: 1, duration: 0.55, ease: "power3.out",
-      }, 0.2);
+      // Fade out intact seal circle
+      tl.to(sealRef.current, {
+        opacity: 0,
+        scale: 0.8,
+        duration: 0.15,
+        ease: "power1.in",
+      }, "crack");
 
-      // Step 3 (0.50s): Bow drops + spring bounce
-      tl.to(bowRef.current, {
-        opacity: 1, scale: 1, y: 0,
-        duration: 0.6, ease: "back.out(2.2)",
+      // Animate the irregular wax shards exploding and falling down
+      const validShards = shardRefs.current.filter(Boolean);
+      tl.call(() => {
+        if (validShards.length > 0) {
+          // Reveal shards
+          gsap.set(validShards, { opacity: 0.95, x: 0, y: 0, rotation: 0, scale: 1 });
+
+          gsap.to(validShards, {
+            x: () => gsap.utils.random(-60, 60),
+            y: () => gsap.utils.random(40, 100), // falls downward
+            rotation: () => gsap.utils.random(-180, 180),
+            scale: () => gsap.utils.random(0.4, 0.8),
+            opacity: 0,
+            duration: () => gsap.utils.random(0.6, 0.8),
+            ease: "power2.in",
+            stagger: 0.02,
+          });
+        }
+      }, [], "crack");
+
+      // Step C: Flap Peel-Open
+      tl.addLabel("peel", "+=0.15");
+
+      // Peels backward along bottom hinge, with elastic overshoot
+      tl.to(flapRef.current, {
+        rotationX: -150,
+        duration: 0.65,
+        ease: "power2.in",
+      }, "peel");
+
+      tl.to(flapRef.current, {
+        rotationX: -135,
+        duration: 0.2,
+        ease: "power1.out",
+      });
+
+      tl.to(flapRef.current, {
+        rotationX: -140,
+        duration: 0.15,
+        ease: "power1.inOut",
+      });
+
+      // Spilling warm radial light gradient
+      tl.to(glowRef.current, {
+        opacity: 1,
+        duration: 0.5,
+        ease: "power2.out",
+      }, "peel");
+
+      // Step D: Scroll-Driven Reveal (starts 0.45s before flap finishes opening)
+      tl.add(() => {
+        // Unlock scroll
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
+
+        const lenis = (window as unknown as Record<string, unknown>).lenis as {
+          scrollTo: (t: Element, o: object) => void;
+        } | undefined;
+
+        if (lenis?.scrollTo) {
+          lenis.scrollTo(nextSection, {
+            duration: 1.6,
+            easing: (t: number) => 1 - Math.pow(1 - t, 3), // cubic ease out
+          });
+        } else {
+          // Fallback smooth scroll using GSAP to control speed
+          gsap.to([document.documentElement, document.body], {
+            scrollTop: nextSection.offsetTop,
+            duration: 1.6,
+            ease: "power2.inOut",
+          });
+        }
+
+        // Reset button back to its idle state 2s later for robustness if user scrolls back
+        setTimeout(() => {
+          setIsOpening(false);
+          if (flapRef.current) gsap.set(flapRef.current, { rotationX: 0 });
+          if (sealRef.current) gsap.set(sealRef.current, { opacity: 1, scale: 1 });
+          if (glowRef.current) gsap.set(glowRef.current, { opacity: 0 });
+          if (validShards.length > 0) gsap.set(validShards, { opacity: 0 });
+        }, 2000);
+      }, "peel+=0.35"); // Visual overlap: scroll starts 0.35s after peel starts (total peel duration is ~1s)
+
+    } catch (err) {
+      console.error("Error opening seal:", err);
+      setIsOpening(false);
+    }
+
+  }, [isOpening, prefersReduced, handleCta]);
+
+  // ── Mount Entrance & Parallax Animations ───────────────────────────────────
+  useGSAP(
+    () => {
+      if (!containerRef.current) return;
+
+      if (prefersReduced) {
+        gsap.set([titleRef.current, subtitleRef.current, envelopeRef.current], { opacity: 1, y: 0, scale: 1, filter: "none" });
+        photos.forEach((photo, i) => {
+          const ref = photoRefs.current[i];
+          if (ref) {
+            gsap.set(ref, { opacity: 1, scale: 1, rotation: photo.rotation, y: 0 });
+          }
+        });
+        return;
+      }
+
+      // Split the title into characters
+      let split: SplitText | null = null;
+      if (titleRef.current) {
+        split = new SplitText(titleRef.current, { type: "chars" });
+        split.chars.forEach((char, index) => {
+          gsap.set(char, {
+            opacity: 0,
+            y: index % 2 === 0 ? -55 : 55,
+          });
+        });
+      }
+
+      // ── 1. Set initial positions on mount ──
+      gsap.set(subtitleRef.current, { opacity: 0, y: 10, filter: "blur(6px)" });
+      gsap.set(envelopeRef.current, { opacity: 0, y: 100, scale: 0.9 });
+
+      photos.forEach((photo, i) => {
+        const ref = photoRefs.current[i];
+        if (ref) {
+          gsap.set(ref, { opacity: 0, scale: 1.15, rotation: photo.rotation + gsap.utils.random(-10, 10), y: -20 });
+        }
+      });
+
+      // ── 2. Entrance Timeline ──
+      const tl = gsap.timeline();
+
+      // Recipient name SplitText character reveal
+      if (split && split.chars.length > 0) {
+        tl.to(split.chars, {
+          opacity: 1,
+          y: 0,
+          duration: 1.6,
+          stagger: 0.14,
+          ease: "power4.out",
+        }, 0.25);
+      } else {
+        tl.to(titleRef.current, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: "power2.out",
+        }, 0.25);
+      }
+
+      // Subtitle tagline reveal
+      tl.to(subtitleRef.current, {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+        duration: 0.65,
+        ease: "power2.out",
       }, 0.5);
 
-      // Step 4 (0.70s): Photo 1 — iris-open wipe reveal
-      tl.to(photo1Ref.current, {
-        clipPath: "inset(0% 0% 0% 0%)",
-        opacity: 1,
-        duration: 0.65,
-        ease: "expo.out",
-      }, 0.7);
-
-      // Step 5 (0.85s): Photo 2 — wipe up
-      tl.to(photo2Ref.current, {
-        clipPath: "inset(0% 0% 0% 0%)",
-        opacity: 1,
-        duration: 0.65,
-        ease: "expo.out",
-      }, 0.85);
-
-      // Step 6 (1.00s): Photo 3 — wipe up
-      tl.to(photo3Ref.current, {
-        clipPath: "inset(0% 0% 0% 0%)",
-        opacity: 1,
-        duration: 0.65,
-        ease: "expo.out",
-      }, 1.0);
-
-      // Step 7 (1.10s): Headline lines explode in — scale + blur
-      tl.to(".hero-line", {
-        opacity: 1,
-        scale: 1,
-        filter: "blur(0px)",
-        y: 0,
-        duration: 0.5,
-        stagger: 0.12,
-        ease: "back.out(1.5)",
-      }, 1.1);
-
-      // Step 8 (1.55s): Recipient name punches in
-      tl.to(".hero-name", {
-        opacity: 1,
-        scale: 1,
-        filter: "blur(0px)",
-        duration: 0.45,
-        ease: "back.out(2.0)",
-      }, 1.55);
-
-      // Step 9 (1.80s): Tagline fades up
-      tl.to(taglineRef.current, {
+      // Envelope CTA reveal
+      tl.to(envelopeRef.current, {
         opacity: 1,
         y: 0,
-        duration: 0.4,
-        ease: "power2.out",
-      }, 1.8);
-
-      // Step 10 (1.90s): CTA scales in
-      tl.to(ctaRef.current, {
-        opacity: 1,
         scale: 1,
-        duration: 0.4,
-        ease: "back.out(1.8)",
-      }, 1.9);
+        duration: 0.85,
+        ease: "back.out(1.3)",
+      }, 0.8);
 
-      // ── Scroll-Linked Parallax Effect ─────────────────────────────────────
-      // As the user scrolls down, the sticky Hero section will scale down slightly
-      // and fade out as the incoming section slides up over it.
-      gsap.to(containerRef.current, {
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-          pin: false,
-        },
-        opacity: 0.25,
-        scale: 0.94,
-        ease: "none",
+      // Polaroid cards staggered fly-in
+      photos.forEach((photo, i) => {
+        const ref = photoRefs.current[i];
+        if (!ref) return;
+
+        tl.to(ref, {
+          opacity: 1,
+          scale: 1,
+          rotation: photo.rotation,
+          y: 0,
+          duration: 0.75,
+          ease: "back.out(1.4)",
+        }, 0.45 + i * 0.15);
       });
 
-      // ── Curved Overlap Animation ──────────────────────────────────────────
-      // Morph the top corners of the incoming section from a deep curve (100px)
-      // to a flat edge (0px) as it rolls up to cover the screen.
-      // We wrap this in a requestAnimationFrame to ensure the sibling element
-      // '#rakhi-next-section' is fully mounted in the DOM.
+      // ── 3. Curved Morphing Transition on Scroll ──
       requestAnimationFrame(() => {
         const nextSection = document.getElementById("rakhi-next-section");
         if (nextSection) {
-          gsap.fromTo(nextSection,
+          gsap.fromTo(
+            nextSection,
             {
-              borderTopLeftRadius: "100px",
-              borderTopRightRadius: "100px",
+              borderTopLeftRadius: "280px",
+              borderTopRightRadius: "280px",
             },
             {
               scrollTrigger: {
@@ -319,34 +429,147 @@ export default function Hero() {
           );
         }
       });
+
+      // ── 4. Continuous Idle Wobble Loops ──
+      photos.forEach((photo, i) => {
+        const ref = photoRefs.current[i];
+        if (!ref) return;
+
+        gsap.to(ref, {
+          rotation: photo.rotation + gsap.utils.random(1, 2) * (Math.random() > 0.5 ? 1 : -1),
+          duration: gsap.utils.random(4, 6),
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          delay: 1.5 + gsap.utils.random(0, 1.5),
+        });
+      });
+
+      return () => {
+        if (split) {
+          split.revert();
+        }
+      };
     },
-    { scope: containerRef, dependencies: [prefersReduced] }
+    { scope: containerRef, dependencies: [prefersReduced, photos] }
   );
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // ── 6. Idle Wax Seal Pulsing ──
+  useGSAP(
+    () => {
+      if (isOpening || !sealRef.current) return;
+
+      const pulse = gsap.fromTo(
+        sealRef.current,
+        { opacity: 0.9, scale: 0.97 },
+        {
+          opacity: 1,
+          scale: 1.03,
+          duration: 1.25,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+        }
+      );
+
+      return () => {
+        pulse.kill();
+      };
+    },
+    { scope: containerRef, dependencies: [isOpening] }
+  );
+
+  // ── Declarative Pointer Parallax using Framer Motion ───────────────────────
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const getMultiplier = (zIndex: number) => {
+    if (zIndex === 3) return 8;  // Front supporting cards (move most)
+    if (zIndex === 2) return 4;  // Middle focal card
+    return 2;                    // Back accent card (move least)
+  };
+
+  const px0 = useSpring(useTransform(x, (val) => val * getMultiplier(photos[0]?.zIndex ?? 2)), { stiffness: 150, damping: 20 });
+  const py0 = useSpring(useTransform(y, (val) => val * getMultiplier(photos[0]?.zIndex ?? 2)), { stiffness: 150, damping: 20 });
+
+  const px1 = useSpring(useTransform(x, (val) => val * getMultiplier(photos[1]?.zIndex ?? 3)), { stiffness: 150, damping: 20 });
+  const py1 = useSpring(useTransform(y, (val) => val * getMultiplier(photos[1]?.zIndex ?? 3)), { stiffness: 150, damping: 20 });
+
+  const px2 = useSpring(useTransform(x, (val) => val * getMultiplier(photos[2]?.zIndex ?? 3)), { stiffness: 150, damping: 20 });
+  const py2 = useSpring(useTransform(y, (val) => val * getMultiplier(photos[2]?.zIndex ?? 3)), { stiffness: 150, damping: 20 });
+
+  const px3 = useSpring(useTransform(x, (val) => val * getMultiplier(photos[3]?.zIndex ?? 1)), { stiffness: 150, damping: 20 });
+  const py3 = useSpring(useTransform(y, (val) => val * getMultiplier(photos[3]?.zIndex ?? 1)), { stiffness: 150, damping: 20 });
+
+  const getParallaxOffset = (index: number) => {
+    if (index === 0) return { x: px0, y: py0 };
+    if (index === 1) return { x: px1, y: py1 };
+    if (index === 2) return { x: px2, y: py2 };
+    return { x: px3, y: py3 };
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (prefersReduced) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const normX = (e.clientX - centerX) / (rect.width / 2);
+    const normY = (e.clientY - centerY) / (rect.height / 2);
+
+    x.set(normX);
+    y.set(normY);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  const getSizeStyle = (size: "focal" | "large" | "medium" | "small") => {
+    switch (size) {
+      case "focal":
+        return { width: "190px", height: "230px" };
+      case "large":
+        return { width: "140px", height: "160px" };
+      case "medium":
+        return { width: "130px", height: "150px" };
+      default:
+        return { width: "120px", height: "140px" };
+    }
+  };
+
   return (
     <section
       ref={containerRef}
       aria-label="Raksha Bandhan Greeting Card Hero"
-      className="sticky top-0 z-10 w-full h-[100dvh] flex flex-col items-center justify-center overflow-hidden hero-bg"
+      className="fixed top-0 left-0 z-10 w-full h-[100vh] flex flex-col items-center justify-between overflow-hidden hero-bg"
       style={{
         paddingTop: "env(safe-area-inset-top)",
         paddingBottom: "env(safe-area-inset-bottom)",
+        perspective: "1000px", // Enables 3D rotations
       }}
     >
-      {/* ── Subtle mandala background ─────────────────────────────────────── */}
-      <div className="absolute inset-0 hero-mandala pointer-events-none" aria-hidden="true" />
+      {/* Mandala watermark background decoration */}
+      <div className="absolute inset-0 hero-mandala pointer-events-none opacity-[0.12]" aria-hidden="true" />
 
-      {/* ── Mute toggle ───────────────────────────────────────────────────── */}
+      {/* Top-Left Notebook Grid Overlay */}
+      <div
+        className="absolute top-0 left-0 w-[68%] h-[48%] pointer-events-none opacity-35"
+        style={{
+          backgroundSize: "16px 16px",
+          backgroundImage: "linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)",
+          maskImage: "linear-gradient(to bottom right, black 65%, transparent 100%)",
+          WebkitMaskImage: "linear-gradient(to bottom right, black 65%, transparent 100%)"
+        }}
+      />
+
+      {/* Mute button overlay */}
       <motion.button
+        type="button"
         onClick={() => setMuted((m) => !m)}
         aria-label={muted ? "Unmute music" : "Mute music"}
-        className={cn(
-          "absolute top-4 right-4 z-50",
-          "flex items-center justify-center w-11 h-11 rounded-full",
-          "bg-white/30 backdrop-blur-sm border border-white/40",
-          "text-[var(--rakhi-maroon)]"
-        )}
+        className="absolute top-4 right-4 z-50 flex items-center justify-center w-11 h-11 rounded-full bg-white/30 backdrop-blur-sm border border-white/40 text-[var(--rakhi-maroon)] shadow-sm"
         style={{ top: "calc(1rem + env(safe-area-inset-top))" }}
         whileTap={{ scale: 0.88 }}
         whileHover={{ scale: 1.1 }}
@@ -364,216 +587,238 @@ export default function Hero() {
         </AnimatePresence>
       </motion.button>
 
-      {/* ════════════════════════════════════════════════════════════════════
-          CARD LAYOUT — 2-col × 2-row grid divided by a ribbon cross
-          ════════════════════════════════════════════════════════════════ */}
-      <div
-        className="relative w-full max-w-[430px] mx-auto"
-        style={{
-          minHeight: "min(100dvh, 760px)",
-          display: "grid",
-          /* Col split ~42% / 58% */
-          gridTemplateColumns: "42% 58%",
-          /* Row split: top half / ribbon band / bottom half */
-          gridTemplateRows: "1fr 64px 1fr",
-          padding: "0 0 0 0",
-        }}
-      >
-        {/* ── TOP-LEFT: Headline text panel ─────────────────────────────── */}
-        <div
-          ref={textPanelRef}
-          className="flex flex-col justify-center pl-6 pr-3 py-8"
-          style={{ gridColumn: "1", gridRow: "1" }}
-        >
-          <h1 className="sr-only">
-            {CARD_CONTENT.headlineLines.join(" ")} {CARD_CONTENT.recipientName}
+      {/* ── Collage Content Container (Full Width & Height to fill the screen) ── */}
+      <div className="w-full h-full relative overflow-visible flex flex-col items-center pt-[10vh] px-4">
+
+        {/* Title Area */}
+        <div ref={titleAreaRef} className="text-center w-full select-none mb-4 z-30 relative">
+          <h1
+            ref={titleRef}
+            className="text-[4.0rem] text-[var(--rakhi-maroon)] leading-[1.1] font-normal tracking-wide pointer-events-auto overflow-hidden inline-block"
+            style={{
+              fontFamily: "var(--font-cherry-bomb-one, 'Cherry Bomb One', cursive)",
+              transform: "translateZ(0)",
+              WebkitMaskImage: "-webkit-radial-gradient(white, black)",
+            }}
+          >
+            {name}
           </h1>
-          <div aria-hidden="true" className="flex flex-col gap-[2px] relative">
-            {CARD_CONTENT.headlineLines.map((line, i) => (
-              <span
-                key={i}
-                className="hero-line block"
-                style={{
-                  fontFamily: "var(--font-display, 'Playfair Display', serif)",
-                  fontWeight: 700,
-                  fontSize: "clamp(1.4rem, 3vw, 2rem)",
-                  letterSpacing: "0.18em",
-                  color: "var(--rakhi-maroon)",
-                  lineHeight: 1.15,
-                }}
-              >
-                {line}
-              </span>
-            ))}
-            <span
-              className="hero-name block mt-2 relative w-fit"
-              style={{
-                fontFamily: "var(--font-display, 'Playfair Display', serif)",
-                fontWeight: 700,
-                fontSize: "clamp(1.4rem, 7vw, 2rem)",
-                letterSpacing: "0.18em",
-                color: "var(--rakhi-thread-red)",
-                lineHeight: 1.15,
-              }}
-            >
-              {CARD_CONTENT.recipientName}
-
-              {/* Butterfly start target anchor */}
-              <span id="butterfly-start-anchor" className="absolute -bottom-8 left-4 w-12 h-12 pointer-events-none opacity-0" />
-            </span>
-          </div>
-        </div>
-
-        {/* ── TOP-RIGHT: Photo 1 ────────────────────────────────────────── */}
-        <div
-          ref={photo1Ref}
-          className="relative overflow-hidden"
-          style={{
-            gridColumn: "2",
-            gridRow: "1",
-            margin: "32px 12px 10px 20px",
-            borderRadius: "4px",
-          }}
-        >
-          <Image
-            src={CARD_CONTENT.photo1}
-            alt="Sibling moment 1"
-            fill
-            className="object-cover"
-            priority
-            sizes="(max-width: 430px) 58vw, 250px"
-          />
-        </div>
-
-        {/* ── RIBBON ROW: horizontal band + vertical line + BOW ─────────── */}
-        {/* Horizontal ribbon */}
-        <div
-          ref={hRibbonRef}
-          aria-hidden="true"
-          style={{
-            gridColumn: "1 / -1",
-            gridRow: "2",
-            position: "relative",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          {/* Full-width horizontal stripe */}
-          <div
-            className="w-full"
-            style={{
-              height: "7px",
-              background: "var(--rakhi-thread-red)",
-              opacity: 0.9,
-            }}
-          />
-        </div>
-
-        {/* Vertical ribbon — absolutely positioned, full height of card */}
-        <div
-          ref={vRibbonRef}
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            left: "42%",
-            top: 0,
-            bottom: 0,
-            width: "7px",
-            background: "var(--rakhi-thread-red)",
-            opacity: 0.9,
-            zIndex: 10,
-          }}
-        />
-
-        {/* BOW — centred at the ribbon cross-point */}
-        <div
-          ref={bowRef}
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            left: "calc(42% - 46px)",
-            top: "calc(50% - 40px)",
-            width: "92px",
-            height: "80px",
-            zIndex: 20,
-          }}
-        >
-          <RibbonBow />
-        </div>
-
-        {/* ── BOTTOM-LEFT: Photo 2 ──────────────────────────────────────── */}
-        <div
-          ref={photo2Ref}
-          className="relative overflow-hidden"
-          style={{
-            gridColumn: "1",
-            gridRow: "3",
-            margin: "10px 8px 50px 8px",
-            borderRadius: "4px",
-          }}
-        >
-          <Image
-            src={CARD_CONTENT.photo2}
-            alt="Sibling moment 2"
-            fill
-            className="object-cover"
-            sizes="(max-width: 430px) 42vw, 180px"
-          />
-        </div>
-
-        {/* ── BOTTOM-RIGHT: Photo 3 + tagline ──────────────────────────── */}
-        <div
-          style={{
-            gridColumn: "2",
-            gridRow: "3",
-            display: "flex",
-            flexDirection: "column",
-            margin: "0 12px 12px 20px",
-            gap: "6px",
-          }}
-        >
-          <div
-            ref={photo3Ref}
-            className="relative overflow-hidden flex-1"
-            style={{ borderRadius: "4px", minHeight: 0 }}
-          >
-            <Image
-              src={CARD_CONTENT.photo3}
-              alt="Sibling moment 3"
-              fill
-              className="object-cover"
-              sizes="(max-width: 430px) 58vw, 250px"
-            />
-          </div>
-
-          {/* Tagline + CTA below photo 3 */}
           <p
-            ref={taglineRef}
-            style={{
-              fontFamily: "var(--font-display, 'Playfair Display', serif)",
-              fontStyle: "italic",
-              fontSize: "0.78rem",
-              color: "var(--rakhi-text-secondary)",
-              paddingLeft: "2px",
-            }}
+            ref={subtitleRef}
+            className="text-[0.78rem] italic text-stone-600/90 max-w-[280px] mx-auto mt-2 font-serif leading-relaxed px-2 pointer-events-auto scroll-animate-text"
           >
-            {CARD_CONTENT.tagline}
+            {subtitle}
           </p>
         </div>
-      </div>
 
-      {/* ── CTA below the card grid ───────────────────────────────────────── */}
-      <div className="relative z-30 mt-6 pb-4 flex flex-col items-center gap-3"
-        style={{ paddingBottom: "calc(1rem + env(safe-area-inset-bottom))" }}>
-
-        {/* Scroll chevron */}
-        <motion.div
-          aria-hidden="true"
-          animate={prefersReduced ? {} : { y: [0, 7, 0] }}
-          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+        {/* Collage Stack Container */}
+        <div
+          ref={collageContainerRef}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
+          className="relative w-full max-w-[380px] md:max-w-[440px] h-[390px] mt-2 select-none overflow-visible z-25 pointer-events-auto"
         >
-          <ChevronDown size={24} style={{ color: "var(--rakhi-maroon)", opacity: 0.45 }} />
-        </motion.div>
+          {photos.map((photo, i) => {
+            const sizeStyle = getSizeStyle(photo.size);
+            const parallax = getParallaxOffset(i);
+
+            return (
+              <motion.div
+                key={photo.id}
+                ref={(el) => {
+                  photoRefs.current[i] = el;
+                }}
+                className="absolute will-change-transform"
+                style={{
+                  top: photo.position.top,
+                  left: photo.position.left,
+                  right: photo.position.right,
+                  width: sizeStyle.width,
+                  height: sizeStyle.height,
+                  zIndex: photo.zIndex,
+                  x: parallax.x,
+                  y: parallax.y,
+                }}
+              >
+                {/* Polaroid Frame Container */}
+                <div className="w-full h-full bg-white p-2 pb-5 rounded-sm shadow-[0_12px_28px_rgba(122,31,61,0.12),0_4px_10px_rgba(0,0,0,0.06)] border border-stone-200/40 flex flex-col items-center relative">
+
+                  {/* Washi-tape accent on the focal photo only */}
+                  {photo.id === "focal" && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-14 h-7 opacity-85 rotate-[-3deg] pointer-events-none z-30">
+                      <Image
+                        src="/Rakhi-card-media/Tape-2.png"
+                        alt="Tape decoration"
+                        fill
+                        className="object-contain"
+                        sizes="60px"
+                      />
+                    </div>
+                  )}
+
+                  {/* Polaroid Image Slot */}
+                  <div className="relative w-full flex-1 bg-stone-100 overflow-hidden rounded-sm">
+                    <Image
+                      src={photo.src}
+                      alt={photo.caption}
+                      fill
+                      className="object-cover"
+                      sizes="220px"
+                    />
+                  </div>
+
+                  {/* Polaroid Caption */}
+                  <span
+                    className="text-[0.52rem] font-light text-[var(--rakhi-text-primary)] mt-2 leading-none font-dancing tracking-wide font-serif italic"
+                  >
+                    {photo.caption}
+                  </span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* ✉ Envelope Seal Break CTA Container */}
+        <div
+          ref={envelopeRef}
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center pointer-events-auto [perspective:1000px] select-none"
+          style={{
+            transformStyle: "preserve-3d",
+            width: "360px",
+            height: "125px", // Peeks up from bottom
+            willChange: "transform, opacity",
+          }}
+        >
+          {/* Muted instruction text above the flap */}
+          <AnimatePresence>
+            {!isOpening && (
+              <motion.p
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 0.75, y: 0 }}
+                exit={{ opacity: 0 }}
+                className="text-[0.68rem] tracking-[0.2em] uppercase font-bold mb-2 cursor-default pointer-events-none select-none text-[#7A1F3D]/80"
+                style={{
+                  fontFamily: "var(--font-body, Poppins, sans-serif)",
+                }}
+              >
+                Tap the seal to open
+              </motion.p>
+            )}
+          </AnimatePresence>
+
+          {/* Envelope Flap Crease & Body wrapper */}
+          <div
+            className="relative w-[320px] h-[90px] [transform-style:preserve-3d]"
+          >
+            {/* Inside Glow (Radial Gradient behind flap) */}
+            <div
+              ref={glowRef}
+              className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(245,166,35,0.45)_0%,transparent_70%)] opacity-0 pointer-events-none transition-opacity duration-300"
+              style={{ top: "0px", zIndex: 0 }}
+            />
+
+            {/* Envelope Body Edge (peeking up just slightly) */}
+            <div
+              className="absolute bottom-0 left-0 w-full h-[15px] bg-[#FFF8F0] border-t border-amber-800/10 shadow-[0_-8px_20px_rgba(0,0,0,0.04)]"
+              style={{ zIndex: 5, borderRadius: "2px 2px 0 0" }}
+            />
+
+            {/* Triangular Flap */}
+            <div
+              ref={flapRef}
+              className="absolute bottom-0 left-0 w-full h-[70px] origin-bottom [transform-style:preserve-3d]"
+              style={{
+                zIndex: 10,
+                transformOrigin: "bottom center",
+                willChange: "transform",
+              }}
+            >
+              <svg viewBox="0 0 320 70" className="w-full h-full drop-shadow-[0_-4px_6px_rgba(0,0,0,0.06)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+                {/* Triangular Flap Shape */}
+                <polygon
+                  points="0,70 160,0 320,70"
+                  fill="#FFF8F0"
+                  stroke="#E8C39E"
+                  strokeWidth="0.75"
+                />
+                {/* Thin gold border line tracing edge */}
+                <polyline
+                  points="2,69 160,2 318,69"
+                  stroke="rgba(245, 166, 35, 0.4)"
+                  strokeWidth="1.25"
+                  fill="none"
+                />
+              </svg>
+            </div>
+
+            {/* Wax Seal Container (layered over the flap tip when closed) */}
+            <div
+              className="absolute left-1/2 -translate-x-1/2"
+              style={{
+                bottom: "42px", // aligns center of 56px seal exactly on 70px flap tip
+                width: "56px",
+                height: "56px",
+                zIndex: 20,
+              }}
+            >
+              {/* Wax Seal interactive button */}
+              <motion.button
+                ref={sealRef}
+                type="button"
+                onClick={handleOpenSeal}
+                disabled={isOpening}
+                whileTap={{ scale: 0.9 }}
+                className="relative w-full h-full rounded-full cursor-pointer flex items-center justify-center select-none active:outline-none focus:outline-none"
+                style={{
+                  background: "radial-gradient(circle at 35% 35%, #9E2B4B 0%, #7A1F3D 70%, #540D23 100%)",
+                  boxShadow: "0 6px 14px rgba(78, 10, 30, 0.35), inset 0 2px 3px rgba(255, 255, 255, 0.25), inset 0 -2px 4px rgba(0, 0, 0, 0.45)",
+                  border: "1.5px solid #63132B",
+                  opacity: 1,
+                  willChange: "transform, opacity",
+                }}
+                aria-label="Tap to open the envelope seal"
+              >
+                {/* Inner decorative emboss ring */}
+                <div className="absolute inset-1.5 rounded-full border border-dashed border-[#F5A623]/25 pointer-events-none" />
+
+                {/* Gold Embossed Heart Symbol in center */}
+                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current text-[#F5A623] drop-shadow-[0_1.5px_1px_rgba(0,0,0,0.55)]">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                </svg>
+              </motion.button>
+
+              {/* Wax Fragment Shards (hidden until clicked) */}
+              <div className="absolute inset-0 pointer-events-none overflow-visible">
+                {[...Array(6)].map((_, i) => (
+                  <div
+                    key={i}
+                    ref={(el) => {
+                      if (el) shardRefs.current[i] = el;
+                    }}
+                    className="absolute w-6 h-6 opacity-0 select-none pointer-events-none"
+                    style={{
+                      top: "16px",
+                      left: "16px",
+                      willChange: "transform, opacity",
+                    }}
+                  >
+                    <svg viewBox="0 0 24 24" className="w-full h-full" fill="#7A1F3D">
+                      {/* Unique organic shards */}
+                      {i === 0 && <polygon points="3,13 11,3 15,13" />}
+                      {i === 1 && <polygon points="13,3 21,11 11,17" />}
+                      {i === 2 && <polygon points="21,13 13,21 9,9" />}
+                      {i === 3 && <polygon points="13,21 3,13 14,7" />}
+                      {i === 4 && <polygon points="5,5 17,9 11,19" />}
+                      {i === 5 && <polygon points="19,19 7,15 13,5" />}
+                    </svg>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
   );

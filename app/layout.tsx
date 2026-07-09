@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Poppins, Great_Vibes } from "next/font/google";
-import SmoothScroll from "../components/wedding-card/SmoothScroll";
+import { Playfair_Display, Poppins, Great_Vibes, Dancing_Script, Crimson_Pro, Cherry_Bomb_One } from "next/font/google";
+import localFont from "next/font/local";
+import SmoothScroll from "../components/Rakhi-card/SmoothScroll";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,34 @@ const greatVibes = Great_Vibes({
   variable: "--font-script",
 });
 
+// ── Second script font: for personal written messages ──────────────────────────
+const dancingScript = Dancing_Script({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-dancing",
+});
+
+// ── Warm text serif: Crimson Pro ───────────────────────────────────────────────
+const crimsonPro = Crimson_Pro({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-crimson-pro",
+});
+
+// ── Playful Bubble Font: Cherry Bomb One ─────────────────────────────────────────
+const cherryBombOne = Cherry_Bomb_One({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-cherry-bomb-one",
+});
+
+// ── Local Custom Script Font: High Spirited ────────────────────────────────────
+const highSpirited = localFont({
+  src: "../public/Rakhi-card-media/High-Spirited/High Spirited.ttf",
+  variable: "--font-high-spirited",
+});
+
 export const metadata: Metadata = {
   title: "Happy Raksha Bandhan 🪢",
   description: "A heartfelt digital Raksha Bandhan greeting card — because some threads cross any distance.",
@@ -49,7 +78,11 @@ export default function RootLayout({
         "h-full antialiased",
         playfair.variable,
         poppins.variable,
-        greatVibes.variable
+        greatVibes.variable,
+        dancingScript.variable,
+        highSpirited.variable,
+        crimsonPro.variable,
+        cherryBombOne.variable
       )}
       suppressHydrationWarning
     >

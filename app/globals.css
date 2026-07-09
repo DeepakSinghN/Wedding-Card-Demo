@@ -34,14 +34,22 @@
 
   /* ── Rakhi card design tokens (--rakhi-* namespace) ─────────────────────
      Change these to retheme the entire greeting card. */
-  --rakhi-maroon:        #7A1F3D;  /* deep rani-pink / maroon — primary */
-  --rakhi-gold:          #F5A623;  /* marigold gold — accent */
-  --rakhi-saffron:       #FFD36E;  /* lighter saffron — secondary accent */
-  --rakhi-thread-red:    #C0392B;  /* rakhi thread red */
-  --rakhi-cream:         #FFF8F0;  /* background / text on dark */
-  --rakhi-blush:         #FFE4E4;  /* soft blush tint */
-  --rakhi-text-primary:  #4A1525;  /* body text on cream background */
-  --rakhi-text-secondary:#8B4A5A;  /* muted text */
+  --rakhi-maroon: #7A1F3D;
+  /* deep rani-pink / maroon — primary */
+  --rakhi-gold: #F5A623;
+  /* marigold gold — accent */
+  --rakhi-saffron: #FFD36E;
+  /* lighter saffron — secondary accent */
+  --rakhi-thread-red: #C0392B;
+  /* rakhi thread red */
+  --rakhi-cream: #FFF8F0;
+  /* background / text on dark */
+  --rakhi-blush: #FFE4E4;
+  /* soft blush tint */
+  --rakhi-text-primary: #4A1525;
+  /* body text on cream background */
+  --rakhi-text-secondary: #8B4A5A;
+  /* muted text */
   /* ─────────────────────────────────────────────────────────────────────── */
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -87,12 +95,10 @@ body {
 
 /* ── Hero section background ──────────────────────────────────────────────── */
 .hero-bg {
-  background: linear-gradient(
-    165deg,
-    var(--rakhi-cream) 0%,
-    #fff0f4 45%,
-    var(--rakhi-blush) 100%
-  );
+  background: linear-gradient(165deg,
+      var(--rakhi-cream) 0%,
+      #fff0f4 45%,
+      var(--rakhi-blush) 100%);
 }
 
 /* ── Slow-rotating mandala watermark ──────────────────────────────────────── */
@@ -106,11 +112,16 @@ body {
 }
 
 @keyframes mandalaSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-mandala { animation: none; }
+  .hero-mandala {
+    animation: none;
+  }
+
   @keyframes mandalaSpin {}
 }
 
@@ -385,4 +396,13 @@ html.lenis body {
   html {
     @apply font-sans;
   }
+}
+
+
+/* Text Animation */
+
+.char {
+  position: relative;
+  display: inline-block;
+  will-change: transform;
 }
