@@ -5,7 +5,10 @@ import Image from "next/image";
 import ScrollReveal from "./ScrollReveal";
 import ShinyText from "./ShinyText";
 
-export default function Hero() {
+export default function Hero({ data }: { data: any }) {
+  const bride = data?.brideName || "Meenal";
+  const groom = data?.groomName || "Avinash";
+
   return (
     <section className="w-full h-screen flex items-center justify-center bg-[#FAF4EF] px-6">
       {/* 3D Center Card */}
@@ -35,21 +38,21 @@ export default function Hero() {
           </div>
 
           {/* Hindi Shloka (Scripture Serif style) */}
-          <p className="font-cormorant italic text-[clamp(0.85rem,3vw,1.05rem)] tracking-wide leading-relaxed text-[#A0635F] max-w-[80%] font-medium">
+          <p className="font-cormorant italic text-[clamp(0.65rem,2vw,1.05rem)] tracking-wide leading-relaxed text-[#A0635F] max-w-[80%] font-medium">
             || श्री गणेशाय नमः ||
             वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ।
             निर्विघ्नं कुरु मे देव सर्वकार्येषु सर्वदा॥
           </p>
 
           {/* English Blessings */}
-          <p className="font-cormorant italic text-[clamp(1rem,1.5vw,1.15rem)] leading-[1.6rem] tracking-wide text-[#A36662]/80 max-w-[100%] md:max-w-[90%] mt-4 md:mt-2">
+          <p className="font-cormorant italic text-[clamp(0.84rem,1.5vw,1.15rem)] leading-[1.6rem] tracking-wide text-[#A36662]/80 max-w-[100%] md:max-w-[90%] mt-2 md:mt-2">
             ॥ Shri Ganeshaya Namah ॥
             We seek the blessings of Lord Ganesha for a happy & peaceful beginning.
           </p>
         </div>
 
         {/* Middle Section: Couple Names with Separators */}
-        <div className="flex flex-col items-center text-center z-10 w-full ">
+        <div className="flex flex-col items-center text-center z-10 w-full mt-3 ">
           {/* Top Diamond Separator */}
           <div className="flex items-center gap-3 w-[clamp(8rem,18vw,8.5rem)] opacity-35">
             <div className="h-[1px] bg-[#A36662] flex-1" />
@@ -59,8 +62,8 @@ export default function Hero() {
 
           <div className="flex flex-col items-center mt-2">
             <ShinyText
-              text="Meenal"
-              className="font-cormorant text-[clamp(3rem,6vw,4.25rem)] tracking-[0.1rem] md:tracking-[0.2rem] leading-none font-bold"
+              text={bride}
+              className="font-cormorant text-[clamp(2.5rem,6vw,4.25rem)] tracking-[0.1rem] md:tracking-[0.2rem] leading-none font-bold"
               speed={4}
               delay={1}
               color="#A0635F"
@@ -79,8 +82,8 @@ export default function Hero() {
               direction="right"
             />
             <ShinyText
-              text="Avinash"
-              className="font-cormorant text-[clamp(3rem,6vw,4.25rem)] tracking-[0.1rem] md:tracking-[0.2rem] leading-none font-bold "
+              text={groom}
+              className="font-cormorant text-[clamp(2.5rem,6vw,4.25rem)] tracking-[0.1rem] md:tracking-[0.2rem] leading-none font-bold "
               speed={4}
               delay={1}
               color="#A0635F"
@@ -100,7 +103,7 @@ export default function Hero() {
 
         {/* Bottom Section: Footer Regards */}
         <div className="text-center z-10 w-full pb-3 mt-2">
-          <p className="font-cormorant italic text-[clamp(0.8rem,1vw,1.05rem)] tracking-wider text-black leading-relaxed normal-case font-medium">
+          <p className="font-cormorant italic text-[clamp(0.7rem,1vw,1.05rem)] tracking-wider text-black leading-relaxed normal-case font-medium">
             Daughter of Mr. &amp; Mrs. Sharma &
             Son of Mr. &amp; Mrs. Patel
           </p>

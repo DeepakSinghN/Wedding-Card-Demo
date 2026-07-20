@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Poppins, Great_Vibes, Dancing_Script, Crimson_Pro, Cherry_Bomb_One } from "next/font/google";
+import { Playfair_Display, Poppins, Great_Vibes, Dancing_Script, Crimson_Pro, Cherry_Bomb_One, Alex_Brush, Arimo, Vesper_Libre } from "next/font/google";
 import localFont from "next/font/local";
 import SmoothScroll from "../components/Rakhi-card/SmoothScroll";
 import "./globals.css";
@@ -55,6 +55,29 @@ const highSpirited = localFont({
   variable: "--font-high-spirited",
 });
 
+// ── Wedding Card 2: cursive display (Latin) ────────────────────────────────────
+const alexBrush = Alex_Brush({
+  subsets: ["latin"],
+  weight: ["400"],
+  variable: "--font-alex-brush",
+});
+
+// ── Wedding Card 2: clean body (Latin) ─────────────────────────────────────────
+const arimo = Arimo({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-arimo",
+});
+
+// ── Wedding Card 2: Devanagari serif for the Sanskrit shloka ───────────────────
+// (Alex Brush & Arimo are Latin-only, so a Devanagari face is required to render
+//  the Sanskrit text correctly.)
+const vesperLibre = Vesper_Libre({
+  subsets: ["devanagari"],
+  weight: ["400", "500", "700", "900"],
+  variable: "--font-devanagari",
+});
+
 export const metadata: Metadata = {
   title: "Happy Raksha Bandhan 🪢",
   description: "A heartfelt digital Raksha Bandhan greeting card — because some threads cross any distance.",
@@ -82,7 +105,10 @@ export default function RootLayout({
         dancingScript.variable,
         highSpirited.variable,
         crimsonPro.variable,
-        cherryBombOne.variable
+        cherryBombOne.variable,
+        alexBrush.variable,
+        arimo.variable,
+        vesperLibre.variable
       )}
       suppressHydrationWarning
     >

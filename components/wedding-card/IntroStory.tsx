@@ -13,7 +13,7 @@ const stories = [
   "Come witness a promise that lasts forever."
 ];
 
-export default function IntroStory() {
+export default function IntroStory({ data }: { data: any }) {
   const [index, setIndex] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { amount: 0.3 });

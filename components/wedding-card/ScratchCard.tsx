@@ -11,6 +11,7 @@ interface ScratchCardProps {
   swingDelay?: number;
   rotateDuration?: number;
   yDuration?: number;
+  isCompact?: boolean;
 }
 
 // Programmatic ASMR scratch sound synthesizer using Web Audio API
@@ -88,7 +89,8 @@ export default function ScratchCard({
   onReveal,
   swingDelay = 0,
   rotateDuration = 1.2,
-  yDuration = 1.4
+  yDuration = 1.4,
+  isCompact = false
 }: ScratchCardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isScratched, setIsScratched] = useState(false);
@@ -153,8 +155,8 @@ export default function ScratchCard({
 
     const dpr = window.devicePixelRatio || 1;
     const isMobile = window.innerWidth < 768;
-    const width = isMobile ? 120 : 160;
-    const height = isMobile ? 165 : 220;
+    const width = isMobile ? 110 : 160;
+    const height = isMobile ? 150 : 200;
 
     canvas.width = width * dpr;
     canvas.height = height * dpr;
@@ -486,7 +488,7 @@ export default function ScratchCard({
   return (
     <div className="flex flex-col items-center gap-2 select-none scratch-card-container">
       {/* Title above the card */}
-      <span className="font-semibold text-lg tracking-[0.2em] text-black/75 uppercase">
+      <span className="font-medium text-sm tracking-[0.2em] text-black/60 uppercase">
         {title}
       </span>
 
@@ -509,7 +511,7 @@ export default function ScratchCard({
         className="relative"
       >
         <div
-          className="relative w-[130px] h-[170px] mx-2 md:w-[160px] md:h-[200px] rounded-2xl bg-[#FDFAF7] border border-[#A36662]/12 border-b-[4px] md:border-b-[6px] border-b-[#A36662]/20 overflow-hidden flex items-center justify-center  cursor-pointer"
+          className="relative w-[110px] h-[150px] mx-2 md:w-[160px] md:h-[200px] rounded-2xl bg-[#FDFAF7] border border-[#A36662]/12 border-b-[4px] md:border-b-[6px] border-b-[#A36662]/20 overflow-hidden flex items-center justify-center  cursor-pointer"
           onMouseMove={handleMouseMove}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
@@ -536,7 +538,8 @@ export default function ScratchCard({
               transformStyle: "preserve-3d",
             }}
           >
-            <span className="font-cormorant font-light text-4xl md:text-5xl text-[#8f5854] font-bold uppercase tracking-wider leading-none">
+            <span className={`font-cormorant font-light ${isCompact ? "text-2xl md:text-3xl" : "text-4xl md:text-5xl"
+              } text-[#8f5854] font-bold tracking-wider leading-none`}>
               {revealValue}
             </span>
           </motion.div>

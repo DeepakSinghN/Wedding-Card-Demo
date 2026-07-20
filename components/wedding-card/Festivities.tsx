@@ -92,7 +92,7 @@ function EventCard({ event }: { event: EventDetails }) {
     >
       {/* Continuous float animation wrapper */}
       <div
-        className="w-[290px] h-[450px] sm:w-[350px] sm:h-[490px] animate-float relative"
+        className="w-[300px] h-[500px] sm:w-[350px] sm:h-[490px] animate-float relative"
         style={{ animationDuration: `${event.floatDuration}s` }}
       >
         <div
@@ -109,12 +109,11 @@ function EventCard({ event }: { event: EventDetails }) {
           <div className="absolute inset-0 bg-[#FDFAF7] border border-[#A36662]/12 rounded-[32px] p-5 sm:p-6 pb-6 flex flex-col items-center justify-between z-10 overflow-hidden">
             {/* 1. Rounded Event Mood Image */}
             <div className="relative w-full h-[38%] rounded-[20px] overflow-hidden border border-neutral-100 shadow-sm flex-shrink-0">
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={event.image}
                 alt={event.title}
-                fill
-                className="object-cover pointer-events-none"
-                sizes="(max-w-md) 100vw, 420px"
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none"
               />
             </div>
 
@@ -142,14 +141,16 @@ function EventCard({ event }: { event: EventDetails }) {
               </p>
 
               {/* Dress Code Block */}
-              <div className="w-full border-t border-[#A36662]/10 pt-2.5 flex flex-col items-center justify-center">
-                <span className="font-sans text-[0.65rem] sm:text-[0.7rem] uppercase tracking-wider text-[#A36662]/75 font-bold block select-none">
-                  Dress Code
-                </span>
-                <span className="font-cormorant font-bold text-sm sm:text-[1.05rem] text-[#7A1C2C] mt-0.5">
-                  {event.dressCode}
-                </span>
-              </div>
+              {event.dressCode && (
+                <div className="w-full border-t border-[#A36662]/10 pt-2.5 flex flex-col items-center justify-center">
+                  <span className="font-sans text-[0.65rem] sm:text-[0.7rem] uppercase tracking-wider text-[#A36662]/75 font-bold block select-none">
+                    Dress Code
+                  </span>
+                  <span className="font-cormorant font-bold text-sm sm:text-[1.05rem] text-[#7A1C2C] mt-0.5">
+                    {event.dressCode}
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* 5. Pill-Shaped VIEW ON MAPS Button */}
@@ -349,7 +350,26 @@ function EventCard({ event }: { event: EventDetails }) {
   );
 }
 
-export default function Festivities() {
+export default function Festivities({ data }: { data: any }) {
+  const customFestivities = data?.festivities;
+
+  const events: EventDetails[] = customFestivities !== undefined && customFestivities !== null
+    ? customFestivities.map((item: any): EventDetails => {
+      const defaultEvent = EVENTS_LIST.find((e) => e.id === item.id);
+      return {
+        id: item.id,
+        title: item.title || "New Event",
+        image: item.image || defaultEvent?.image || "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800",
+        dateTime: item.dateTime || "Saturday, Nov 28 • 7:00 PM",
+        location: item.location || "Event Venue Details",
+        dressCode: item.dressCode || "",
+        mapLink: item.mapLink || "https://www.google.com/maps",
+        defaultRotation: item.defaultRotation !== undefined ? item.defaultRotation : (defaultEvent?.defaultRotation !== undefined ? defaultEvent.defaultRotation : 0),
+        floatDuration: item.floatDuration !== undefined ? item.floatDuration : (defaultEvent?.floatDuration !== undefined ? defaultEvent.floatDuration : 3.5),
+      };
+    })
+    : EVENTS_LIST;
+
   return (
     <section
       className="w-full bg-[#FAF4EF] relative flex flex-col items-center justify-center overflow-hidden py-24 px-6 border-t border-[#A36662]/5 min-h-screen"
@@ -366,7 +386,7 @@ export default function Festivities() {
 
       {/* Vertical Cards List Column Wrapper */}
       <div className="w-full max-w-[340px] sm:max-w-[410px] md:max-w-[460px] flex flex-col gap-10 md:gap-14 items-center z-10 relative">
-        {EVENTS_LIST.map((event) => (
+        {events.map((event) => (
           <EventCard key={event.id} event={event} />
         ))}
       </div>

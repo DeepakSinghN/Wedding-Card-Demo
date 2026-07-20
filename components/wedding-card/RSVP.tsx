@@ -163,7 +163,7 @@ const LotusMedallion = ({ isBlooming, onClick }: { isBlooming: boolean; onClick:
   );
 };
 
-export default function RSVP() {
+export default function RSVP({ data }: { data: any }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [envelopeState, setEnvelopeState] = useState<EnvelopeState>("sealed");
   const [isBlooming, setIsBlooming] = useState(false);

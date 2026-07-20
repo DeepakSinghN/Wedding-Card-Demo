@@ -25,6 +25,12 @@ export default function ScrollReveal({
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    const isEmbed = typeof window !== "undefined" && window.location.search.includes("embed=true");
+    if (isEmbed) {
+      setIsVisible(true);
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

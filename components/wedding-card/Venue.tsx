@@ -5,9 +5,13 @@ import Image from "next/image";
 import { motion, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import ParallaxHeader from "./ParallaxHeader";
 
-export default function Venue() {
+export default function Venue({ data }: { data: any }) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
+
+  const venueName = data?.venueName || "Rajalakshmi Kalyana Mandapam";
+  const venueAddress = data?.venueAddress || "No. 205/1, Velachery Main Road, Dhandeeswaram, Velachery, Chennai, Tamil Nadu — 600042";
+  const venueImage = data?.venueImage || "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?q=80&w=1000";
 
   // Parallax Scroll Tracking for card entrance
   const { scrollYProgress } = useScroll({
@@ -156,13 +160,11 @@ export default function Venue() {
               style={{ transform: "translateZ(25px)" }}
               className="relative w-full aspect-[4/3] rounded-[20px] overflow-hidden border border-neutral-100 shadow-sm"
             >
-              <Image
-                src="https://images.unsplash.com/photo-1599940824399-b87987ceb72a?q=80&w=1000"
-                alt="Rajalakshmi Kalyana Mandapam"
-                fill
-                priority
-                className="object-cover pointer-events-none"
-                sizes="(max-w-md) 100vw, 420px"
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={venueImage}
+                alt={venueName}
+                className="w-full h-full object-cover pointer-events-none absolute inset-0"
               />
             </div>
 
@@ -182,10 +184,7 @@ export default function Venue() {
               className="w-full text-center"
             >
               <h3 className="font-distrela text-2xl sm:text-[1.8rem] text-[#7A1C2C] font-bold tracking-wide leading-tight">
-                Rajalakshmi Kalyana
-              </h3>
-              <h3 className="font-distrela text-2xl sm:text-[1.8rem] text-[#7A1C2C] font-bold tracking-wide leading-tight mt-0.5">
-                Mandapam
+                {venueName}
               </h3>
             </div>
 
@@ -195,9 +194,7 @@ export default function Venue() {
               className="text-center px-4 mt-4 mb-6 select-none"
             >
               <p className="font-cormorant italic text-[clamp(1rem,1.8vw,1.15rem)] text-[#8F5E52] leading-relaxed font-semibold">
-                No. 205/1, Velachery Main Road,<br />
-                Dhandeeswaram<br />
-                Velachery, Chennai, Tamil Nadu — 600042
+                {venueAddress}
               </p>
             </div>
 
@@ -207,7 +204,7 @@ export default function Venue() {
               className="w-full flex justify-center z-20"
             >
               <a
-                href="https://www.google.com/maps/search/?api=1&query=Rajalakshmi+Kalyana+Mandapam+Velachery+Chennai"
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueName + " " + venueAddress)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#8F5E52] hover:bg-[#764b41] text-white font-sans font-bold uppercase tracking-[0.2em] text-[0.65rem] sm:text-[0.7rem] text-center shadow-md transition-all duration-300 transform active:scale-95"

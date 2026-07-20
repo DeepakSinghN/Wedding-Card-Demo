@@ -1,13 +1,9 @@
-"use client";
-
-import Page from "@/components/Rakhi-card/page";
+import Page from "@/components/wedding-card/page";
 
 export default function Home() {
-
   return (
     <>
       <Page />
-
     </>
   );
 }

@@ -12,13 +12,6 @@ interface CardData {
   caption: string;
 }
 
-const GALLERY_PHOTOS: CardData[] = [
-  { id: 1, src: "/Gallery/1.svg", caption: "The beginning of our forever" },
-  { id: 2, src: "/Gallery/2.svg", caption: "Laughter shared, dreams built" },
-  { id: 3, src: "/Gallery/3.svg", caption: "Two hearts, one journey" },
-  { id: 4, src: "/Gallery/4.svg", caption: "Memories together" },
-];
-
 const Card = ({
   photo,
   index,
@@ -61,7 +54,7 @@ const Card = ({
           backfaceVisibility: "hidden",
           boxShadow: "0 30px 60px -15px rgba(163, 102, 98, 0.24), 0 12px 25px -10px rgba(163, 102, 98, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.9)",
         }}
-        className="relative w-[330px] h-[500px] md:w-[400px] md:h-[500px] rounded-[18px] bg-white border border-[#A36662]/10 overflow-hidden flex flex-col justify-start items-center gap-2 p-3 pb-0 md:p-3 md:pb-0"
+        className="relative w-[330px] h-[430px] md:w-[400px] md:h-[500px] rounded-[18px] bg-white border border-[#A36662]/10 overflow-hidden flex flex-col justify-start items-center gap-2 p-1 pb-0 md:p-3 md:pb-0"
       >
 
         {/* Polaroid Square Photo Frame */}
@@ -70,13 +63,12 @@ const Card = ({
             style={{ scale: imageScale }}
             className="relative w-full h-full "
           >
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={photo.src}
               alt={photo.caption}
-              fill
-              className="object-cover pointer-events-none p-4  rounded-[26px]"
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none p-4 rounded-[26px]"
               draggable={false}
-              priority={index === 0}
             />
           </motion.div>
         </div>
@@ -92,8 +84,20 @@ const Card = ({
   );
 };
 
-export default function Gallery() {
+export default function Gallery({ data }: { data: any }) {
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const g1 = data?.gallery1 || "/Gallery/1.svg";
+  const g2 = data?.gallery2 || "/Gallery/2.svg";
+  const g3 = data?.gallery3 || "/Gallery/3.svg";
+  const g4 = data?.gallery4 || "/Gallery/4.svg";
+
+  const photos: CardData[] = [
+    { id: 1, src: g1, caption: "The beginning of our forever" },
+    { id: 2, src: g2, caption: "Laughter shared, dreams built" },
+    { id: 3, src: g3, caption: "Two hearts, one journey" },
+    { id: 4, src: g4, caption: "Memories together" },
+  ];
 
   // Track the scroll progress of the entire stack list
   const { scrollYProgress } = useScroll({
@@ -120,16 +124,16 @@ export default function Gallery() {
 
       {/* Cards Stack Parent List */}
       <div className="w-full max-w-2xl mx-auto flex flex-col items-center relative z-10 px-6 pb-[20vh]">
-        {GALLERY_PHOTOS.map((photo, index) => {
+        {photos.map((photo, index) => {
           // Calculate mapping range: Card index starts scaling down as subsequent cards scroll over it
           const startRange = index * 0.25;
-          const targetScale = 1.0 - (GALLERY_PHOTOS.length - index) * 0.04;
+          const targetScale = 1.0 - (photos.length - index) * 0.04;
           return (
             <Card
               key={photo.id}
               photo={photo}
               index={index}
-              total={GALLERY_PHOTOS.length}
+              total={photos.length}
               progress={scrollYProgress}
               range={[startRange, 1.0]}
               targetScale={targetScale}

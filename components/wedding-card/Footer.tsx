@@ -3,7 +3,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-export default function Footer() {
+export default function Footer({ data }: { data: any }) {
+  const bride = data?.brideName || "Meenal";
+  const groom = data?.groomName || "Avinash";
+
   return (
     <footer className="w-full bg-[#733532] relative py-16 px-6 md:py-24 md:px-12 overflow-hidden flex flex-col items-center justify-center border-t border-[#A36662]/10 z-20 min-h-screen">
       {/* Subtle gold dotted border on the top */}
@@ -35,7 +38,7 @@ export default function Footer() {
 
         {/* Couple Giant Signature Header */}
         <h2 className="font-distrela text-[clamp(2.5rem,5.5vw,5rem)] text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#F3E5AB] to-[#AA7C11] font-bold tracking-wider leading-none mt-6 py-2">
-          Meenal & Avinash
+          {bride} & {groom}
         </h2>
 
         {/* CTA Section */}

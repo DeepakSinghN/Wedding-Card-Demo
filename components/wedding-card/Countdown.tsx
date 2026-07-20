@@ -8,9 +8,10 @@ import "animate.css";
 
 interface CountdownProps {
   active: boolean;
+  data: any;
 }
 
-export default function Countdown({ active }: CountdownProps) {
+export default function Countdown({ active, data }: CountdownProps) {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
     hours: 0,
@@ -27,7 +28,21 @@ export default function Countdown({ active }: CountdownProps) {
   useEffect(() => {
     if (!isClient) return;
 
-    const targetDate = new Date("2026-07-18T00:00:00").getTime();
+    const dateStr = data?.date || "2026-11-28";
+    
+    // Parse the date robustly
+    let targetDate = new Date(dateStr).getTime();
+    
+    // If it's invalid (e.g. Chrome/Safari T00:00:00 issues), try sanitizing it
+    if (isNaN(targetDate)) {
+      const cleaned = dateStr.split("—")[0].split("-")[0].trim();
+      targetDate = new Date(cleaned).getTime();
+    }
+    
+    // If still NaN, fallback to default date
+    if (isNaN(targetDate)) {
+      targetDate = new Date("2026-11-28").getTime();
+    }
 
     const calculateTime = () => {
       const now = new Date().getTime();
@@ -50,9 +65,16 @@ export default function Countdown({ active }: CountdownProps) {
     const interval = setInterval(calculateTime, 1000);
 
     return () => clearInterval(interval);
-  }, [isClient]);
+  }, [isClient, data?.date]);
 
   if (!active || !isClient) return null;
+
+  const dateStr = data?.date || "Saturday, November 28, 2026";
+  const dateObj = new Date(dateStr);
+  const isValid = !isNaN(dateObj.getTime());
+  const formattedDate = isValid 
+    ? dateObj.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) 
+    : dateStr;
 
   const timeBlocks = [
     { label: "Days", value: timeLeft.days },
@@ -63,7 +85,7 @@ export default function Countdown({ active }: CountdownProps) {
 
   return (
     <section
-      className="w-full min-h-screen py-16 flex flex-col items-center justify-center bg-[#FAF4EF] px-6 relative border-t border-[#A36662]/5 animate__animated animate__fadeInUp animate__delay-1s"
+      className="w-full min-h-[130vh] md:min-h-screen py-16 flex flex-col items-center justify-center bg-[#FAF4EF] px-6 relative animate__animated animate__fadeInUp animate__delay-1s"
       onAnimationEnd={(e) => {
         if (e.target === e.currentTarget) {
           setIsAnimationDone(true);
@@ -87,7 +109,7 @@ export default function Countdown({ active }: CountdownProps) {
         <ScrollReveal
           animation="zoom-in"
           duration={1.0}
-          className="relative w-full p-8 md:p-12 rounded-[24px] bg-[#FDFAF7] border border-[#A36662]/12 border-b-[4px] md:border-b-[6px] border-b-[#A36662]/20 overflow-hidden flex flex-col items-center text-center z-10"
+          className="relative w-full p-8 md:p-12 rounded-[24px] bg-[#FDFAF7] overflow-hidden flex flex-col items-center text-center z-10"
           style={{
             boxShadow:
               "0 20px 40px -15px rgba(163, 102, 98, 0.25), 0 8px 20px -8px rgba(163, 102, 98, 0.12), inset 0 1px 0 0 rgba(255, 255, 255, 0.7)",
@@ -113,7 +135,7 @@ export default function Countdown({ active }: CountdownProps) {
           {/* 3. Date */}
           <p className="font-distrela text-[clamp(1.3rem,2.5vw,1.7rem)] text-[#7A1C2C] tracking-widest font-bold uppercase mb-8">
             <Highlighter action="underline" color="#D5B03A" isView={true} delay={1000}>
-              July 18, 2026
+              {formattedDate}
             </Highlighter>
           </p>
 
