@@ -32,7 +32,7 @@ export default function ScrollFloat({
   const containerRef = useRef<HTMLHeadingElement>(null);
 
   const words = useMemo(() => {
-    return children.split(" ");
+    return children.trim().replace(/\s+/g, " ").split(" ");
   }, [children]);
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export default function ScrollFloat({
       anim.scrollTrigger?.kill();
       anim.kill();
     };
-  }, [ease, scrollStart, scrollEnd, stagger, animationDuration]);
+  }, [ease, scrollStart, scrollEnd, stagger, animationDuration, children]);
 
   return (
     <h2

@@ -36,8 +36,7 @@ export default function Message() {
                     }}
                     scrollStart="top bottom-=20%"
                     scrollEnd="bottom center+=25%"
-                    enableBlur={true}
-                    blurStrength={10}
+                    enableBlur={false}
                     baseOpacity={0.05}
                     stagger={0.06}
                 >

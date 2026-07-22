@@ -62,48 +62,6 @@ export default function DistanceMeter({
     );
   }, { scope: containerRef, dependencies: [] });
 
-  // ── Floating Clouds Animation ─────────────────────────────────────────────
-  useGSAP(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) return;
-
-    const clouds = containerRef.current?.querySelectorAll(".drifting-cloud");
-    if (!clouds) return;
-
-    clouds.forEach((cloud, i) => {
-      const speed = i === 0 ? 35 : i === 1 ? 24 : 28; // seconds to cross container
-      const delay = i === 0 ? 0 : i === 1 ? -10 : -18; // offset starting points
-
-      // Continuous drift from left to right
-      gsap.fromTo(
-        cloud,
-        { x: -140 },
-        {
-          x: () => {
-            const container = containerRef.current?.querySelector(".map-area-container");
-            return (container?.clientWidth || 500) + 40;
-          },
-          duration: speed,
-          delay: delay,
-          repeat: -1,
-          ease: "none",
-        }
-      );
-
-      // Gentle vertical bobbing
-      gsap.fromTo(
-        cloud,
-        { y: 0 },
-        {
-          y: i % 2 === 0 ? 6 : -6,
-          duration: i === 0 ? 3.5 : i === 1 ? 4.5 : 4.0,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        }
-      );
-    });
-  }, { scope: containerRef, dependencies: [] });
 
   // ── Scroll Trigger & Main Animation Timeline ─────────────────────────────
   useGSAP(() => {
@@ -290,15 +248,18 @@ export default function DistanceMeter({
         {/* Illustrated Map Area */}
         <div className="map-area-container relative w-full aspect-[2/1] border border-amber-800/10 rounded-2xl bg-amber-50/20 p-2 shadow-inner overflow-hidden mb-12">
 
-          {/* Floating Clouds Layer */}
+          {/* Stationary Clouds Layer */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden z-10">
-            <div className="drifting-cloud absolute top-[8%] left-0 w-24 h-24 opacity-25">
+            {/* Top Left Cloud */}
+            <div className="absolute top-[8%] left-[10%] w-24 h-24 opacity-25">
               <Image src="/Rakhi-card-media/clouds.svg" alt="Cloud" fill className="object-contain" />
             </div>
-            <div className="drifting-cloud absolute top-[30%] left-0 w-32 h-32 opacity-[0.15]">
+            {/* Middle Right Cloud */}
+            <div className="absolute top-[22%] right-[8%] w-32 h-32 opacity-[0.15]">
               <Image src="/Rakhi-card-media/clouds.svg" alt="Cloud" fill className="object-contain" />
             </div>
-            <div className="drifting-cloud absolute top-[15%] left-0 w-20 h-20 opacity-[0.35]">
+            {/* Center Top Cloud */}
+            <div className="absolute top-[1%] left-[50%] w-20 h-20 opacity-[0.35]">
               <Image src="/Rakhi-card-media/clouds.svg" alt="Cloud" fill className="object-contain" />
             </div>
           </div>

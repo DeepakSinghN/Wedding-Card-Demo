@@ -68,8 +68,19 @@ export const PixelImage = ({
       )
     }
 
-    return isValidGrid(customGrid) ? customGrid! : DEFAULT_GRIDS[grid]
-  }, [customGrid, grid])
+    const baseGrid = isValidGrid(customGrid) ? customGrid! : DEFAULT_GRIDS[grid]
+
+    // Scale down grid density on mobile to optimize rendering (max 3x4)
+    const isMobileDevice = typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches
+    if (isMobileDevice && mounted) {
+      return {
+        rows: Math.min(baseGrid.rows, 3),
+        cols: Math.min(baseGrid.cols, 4),
+      }
+    }
+
+    return baseGrid
+  }, [customGrid, grid, mounted])
 
   useEffect(() => {
     if (!mounted) return
@@ -147,37 +158,39 @@ export const PixelImage = ({
   }
 
   return (
-    <div ref={containerRef} className={cn("relative select-none", className)}>
-      {pieces.map((piece, index) => (
-        <div
-          key={index}
-          className={cn(
-            "absolute inset-0 transition-all ease-out",
-            isVisible ? "opacity-100" : "opacity-0"
-          )}
-          style={{
-            clipPath: piece.clipPath,
-            transitionDelay: `${piece.delay}ms`,
-            transitionDuration: `${pixelFadeInDuration}ms`,
-          }}
-        >
-          <img
-            src={src}
-            alt={`Pixel image piece ${index + 1}`}
+    <div ref={containerRef} className={cn("relative select-none overflow-hidden", className)}>
+      {/* Wrapper to apply single hardware-accelerated grayscale filter on all pieces together */}
+      <div
+        className={cn(
+          "absolute inset-0 transition-all w-full h-full",
+          grayscaleAnimation && (showColor ? "grayscale-0" : "grayscale"),
+          imageClassName
+        )}
+        style={{
+          transition: grayscaleAnimation
+            ? `filter ${pixelFadeInDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`
+            : "none",
+        }}
+      >
+        {pieces.map((piece, index) => (
+          <div
+            key={index}
             className={cn(
-              "absolute inset-0 w-full h-full object-cover",
-              grayscaleAnimation && (showColor ? "grayscale-0" : "grayscale"),
+              "absolute inset-0 transition-opacity ease-out w-full h-full",
               imageClassName
             )}
             style={{
-              transition: grayscaleAnimation
-                ? `filter ${pixelFadeInDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`
-                : "none",
+              backgroundImage: `url(${src})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              clipPath: piece.clipPath,
+              transitionDelay: `${piece.delay}ms`,
+              transitionDuration: `${pixelFadeInDuration}ms`,
+              opacity: isVisible ? 1 : 0,
             }}
-            draggable={false}
           />
-        </div>
-      ))}
+        ))}
+      </div>
       <img
         src={src}
         alt="Full resolved seamless image"

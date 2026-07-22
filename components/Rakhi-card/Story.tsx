@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { PixelImage } from "@/components/ui/pixel-image";
+import { PixelImage } from "./PixelImage";
 
 gsap.registerPlugin(ScrollTrigger);
 

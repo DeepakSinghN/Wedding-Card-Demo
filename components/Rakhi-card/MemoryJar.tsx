@@ -4,7 +4,10 @@ import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Sparkles, X } from "lucide-react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export interface MemoryChit {
   id: string;
@@ -116,6 +119,8 @@ export default function MemoryJar({
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReduced) return;
 
+    const tweens: gsap.core.Tween[] = [];
+
     chits.forEach((chit) => {
       // Float only unopened chits
       if (openedChits.has(chit.id)) {
@@ -133,7 +138,7 @@ export default function MemoryJar({
         const dur = Math.random() * 1.5 + 2.5;   // 2.5s to 4s
         const del = Math.random() * 1.2;
 
-        gsap.fromTo(
+        const tween = gsap.fromTo(
           el,
           { y: 0, rotation: chit.rotation || 0 },
           {
@@ -146,8 +151,24 @@ export default function MemoryJar({
             yoyo: true,
           }
         );
+        tweens.push(tween);
       }
     });
+
+    const trigger = ScrollTrigger.create({
+      trigger: containerRef.current,
+      start: "top bottom",
+      end: "bottom top",
+      onEnter: () => tweens.forEach((t) => t.play()),
+      onLeave: () => tweens.forEach((t) => t.pause()),
+      onEnterBack: () => tweens.forEach((t) => t.play()),
+      onLeaveBack: () => tweens.forEach((t) => t.pause()),
+    });
+
+    return () => {
+      tweens.forEach((t) => t.kill());
+      trigger.kill();
+    };
   }, [openedChits, chits]);
 
   // ── Handle Chit Tap / Unfold ──────────────────────────────────────────────

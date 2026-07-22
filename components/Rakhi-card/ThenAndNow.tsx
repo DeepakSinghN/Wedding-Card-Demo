@@ -5,7 +5,10 @@ import Image from "next/image";
 import { motion, useMotionValue, AnimatePresence } from "motion/react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ChevronsLeftRight } from "lucide-react";
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface ThenAndNowProps {
   beforeImage: string;   // childhood photo URL
@@ -104,9 +107,11 @@ export default function ThenAndNow({
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReduced) return;
 
+    let trigger: ScrollTrigger | null = null;
+
     if (isShimmering && dividerGlowRef.current) {
       gsap.killTweensOf(dividerGlowRef.current);
-      gsap.fromTo(
+      const tween = gsap.fromTo(
         dividerGlowRef.current,
         { opacity: 0.4 },
         {
@@ -117,10 +122,24 @@ export default function ThenAndNow({
           ease: "sine.inOut",
         }
       );
+
+      trigger = ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        onEnter: () => tween.play(),
+        onLeave: () => tween.pause(),
+        onEnterBack: () => tween.play(),
+        onLeaveBack: () => tween.pause(),
+      });
     } else if (dividerGlowRef.current) {
       gsap.killTweensOf(dividerGlowRef.current);
       gsap.set(dividerGlowRef.current, { opacity: 0 });
     }
+
+    return () => {
+      if (trigger) trigger.kill();
+    };
   }, [isShimmering]);
 
   // ── Slider Drag Event ─────────────────────────────────────────────────────

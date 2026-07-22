@@ -1,18 +1,22 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import Hero from "@/components/Rakhi-card/Hero";
 import Story from "@/components/Rakhi-card/Story";
 import Message from "@/components/Rakhi-card/Message";
-import Scrapbook from "@/components/Rakhi-card/Scrapbook";
-import ThenAndNow from "@/components/Rakhi-card/ThenAndNow";
-import MemoryJar from "@/components/Rakhi-card/MemoryJar";
-import DistanceMeter from "@/components/Rakhi-card/DistanceMeter";
-import ReportCard from "@/components/Rakhi-card/ReportCard";
-import LetterWriter from "@/components/Rakhi-card/LetterWriter";
-import PromisesEnvelope from "@/components/Rakhi-card/PromisesEnvelope";
-import ThankYou from "@/components/Rakhi-card/ThankYou";
-import MemoryFilmstrip from "@/components/Rakhi-card/MemoryFilmstrip";
+
+// Lazy-load sections below the fold to optimize initial load, hydration speed, and critical path performance
+const Scrapbook = dynamic(() => import("@/components/Rakhi-card/Scrapbook"), { ssr: false });
+const ThenAndNow = dynamic(() => import("@/components/Rakhi-card/ThenAndNow"), { ssr: false });
+const MemoryJar = dynamic(() => import("@/components/Rakhi-card/MemoryJar"), { ssr: false });
+const DistanceMeter = dynamic(() => import("@/components/Rakhi-card/DistanceMeter"), { ssr: false });
+const ReportCard = dynamic(() => import("@/components/Rakhi-card/ReportCard"), { ssr: false });
+const LetterWriter = dynamic(() => import("@/components/Rakhi-card/LetterWriter"), { ssr: false });
+const PromisesEnvelope = dynamic(() => import("@/components/Rakhi-card/PromisesEnvelope"), { ssr: false });
+const ThankYou = dynamic(() => import("@/components/Rakhi-card/ThankYou"), { ssr: false });
+const MemoryFilmstrip = dynamic(() => import("@/components/Rakhi-card/MemoryFilmstrip"), { ssr: false });
+
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -62,11 +66,23 @@ export default function Page() {
 
         const t = setTimeout(measure, 300);
         document.fonts.ready.then(measure);
-        window.addEventListener("resize", measure);
+        
+        let lastWidth = typeof window !== "undefined" ? window.innerWidth : 0;
+        let resizeTimeout: NodeJS.Timeout;
+        const handleResize = () => {
+            if (typeof window !== "undefined" && window.innerWidth !== lastWidth) {
+                lastWidth = window.innerWidth;
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(measure, 250);
+            }
+        };
+
+        window.addEventListener("resize", handleResize);
 
         return () => {
             clearTimeout(t);
-            window.removeEventListener("resize", measure);
+            clearTimeout(resizeTimeout);
+            window.removeEventListener("resize", handleResize);
         };
     }, []);
 
@@ -124,6 +140,20 @@ export default function Page() {
             }
         );
 
+        // ── 3. Toggle Butterfly visibility to avoid rendering GIF out of viewport ──
+        ScrollTrigger.create({
+            trigger: "#butterfly-story-anchor",
+            start: "top bottom-=100",
+            endTrigger: "#rakhi-message-section",
+            end: "bottom top+=100",
+            onToggle: (self) => {
+                const b = document.getElementById("global-story-butterfly");
+                if (b) {
+                    b.style.display = self.isActive ? "block" : "none";
+                }
+            }
+        });
+
     }, [vc]);
 
     useGSAP(() => {
@@ -143,6 +173,8 @@ export default function Page() {
 
         const initAnimation = () => {
             ctx = gsap.context(() => {
+                const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
                 targets.forEach((target) => {
                     // Save original state for clean unmount recovery
                     originalHTMLs.set(target, target.innerHTML);
@@ -152,11 +184,57 @@ export default function Page() {
                         display: target.style.display,
                     });
 
-                    // Split the text into lines first
+                    const revealColor = target.getAttribute("data-reveal-color") || "#7A1F3D";
+
+                    if (isMobile) {
+                        // Mobile optimization: Single block shutter reveal over the entire element (no SplitText)
+                        target.style.position = "relative";
+                        target.style.overflow = "hidden";
+                        target.style.display = "block";
+
+                        const originalHTML = target.innerHTML;
+                        target.innerHTML = `<span class="reveal-content inline-block opacity-0" style="width: 100%; height: 100%;">${originalHTML}</span>`;
+                        const content = target.querySelector(".reveal-content") as HTMLElement;
+
+                        const block = document.createElement("div");
+                        block.className = "reveal-block absolute inset-0 pointer-events-none rounded-md";
+                        block.style.backgroundColor = revealColor;
+                        block.style.zIndex = "10";
+                        block.style.transformOrigin = "left center";
+                        gsap.set(block, { scaleX: 0, transformOrigin: "left center" });
+                        target.appendChild(block);
+
+                        const tl = gsap.timeline({
+                            scrollTrigger: {
+                                trigger: target,
+                                start: "top 85%",
+                                toggleActions: "play none none none",
+                            }
+                        });
+
+                        // A: Shutter grows from left
+                        tl.to(block, {
+                            scaleX: 1,
+                            duration: 0.5,
+                            ease: "power2.inOut",
+                        });
+
+                        // B: Content is revealed, shutter origin flips to right
+                        tl.set(content, { opacity: 1 }, 0.35);
+                        tl.set(block, { transformOrigin: "right center" }, 0.35);
+
+                        // C: Shutter collapses to right
+                        tl.to(block, {
+                            scaleX: 0,
+                            duration: 0.35,
+                            ease: "power2.inOut",
+                        }, 0.35);
+                        return;
+                    }
+
+                    // Split the text into lines first (Desktop only)
                     const split = new SplitText(target, { type: "lines" });
                     splits.push(split);
-
-                    const revealColor = target.getAttribute("data-reveal-color") || "#7A1F3D";
 
                     // Create a GSAP timeline triggered when the parent target enters viewport
                     const tl = gsap.timeline({
@@ -179,8 +257,9 @@ export default function Page() {
                         const content = line.querySelector(".reveal-content") as HTMLElement;
 
                         const block = document.createElement("div");
-                        block.className = "reveal-block absolute inset-0 pointer-events-none z-25 rounded-md";
+                        block.className = "reveal-block absolute inset-0 pointer-events-none rounded-md";
                         block.style.backgroundColor = revealColor;
+                        block.style.zIndex = "10";
                         block.style.transformOrigin = "left center";
                         gsap.set(block, { scaleX: 0, transformOrigin: "left center" });
                         line.appendChild(block);
@@ -284,6 +363,7 @@ export default function Page() {
                         willChange: "transform, opacity",
                         zIndex: 30,
                         pointerEvents: "none",
+                        display: "none",
                     }}
                 >
                     <Image

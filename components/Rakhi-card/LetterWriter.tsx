@@ -35,21 +35,29 @@ export default function LetterWriter() {
   useGSAP(() => {
     if (!sectionRef.current || !paperRef.current) return;
 
-    gsap.fromTo(
-      paperRef.current,
-      { opacity: 0, y: 50, scale: 0.95 },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: "top 75%",
-          toggleActions: "play none none none",
-        },
+    const headers = sectionRef.current.querySelectorAll(".letter-header-el");
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        start: "top 75%",
+        toggleActions: "play none none none",
       }
+    });
+
+    // Staggered reveal of headers
+    tl.fromTo(
+      headers,
+      { opacity: 0, y: 25 },
+      { opacity: 1, y: 0, duration: 0.7, stagger: 0.15, ease: "power2.out" }
+    );
+
+    // Smooth reveal of letter paper
+    tl.fromTo(
+      paperRef.current,
+      { opacity: 0, y: 40, scale: 0.96 },
+      { opacity: 1, y: 0, scale: 1, duration: 1.0, ease: "power3.out" },
+      "-=0.4" // overlap by 0.4s
     );
   }, { scope: sectionRef, dependencies: [] });
 
@@ -65,11 +73,11 @@ export default function LetterWriter() {
 
         {/* Header */}
         <div className="w-full max-w-[400px] mx-auto mb-8 flex flex-col items-center">
-          <p className="text-[10px] font-semibold tracking-[0.3em] uppercase mb-2 text-[#8C6A5C] scroll-animate-text"
+          <p className="text-[10px] font-semibold tracking-[0.3em] uppercase mb-2 text-[#8C6A5C] letter-header-el opacity-0"
             style={{ fontFamily: "var(--font-body, Poppins, sans-serif)" }}>
             FROM THE HEART
           </p>
-          <h2 className="text-[2.6rem] text-center select-none leading-tight scroll-animate-text"
+          <h2 className="text-[2.6rem] text-center select-none leading-tight letter-header-el opacity-0"
             style={{ fontFamily: "var(--font-script, 'Great Vibes', cursive)", color: "var(--rakhi-maroon, #7A1F3D)" }}>
             Words From My Heart
           </h2>

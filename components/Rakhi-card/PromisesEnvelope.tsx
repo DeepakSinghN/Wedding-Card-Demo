@@ -69,24 +69,26 @@ export default function PromisesEnvelope() {
       }
     );
 
-    // Butterfly scroll-linked rise animation
+    // Butterfly one-time entrance animation on viewport reveal (replaces heavy scroll scrub)
     gsap.set(butterflyRef.current, {
-      y: 500, // starts offscreen bottom
-      rotation: 45,
-      scale: 0.5,
+      y: 120,
+      rotation: 25,
+      scale: 0.8,
+      opacity: 0,
     });
 
     gsap.to(butterflyRef.current, {
       y: 0,
       rotation: 0,
       scale: 1,
-      ease: "power1.out",
+      opacity: 1,
+      duration: 1.2,
+      ease: "back.out(1.2)",
       scrollTrigger: {
         id: "butterfly-entrance",
         trigger: containerRef.current,
-        start: "top bottom",
-        end: "top 45%",
-        scrub: 1.2,
+        start: "top 75%",
+        toggleActions: "play none none none",
       }
     });
   }, { scope: containerRef, dependencies: [] });

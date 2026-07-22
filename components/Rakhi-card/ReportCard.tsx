@@ -51,13 +51,25 @@ export default function ReportCard({
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // Ribbon gentle idle rotation loop
+    let ribbonTrigger: ScrollTrigger | null = null;
+    let ribbonTween: gsap.core.Tween | null = null;
     if (!prefersReduced && ribbon) {
-      gsap.to(ribbon, {
+      ribbonTween = gsap.to(ribbon, {
         rotation: 6,
         duration: 3.5,
         repeat: -1,
         yoyo: true,
         ease: "sine.inOut",
+      });
+
+      ribbonTrigger = ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top bottom",
+        end: "bottom top",
+        onEnter: () => ribbonTween?.play(),
+        onLeave: () => ribbonTween?.pause(),
+        onEnterBack: () => ribbonTween?.play(),
+        onLeaveBack: () => ribbonTween?.pause(),
       });
     }
 
@@ -207,6 +219,11 @@ export default function ReportCard({
         },
       });
     });
+
+    return () => {
+      if (ribbonTrigger) ribbonTrigger.kill();
+      if (ribbonTween) ribbonTween.kill();
+    };
   }, { scope: containerRef, dependencies: [grades] });
 
   return (

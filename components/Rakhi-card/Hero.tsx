@@ -330,20 +330,45 @@ export default function Hero({
         return;
       }
 
-      // Split the title into characters
+      const isMobile = window.matchMedia("(max-width: 768px)").matches;
+
+      // Split the title into characters with alternating vertical displacements
       let split: SplitText | null = null;
       if (titleRef.current) {
         split = new SplitText(titleRef.current, { type: "chars" });
         split.chars.forEach((char, index) => {
           gsap.set(char, {
             opacity: 0,
-            y: index % 2 === 0 ? -55 : 55,
+            y: index % 2 === 0 ? -45 : 45,
           });
         });
+        // Make parent visible, characters will control their own opacity: 0
+        gsap.set(titleRef.current, { opacity: 1 });
+      }
+
+      // Prep DOM for subtitle solid box reveal
+      let originalSubtitleHTML = "";
+      let subtitleBlock: HTMLDivElement | null = null;
+      let subtitleContent: HTMLElement | null = null;
+      if (subtitleRef.current) {
+        subtitleRef.current.style.position = "relative";
+        subtitleRef.current.style.overflow = "hidden";
+        subtitleRef.current.style.display = "block";
+
+        originalSubtitleHTML = subtitleRef.current.innerHTML;
+        subtitleRef.current.innerHTML = `<span class="subtitle-reveal-content inline-block opacity-0" style="width: 100%; height: 100%;">${originalSubtitleHTML}</span>`;
+        subtitleContent = subtitleRef.current.querySelector(".subtitle-reveal-content") as HTMLElement;
+
+        subtitleBlock = document.createElement("div");
+        subtitleBlock.className = "reveal-block absolute inset-0 pointer-events-none rounded-md";
+        subtitleBlock.style.backgroundColor = "#7A1F3D";
+        subtitleBlock.style.zIndex = "10";
+        subtitleBlock.style.transformOrigin = "left center";
+        gsap.set(subtitleBlock, { scaleX: 0, transformOrigin: "left center" });
+        subtitleRef.current.appendChild(subtitleBlock);
       }
 
       // ── 1. Set initial positions on mount ──
-      gsap.set(subtitleRef.current, { opacity: 0, y: 10, filter: "blur(6px)" });
       gsap.set(envelopeRef.current, { opacity: 0, y: 100, scale: 0.9 });
 
       photos.forEach((photo, i) => {
@@ -354,34 +379,35 @@ export default function Hero({
       });
 
       // ── 2. Entrance Timeline ──
-      const tl = gsap.timeline();
+      const tl = gsap.timeline({ paused: true });
 
       // Recipient name SplitText character reveal
       if (split && split.chars.length > 0) {
         tl.to(split.chars, {
           opacity: 1,
           y: 0,
-          duration: 1.6,
-          stagger: 0.14,
-          ease: "power4.out",
-        }, 0.25);
-      } else {
-        tl.to(titleRef.current, {
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          ease: "power2.out",
+          duration: 1.2,
+          stagger: 0.12,
+          ease: "power3.out",
         }, 0.25);
       }
 
-      // Subtitle tagline reveal
-      tl.to(subtitleRef.current, {
-        opacity: 1,
-        y: 0,
-        filter: "blur(0px)",
-        duration: 0.65,
-        ease: "power2.out",
-      }, 0.5);
+      // Subtitle solid-box reveal sequence
+      if (subtitleRef.current && subtitleBlock && subtitleContent) {
+        tl.set(subtitleRef.current, { opacity: 1 }, 0.5);
+        tl.to(subtitleBlock, {
+          scaleX: 1,
+          duration: 0.5,
+          ease: "power2.inOut",
+        }, 0.5);
+        tl.set(subtitleContent, { opacity: 1 }, 0.85);
+        tl.set(subtitleBlock, { transformOrigin: "right center" }, 0.85);
+        tl.to(subtitleBlock, {
+          scaleX: 0,
+          duration: 0.35,
+          ease: "power2.inOut",
+        }, 0.85);
+      }
 
       // Envelope CTA reveal
       tl.to(envelopeRef.current, {
@@ -406,6 +432,18 @@ export default function Hero({
           ease: "back.out(1.4)",
         }, 0.45 + i * 0.15);
       });
+
+      const triggerTimeline = () => {
+        gsap.delayedCall(0.35, () => tl.play());
+      };
+
+      if (typeof window !== "undefined") {
+        if (document.readyState === "complete") {
+          triggerTimeline();
+        } else {
+          window.addEventListener("load", triggerTimeline);
+        }
+      }
 
       // ── 3. Curved Morphing Transition on Scroll ──
       requestAnimationFrame(() => {
@@ -433,23 +471,43 @@ export default function Hero({
       });
 
       // ── 4. Continuous Idle Wobble Loops ──
+      const wobbleTimeline = gsap.timeline();
       photos.forEach((photo, i) => {
         const ref = photoRefs.current[i];
         if (!ref) return;
 
-        gsap.to(ref, {
+        wobbleTimeline.to(ref, {
           rotation: photo.rotation + gsap.utils.random(1, 2) * (Math.random() > 0.5 ? 1 : -1),
           duration: gsap.utils.random(4, 6),
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
           delay: 1.5 + gsap.utils.random(0, 1.5),
-        });
+        }, 0);
+      });
+
+      const wobbleTrigger = ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top top",
+        end: "bottom top",
+        onEnter: () => wobbleTimeline.play(),
+        onLeave: () => wobbleTimeline.pause(),
+        onEnterBack: () => wobbleTimeline.play(),
+        onLeaveBack: () => wobbleTimeline.pause(),
       });
 
       return () => {
         if (split) {
           split.revert();
+        }
+        if (subtitleRef.current && originalSubtitleHTML) {
+          subtitleRef.current.innerHTML = originalSubtitleHTML;
+        }
+        wobbleTrigger.kill();
+        wobbleTimeline.kill();
+        tl.kill();
+        if (typeof window !== "undefined") {
+          window.removeEventListener("load", triggerTimeline);
         }
       };
     },
@@ -474,8 +532,19 @@ export default function Hero({
         }
       );
 
+      const pulseTrigger = ScrollTrigger.create({
+        trigger: containerRef.current,
+        start: "top top",
+        end: "bottom top",
+        onEnter: () => pulse.play(),
+        onLeave: () => pulse.pause(),
+        onEnterBack: () => pulse.play(),
+        onLeaveBack: () => pulse.pause(),
+      });
+
       return () => {
         pulse.kill();
+        pulseTrigger.kill();
       };
     },
     { scope: containerRef, dependencies: [isOpening] }
@@ -590,13 +659,13 @@ export default function Hero({
       </motion.button>
 
       {/* ── Collage Content Container (Full Width & Height to fill the screen) ── */}
-      <div className="w-full h-full relative overflow-visible flex flex-col items-center pt-[10vh] px-4">
+      <div className="w-full h-full relative overflow-visible flex flex-col items-center pt-[4vh] px-4">
 
         {/* Title Area */}
         <div ref={titleAreaRef} className="text-center w-full select-none mb-4 z-30 relative ">
           <h1
             ref={titleRef}
-            className="text-[4.0rem] text-[var(--rakhi-maroon)] leading-[1.1] font-normal tracking-wide pointer-events-auto overflow-hidden inline-block py-2"
+            className="opacity-0 text-[4.0rem] text-[var(--rakhi-maroon)] leading-[1.1] font-normal tracking-wide pointer-events-auto overflow-hidden inline-block py-2"
             style={{
               fontFamily: "var(--font-cherry-bomb-one, 'Cherry Bomb One', cursive)",
               transform: "translateZ(0)",
@@ -607,7 +676,7 @@ export default function Hero({
           </h1>
           <p
             ref={subtitleRef}
-            className="text-[0.78rem] italic text-stone-600/90 max-w-[280px] mx-auto mt-2 font-serif leading-relaxed px-2 pointer-events-auto scroll-animate-text"
+            className="opacity-0 text-[0.78rem] italic text-stone-600/90 max-w-[280px] mx-auto mt-2 font-serif leading-relaxed px-2 pointer-events-auto"
           >
             {subtitle}
           </p>
@@ -627,10 +696,7 @@ export default function Hero({
             return (
               <motion.div
                 key={photo.id}
-                ref={(el) => {
-                  photoRefs.current[i] = el;
-                }}
-                className="absolute will-change-transform"
+                className="absolute"
                 style={{
                   top: photo.position.top,
                   left: photo.position.left,
@@ -642,41 +708,48 @@ export default function Hero({
                   y: parallax.y,
                 }}
               >
-                {/* Polaroid Frame Container */}
-                <div className="w-full h-full bg-white p-2 pb-5 rounded-sm shadow-[0_12px_28px_rgba(122,31,61,0.12),0_4px_10px_rgba(0,0,0,0.06)] border border-stone-200/40 flex flex-col items-center relative">
+                {/* GSAP entrance & wobble anim wrapper */}
+                <div
+                  ref={(el) => {
+                    photoRefs.current[i] = el;
+                  }}
+                  className="w-full h-full will-change-transform opacity-0"
+                >
+                  {/* Polaroid Frame Container */}
+                  <div className="w-full h-full bg-white p-2 pb-5 rounded-sm shadow-[0_12px_28px_rgba(122,31,61,0.12),0_4px_10px_rgba(0,0,0,0.06)] border border-stone-200/40 flex flex-col items-center relative">
 
-                  {/* Washi-tape accent on the focal photo only */}
-                  {photo.id === "focal" && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-14 h-7 opacity-85 rotate-[-3deg] pointer-events-none z-30">
+                    {/* Washi-tape accent on the focal photo only */}
+                    {photo.id === "focal" && (
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 w-14 h-7 opacity-85 rotate-[-3deg] pointer-events-none z-30">
+                        <Image
+                          src="/Rakhi-card-media/Tape-2.png"
+                          alt="Tape decoration"
+                          fill
+                          className="object-contain"
+                          sizes="60px"
+                        />
+                      </div>
+                    )}
+
+                    {/* Polaroid Image Slot */}
+                    <div className="relative w-full flex-1 bg-stone-100 overflow-hidden rounded-sm">
                       <Image
-                        src="/Rakhi-card-media/Tape-2.png"
-                        alt="Tape decoration"
+                        src={photo.src}
+                        alt={photo.caption}
                         fill
-                        className="object-contain"
-                        sizes="60px"
+                        className="object-cover"
+                        sizes="220px"
+                        priority
                       />
                     </div>
-                  )}
-
-                  {/* Polaroid Image Slot */}
-                  <div className="relative w-full flex-1 bg-stone-100 overflow-hidden rounded-sm">
-                    <Image
-                      src={photo.src}
-                      alt={photo.caption}
-                      fill
-                      className="object-cover"
-                      sizes="220px"
-                    />
-                  </div>
-
-                  {/* Polaroid Caption */}
                   <span
                     className="text-[0.52rem] font-light text-[var(--rakhi-text-primary)] mt-2 leading-none font-dancing tracking-wide font-serif italic"
                   >
                     {photo.caption}
                   </span>
                 </div>
-              </motion.div>
+              </div>
+            </motion.div>
             );
           })}
         </div>
@@ -684,7 +757,7 @@ export default function Hero({
         {/* ✉ Envelope Seal Break CTA Container */}
         <div
           ref={envelopeRef}
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center pointer-events-auto [perspective:1000px] select-none"
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center pointer-events-auto [perspective:1000px] select-none opacity-0"
           style={{
             transformStyle: "preserve-3d",
             width: "360px",

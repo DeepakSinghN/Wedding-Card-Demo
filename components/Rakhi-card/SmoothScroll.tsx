@@ -12,10 +12,10 @@ ScrollTrigger.config({ ignoreMobileResize: true });
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // ── Check if it is a mobile or touch device ─────────────────────────────
-    const isMobile = typeof window !== "undefined" && 
-      (window.matchMedia("(max-width: 768px)").matches || 
-       navigator.maxTouchPoints > 0 || 
-       /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
+    const isMobile = typeof window !== "undefined" &&
+      (window.matchMedia("(max-width: 768px)").matches ||
+        navigator.maxTouchPoints > 0 ||
+        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
 
     if (isMobile) {
       // Use native momentum scroll for mobile to eliminate touch lag
