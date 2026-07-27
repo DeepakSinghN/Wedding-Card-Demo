@@ -120,7 +120,7 @@ export default function Hero() {
             style={{ fontFamily: "var(--font-alex-brush), cursive" }}
           >
             <h2 className="text-[14cqi] leading-none text-[#C84B31] select-none drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
-              Deepak
+              Karthik
             </h2>
             <span
               className="text-[7.5cqi] leading-none text-[#2b2a29] my-[1.2cqi] select-none opacity-90 drop-shadow-[0_1px_0_rgba(255,255,255,0.8)]"
@@ -129,7 +129,7 @@ export default function Hero() {
               &
             </span>
             <h2 className="text-[14cqi] leading-none text-[#C84B31] select-none drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">
-              Amrita
+              Pooja
             </h2>
           </div>
 
