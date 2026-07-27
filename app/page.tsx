@@ -1,4 +1,4 @@
-import Page from "@/components/Wedding-card-2/page";
+import Page from "@/components/wedding-card/page";
 
 
 export default function Home() {
