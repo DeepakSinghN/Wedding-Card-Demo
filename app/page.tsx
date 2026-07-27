@@ -1,4 +1,4 @@
-import Page from "@/components/Rakhi-card/page";
+import Page from "@/components/Wedding-card-2/page";
 
 
 export default function Home() {
