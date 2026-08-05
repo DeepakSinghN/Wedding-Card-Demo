@@ -78,6 +78,23 @@ const vesperLibre = Vesper_Libre({
   variable: "--font-devanagari",
 });
 
+// ── Wedding Card 3: Anastasia script font ──────────────────────────────────────
+const anastasia = localFont({
+  src: "../components/Wedding-card-3/Fonts/anastasia_script/Anastasia Script Personal Use.ttf",
+  variable: "--font-anastasia",
+});
+
+// ── Wedding Card 3 Welcome Section: Amsterdam script fonts ─────────────────────
+const amsterdam = localFont({
+  src: "../components/Wedding-card-3/Welcome-section-resources/Amsterdam_Amsterdam_Four_Font_Family_(Fontmirror)/Amsterdam 400.ttf",
+  variable: "--font-amsterdam",
+});
+
+const amsterdamFour = localFont({
+  src: "../components/Wedding-card-3/Welcome-section-resources/Amsterdam_Amsterdam_Four_Font_Family_(Fontmirror)/Amsterdam Four_ttf 400.ttf",
+  variable: "--font-amsterdam-four",
+});
+
 export const metadata: Metadata = {
   title: "Happy Raksha Bandhan 🪢",
   description: "A heartfelt digital Raksha Bandhan greeting card — because some threads cross any distance.",
@@ -108,7 +125,10 @@ export default function RootLayout({
         cherryBombOne.variable,
         alexBrush.variable,
         arimo.variable,
-        vesperLibre.variable
+        vesperLibre.variable,
+        anastasia.variable,
+        amsterdam.variable,
+        amsterdamFour.variable
       )}
       suppressHydrationWarning
     >
