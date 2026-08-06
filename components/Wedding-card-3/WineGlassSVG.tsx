@@ -25,7 +25,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                     {/* 1. Glass Outlines */}
                     <path
                         className="mask-glass-rim-left"
-                        d="M 110 60 Q 6 70 6 130 C 6 190 106 200 110 200"
+                        d="M 110 60 C 50 50, 0 60, 0.86 72.72 C 3.71 78.95, 11.14 90.96, 46.19 136.24 C 70.89 164.29, 101.21 198.87, 110 200"
                         fill="none"
                         stroke="white"
                         strokeWidth="32"
@@ -34,7 +34,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                     />
                     <path
                         className="mask-glass-rim-right"
-                        d="M 110 60 C 214 70 214 130 214 130 C 214 190 114 200 110 200"
+                        d="M 110 60 C 170 50, 220 60, 220.5 66.6 C 218.0 74.0, 210.6 86.5, 175.5 133.8 C 150.8 163.0, 118.6 214.9, 110 200"
                         fill="none"
                         stroke="white"
                         strokeWidth="32"
