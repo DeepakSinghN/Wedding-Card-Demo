@@ -69,32 +69,38 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                     {/* 2. Pick & Olives */}
                     <path
                         className="mask-pick-line"
-                        d="M 220 2 L 140 140"
+                        d="M 224 2 L 110 185"
                         fill="none"
                         stroke="white"
                         strokeWidth="16"
                         strokeLinecap="round"
                     />
-                    <path
+                    <circle
                         className="mask-olive-1"
-                        d="M 160 77 C 160 72, 150 72, 150 77 C 150 82, 160 82, 160 77 Z"
+                        cx="199.3"
+                        cy="71.5"
+                        r="1"
                         fill="none"
                         stroke="white"
-                        strokeWidth="24"
+                        strokeWidth="48"
                     />
-                    <path
+                    <circle
                         className="mask-olive-2"
-                        d="M 156 103 C 156 97, 144 97, 144 103 C 144 109, 156 109, 156 103 Z"
+                        cx="167.5"
+                        cy="98.8"
+                        r="1"
                         fill="none"
                         stroke="white"
-                        strokeWidth="24"
+                        strokeWidth="48"
                     />
-                    <path
+                    <circle
                         className="mask-olive-3"
-                        d="M 155 130 C 155 123, 141 123, 141 130 C 141 137, 155 137, 155 130 Z"
+                        cx="142.7"
+                        cy="123.6"
+                        r="1"
                         fill="none"
                         stroke="white"
-                        strokeWidth="24"
+                        strokeWidth="48"
                     />
 
                     {/* 3. Ribbon Bow */}
