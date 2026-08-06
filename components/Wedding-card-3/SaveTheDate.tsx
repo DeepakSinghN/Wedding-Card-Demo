@@ -45,9 +45,9 @@ export default function SaveTheDate() {
         });
 
         // Glass Outline Sequence
-        tl.to(".glass-rim", { strokeDashoffset: 0, duration: 1.3 }, 0.2);
+        tl.to([".glass-rim-left", ".glass-rim-right"], { strokeDashoffset: 0, duration: 1.3 }, 0.2);
         tl.to(".glass-stem", { strokeDashoffset: 0, duration: 0.6 }, 1.1);
-        tl.to(".glass-base", { strokeDashoffset: 0, duration: 0.6 }, 1.4);
+        tl.to([".glass-base-left", ".glass-base-right"], { strokeDashoffset: 0, duration: 0.6 }, 1.4);
 
         // Pick & Olives Sequence
         tl.to(".pick-line", { strokeDashoffset: 0, duration: 0.6 }, 1.4);

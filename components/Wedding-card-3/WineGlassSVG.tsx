@@ -19,10 +19,19 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                 {/* 1. Mask for Glass Outline */}
                 <mask id="mask-glass">
                     <rect x="-50" y="-50" width="400" height="500" fill="black" />
-                    {/* Glass Rim */}
+                    {/* Symmetrical Glass Rim */}
                     <path
-                        className="glass-rim"
-                        d="M 110 60 Q 6 70 6 130 C 6 190 106 200 110 200 C 114 200 214 190 214 130 C 214 70 110 60 110 60"
+                        className="glass-rim-left"
+                        d="M 110 60 C 60 65, 6 95, 6 130 C 6 170, 60 195, 110 200"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="32"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                    <path
+                        className="glass-rim-right"
+                        d="M 110 60 C 160 65, 214 95, 214 130 C 214 170, 160 195, 110 200"
                         fill="none"
                         stroke="white"
                         strokeWidth="32"
@@ -38,10 +47,18 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         strokeWidth="32"
                         strokeLinecap="round"
                     />
-                    {/* Glass Base */}
+                    {/* Symmetrical Glass Base */}
                     <path
-                        className="glass-base"
-                        d="M 60 338 Q 110 332 160 338"
+                        className="glass-base-left"
+                        d="M 110 335 L 60 338"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="36"
+                        strokeLinecap="round"
+                    />
+                    <path
+                        className="glass-base-right"
+                        d="M 110 335 L 160 338"
                         fill="none"
                         stroke="white"
                         strokeWidth="36"
