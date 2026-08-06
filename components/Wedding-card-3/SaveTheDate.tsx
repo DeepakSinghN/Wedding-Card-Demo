@@ -19,6 +19,7 @@ export default function SaveTheDate() {
         const maskPaths = [
             ".mask-glass-rim-left",
             ".mask-glass-rim-right",
+            ".mask-glass-liquid-surface",
             ".mask-glass-stem",
             ".mask-glass-base-left",
             ".mask-glass-base-right",
@@ -49,7 +50,7 @@ export default function SaveTheDate() {
         });
 
         // Glass Outline Sequence
-        tl.to([".mask-glass-rim-left", ".mask-glass-rim-right"], { drawSVG: "100%", duration: 1.3 }, 0.2);
+        tl.to([".mask-glass-rim-left", ".mask-glass-rim-right", ".mask-glass-liquid-surface"], { drawSVG: "100%", duration: 1.3 }, 0.2);
         tl.to(".mask-glass-stem", { drawSVG: "100%", duration: 0.6 }, 1.1);
         tl.to([".mask-glass-base-left", ".mask-glass-base-right"], { drawSVG: "100%", duration: 0.6 }, 1.4);
 

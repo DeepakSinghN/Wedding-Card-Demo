@@ -42,6 +42,14 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         strokeLinejoin="round"
                     />
                     <path
+                        className="mask-glass-liquid-surface"
+                        d="M 20 80 L 200 80"
+                        fill="none"
+                        stroke="white"
+                        strokeWidth="32"
+                        strokeLinecap="round"
+                    />
+                    <path
                         className="mask-glass-stem"
                         d="M 110 200 L 110 338"
                         fill="none"
@@ -51,7 +59,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                     />
                     <path
                         className="mask-glass-base-left"
-                        d="M 110 336 L 60 338"
+                        d="M 110 336 L 40 338"
                         fill="none"
                         stroke="white"
                         strokeWidth="36"
@@ -59,7 +67,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                     />
                     <path
                         className="mask-glass-base-right"
-                        d="M 110 336 L 160 338"
+                        d="M 110 336 L 180 338"
                         fill="none"
                         stroke="white"
                         strokeWidth="36"
@@ -78,11 +86,11 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                     <circle
                         className="mask-olive-1"
                         cx="199.3"
-                        cy="71.5"
+                        cy="54.0"
                         r="1"
                         fill="none"
                         stroke="white"
-                        strokeWidth="48"
+                        strokeWidth="64"
                     />
                     <circle
                         className="mask-olive-2"
@@ -113,7 +121,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                     />
                     <path
                         className="mask-bow-left-loop"
-                        d="M 110 227 C 90 220, 55 210, 55 220 C 55 230, 85 240, 110 227"
+                        d="M 110 227 C 90 200, 50 195, 50 220 C 50 235, 85 245, 110 227"
                         fill="none"
                         stroke="white"
                         strokeWidth="24"
@@ -121,7 +129,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                     />
                     <path
                         className="mask-bow-right-loop"
-                        d="M 110 227 C 130 220, 165 210, 165 220 C 165 230, 135 240, 110 227"
+                        d="M 110 227 C 130 200, 170 195, 170 220 C 170 235, 135 245, 110 227"
                         fill="none"
                         stroke="white"
                         strokeWidth="24"
