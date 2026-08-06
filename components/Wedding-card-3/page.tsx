@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Hero from "./hero";
+import SaveTheDate from "./SaveTheDate";
 import Invitation from "./invitation";
 import EventDetails from "./EventDetails";
 
@@ -39,6 +40,7 @@ export default function WeddingCardThreePage() {
               transition={{ duration: 1 }}
               className="w-full flex flex-col"
             >
+              <SaveTheDate />
               <Invitation />
               <EventDetails />
             </motion.div>
