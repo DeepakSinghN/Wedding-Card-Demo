@@ -22,19 +22,19 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                     {/* Symmetrical Glass Rim */}
                     <path
                         className="glass-rim-left"
-                        d="M 110 60 C 60 65, 6 95, 6 130 C 6 170, 60 195, 110 200"
+                        d="M 110 60 Q 6 70 6 130 C 6 190 106 200 110 200"
                         fill="none"
                         stroke="white"
-                        strokeWidth="32"
+                        strokeWidth="48"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     />
                     <path
                         className="glass-rim-right"
-                        d="M 110 60 C 160 65, 214 95, 214 130 C 214 170, 160 195, 110 200"
+                        d="M 110 60 C 214 70 214 130 214 130 C 214 190 114 200 110 200"
                         fill="none"
                         stroke="white"
-                        strokeWidth="32"
+                        strokeWidth="48"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                     />
@@ -44,7 +44,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         d="M 110 200 L 110 338"
                         fill="none"
                         stroke="white"
-                        strokeWidth="32"
+                        strokeWidth="42"
                         strokeLinecap="round"
                     />
                     {/* Symmetrical Glass Base */}
@@ -53,7 +53,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         d="M 110 335 L 60 338"
                         fill="none"
                         stroke="white"
-                        strokeWidth="36"
+                        strokeWidth="48"
                         strokeLinecap="round"
                     />
                     <path
@@ -61,7 +61,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         d="M 110 335 L 160 338"
                         fill="none"
                         stroke="white"
-                        strokeWidth="36"
+                        strokeWidth="48"
                         strokeLinecap="round"
                     />
                 </mask>
@@ -75,7 +75,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         d="M 220 2 L 140 140"
                         fill="none"
                         stroke="white"
-                        strokeWidth="16"
+                        strokeWidth="24"
                         strokeLinecap="round"
                     />
                     {/* Olives */}
@@ -84,21 +84,21 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         d="M 160 77 C 160 72, 150 72, 150 77 C 150 82, 160 82, 160 77 Z"
                         fill="none"
                         stroke="white"
-                        strokeWidth="24"
+                        strokeWidth="42"
                     />
                     <path
                         className="olive-2"
                         d="M 156 103 C 156 97, 144 97, 144 103 C 144 109, 156 109, 156 103 Z"
                         fill="none"
                         stroke="white"
-                        strokeWidth="26"
+                        strokeWidth="42"
                     />
                     <path
                         className="olive-3"
                         d="M 155 130 C 155 123, 141 123, 141 130 C 141 137, 155 137, 155 130 Z"
                         fill="none"
                         stroke="white"
-                        strokeWidth="28"
+                        strokeWidth="42"
                     />
                 </mask>
 
@@ -111,7 +111,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         d="M 100 227 C 100 220, 120 220, 120 227 C 120 234, 100 234, 100 227 Z"
                         fill="none"
                         stroke="white"
-                        strokeWidth="32"
+                        strokeWidth="42"
                     />
                     {/* Left Loop */}
                     <path
@@ -119,7 +119,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         d="M 110 227 C 90 220, 55 210, 55 220 C 55 230, 85 240, 110 227"
                         fill="none"
                         stroke="white"
-                        strokeWidth="24"
+                        strokeWidth="36"
                         strokeLinecap="round"
                     />
                     {/* Right Loop */}
@@ -128,7 +128,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         d="M 110 227 C 130 220, 165 210, 165 220 C 165 230, 135 240, 110 227"
                         fill="none"
                         stroke="white"
-                        strokeWidth="24"
+                        strokeWidth="36"
                         strokeLinecap="round"
                     />
                     {/* Left Tail */}
@@ -137,7 +137,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         d="M 105 235 Q 95 255, 80 280"
                         fill="none"
                         stroke="white"
-                        strokeWidth="24"
+                        strokeWidth="36"
                         strokeLinecap="round"
                     />
                     {/* Right Tail */}
@@ -146,7 +146,7 @@ export default function WineGlassSVG({ className = "" }: WineGlassSVGProps) {
                         d="M 115 235 Q 125 260, 138 290"
                         fill="none"
                         stroke="white"
-                        strokeWidth="24"
+                        strokeWidth="36"
                         strokeLinecap="round"
                     />
                 </mask>
