@@ -3,7 +3,11 @@
 import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import WineGlassSVG from "./WineGlassSVG";
+
+// Register DrawSVGPlugin
+gsap.registerPlugin(DrawSVGPlugin);
 
 export default function SaveTheDate() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -11,47 +15,63 @@ export default function SaveTheDate() {
     useGSAP(() => {
         if (!containerRef.current) return;
 
-        // 1. Setup Underline flourish starting state
-        const flourishPath = containerRef.current.querySelector(".underline-flourish");
-        if (flourishPath instanceof SVGPathElement) {
-            const length = flourishPath.getTotalLength();
-            gsap.set(flourishPath, {
-                strokeDasharray: length,
-                strokeDashoffset: length
-            });
-        }
+        // 1. Setup starting states for mask paths (hiding them)
+        const maskPaths = [
+            ".mask-glass-rim-left",
+            ".mask-glass-rim-right",
+            ".mask-glass-stem",
+            ".mask-glass-base-left",
+            ".mask-glass-base-right",
+            ".mask-pick-line",
+            ".mask-olive-1",
+            ".mask-olive-2",
+            ".mask-olive-3",
+            ".mask-bow-knot",
+            ".mask-bow-left-loop",
+            ".mask-bow-right-loop",
+            ".mask-bow-left-tail",
+            ".mask-bow-right-tail"
+        ];
+        gsap.set(maskPaths, { drawSVG: "0%" });
 
-        // 2. Set starting states for illustration & text elements (fade + scale/y-slide)
-        gsap.set(".std-illustration", {
-            opacity: 0,
-            scale: 0.9,
-            y: 15
-        });
+        // 2. Setup Underline flourish starting state
+        gsap.set(".underline-flourish", { drawSVG: "0%" });
+
+        // 3. Set starting states for text elements (fade + y-slide)
         gsap.set([".std-title", ".std-names", ".std-date", ".std-footnote"], {
             opacity: 0,
             y: 12
         });
 
-        // 3. Create unified timeline
+        // 4. Create unified timeline
         const tl = gsap.timeline({
-            defaults: { ease: "power3.out" }
+            defaults: { ease: "power2.inOut" }
         });
 
-        // Illustration entrance (fade and scale up)
-        tl.to(".std-illustration", {
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            duration: 1.4,
-            ease: "power4.out"
-        }, 0.2);
+        // Glass Outline Sequence
+        tl.to([".mask-glass-rim-left", ".mask-glass-rim-right"], { drawSVG: "100%", duration: 1.3 }, 0.2);
+        tl.to(".mask-glass-stem", { drawSVG: "100%", duration: 0.6 }, 1.1);
+        tl.to([".mask-glass-base-left", ".mask-glass-base-right"], { drawSVG: "100%", duration: 0.6 }, 1.4);
 
-        // Typography Sequence
-        tl.to(".std-title", { opacity: 1, y: 0, duration: 0.8 }, 0.8);
-        tl.to(".std-names", { opacity: 1, y: 0, duration: 0.8 }, 1.1);
-        tl.to(".underline-flourish", { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut" }, 1.4);
-        tl.to(".std-date", { opacity: 1, y: 0, duration: 0.6 }, 1.6);
-        tl.to(".std-footnote", { opacity: 1, y: 0, duration: 0.8 }, 1.9);
+        // Pick & Olives Sequence
+        tl.to(".mask-pick-line", { drawSVG: "100%", duration: 0.6 }, 1.4);
+        tl.to(".mask-olive-1", { drawSVG: "100%", duration: 0.4 }, 1.8);
+        tl.to(".mask-olive-2", { drawSVG: "100%", duration: 0.4 }, 1.9);
+        tl.to(".mask-olive-3", { drawSVG: "100%", duration: 0.4 }, 2.0);
+
+        // Ribbon Bow Sequence
+        tl.to(".mask-bow-knot", { drawSVG: "100%", duration: 0.4 }, 2.0);
+        tl.to(".mask-bow-left-loop", { drawSVG: "100%", duration: 0.6 }, 2.2);
+        tl.to(".mask-bow-right-loop", { drawSVG: "100%", duration: 0.6 }, 2.4);
+        tl.to(".mask-bow-left-tail", { drawSVG: "100%", duration: 0.5 }, 2.6);
+        tl.to(".mask-bow-right-tail", { drawSVG: "100%", duration: 0.5 }, 2.8);
+
+        // Typography Sequence (starts shortly after bow begins drawing)
+        tl.to(".std-title", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 2.6);
+        tl.to(".std-names", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 2.9);
+        tl.to(".underline-flourish", { drawSVG: "100%", duration: 0.6 }, 3.3);
+        tl.to(".std-date", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 3.5);
+        tl.to(".std-footnote", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 3.8);
 
     }, { scope: containerRef });
 
