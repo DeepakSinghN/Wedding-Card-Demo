@@ -223,8 +223,8 @@ export default function EventDetails() {
           />
         </div>
 
-        {/* Backdrop-blur glass overlay on the bottom envelope section */}
-        <div className="absolute bottom-0 left-0 w-full h-[43%] backdrop-blur-[6px] bg-[#FCEAEA]/20 z-10 pointer-events-none" />
+        {/* Backdrop-blur glass overlay at the very bottom edge (section ending) */}
+        <div className="absolute bottom-0 left-0 w-full h-[8%] backdrop-blur-[6px] bg-gradient-to-t from-[#FCEAEA]/80 to-transparent z-30 pointer-events-none" />
 
         {/* Content area — sits in the cream space above the envelope flap */}
         <div className="absolute top-[12%] left-0 w-full h-[45%] flex items-center justify-center overflow-hidden z-20">
