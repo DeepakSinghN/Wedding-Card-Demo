@@ -7,6 +7,7 @@ import SaveTheDate from "./SaveTheDate";
 import Invitation from "./invitation";
 import Collage from "./collage";
 import EventDetails from "./EventDetails";
+import Closing from "./Closing";
 
 export default function WeddingCardThreePage() {
   const [isRevealed, setIsRevealed] = useState(false);
@@ -45,6 +46,7 @@ export default function WeddingCardThreePage() {
               <Invitation />
               <EventDetails />
               <Collage />
+              <Closing />
             </motion.div>
           )}
         </AnimatePresence>

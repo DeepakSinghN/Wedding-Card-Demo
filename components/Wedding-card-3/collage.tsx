@@ -105,7 +105,7 @@ export default function Collage() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex flex-col items-center justify-start pt-12 pb-6"
+      className="relative w-full h-screen flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex flex-col items-center justify-start pt-30 pb-6"
     >
       {/* Section Heading */}
       <h2
@@ -136,7 +136,7 @@ export default function Collage() {
         {/* 2. Text Block 1 */}
         <div className="collage-cell cell-text-1 text-center px-4">
           <p
-            className="font-serif italic text-[#9D2C2D] text-[3.8cqi] leading-[1.8] font-medium"
+            className="font-serif italic text-[#9D2C2D] text-[3.5cqi] leading-[1.8] font-medium py-4"
             style={{ fontFamily: "Georgia, serif" }}
           >
             A little glimpse into our journey
@@ -186,7 +186,7 @@ export default function Collage() {
         {/* 4. Text Block 2 */}
         <div className="collage-cell cell-text-2 text-center px-4">
           <p
-            className="font-serif italic text-[#9D2C2D] text-[3.2cqi] leading-[1.8] font-medium"
+            className="font-serif italic text-[#9D2C2D] text-[3.5cqi] leading-[1.8] font-medium py-4"
             style={{ fontFamily: "Georgia, serif" }}
           >
             from where it started to where we are now.
