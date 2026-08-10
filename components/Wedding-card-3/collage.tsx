@@ -130,7 +130,7 @@ export default function Collage() {
         className="w-full flex-1 max-h-[76vh] flex flex-col justify-between py-2"
       >
         {/* 1. Top Landscape Photo */}
-        <div className="collage-cell cell-top w-[89%] aspect-[1.5/1] relative overflow-hidden rounded-2xl mx-auto shadow-sm">
+        <div className="collage-cell cell-top w-[89%] aspect-[1.2/1] relative overflow-hidden rounded-2xl mx-auto shadow-sm">
           <div className="w-full h-full overflow-hidden transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03]">
             <Image
               src={PhotoTopLeft}
@@ -204,7 +204,7 @@ export default function Collage() {
         </div>
 
         {/* 5. Bottom Landscape Photo */}
-        <div className="collage-cell cell-bottom w-[89%] aspect-[1.5/1] relative overflow-hidden rounded-2xl mx-auto shadow-sm">
+        <div className="collage-cell cell-bottom w-[89%] aspect-[1.2/1] relative overflow-hidden rounded-2xl mx-auto shadow-sm">
           <div className="w-full h-full overflow-hidden transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03]">
             <Image
               src={PhotoBottomRight}
