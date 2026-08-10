@@ -103,19 +103,19 @@ export default function Collage() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex items-center justify-center mt-20"
+      className="relative w-full h-screen flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex flex-col items-center justify-start pt-12 pb-6"
     >
-
       {/* Section Heading */}
       <h2
-        className="collage-heading absolute top-[1.2%] left-0 w-full text-center text-[7.5cqi] text-[#9D2C2D] font-normal z-20"
+        className="collage-heading text-[12cqi] text-[#9D2C2D] font-normal z-20 mb-6"
         style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
       >
         Our moments
       </h2>
+
       <div
         ref={containerRef}
-        className="relative w-full h-full max-h-screen max-w-full aspect-[726/1024] mx-auto"
+        className="relative w-full flex-1 max-h-[76vh] aspect-[726/1024] mx-auto"
       >
         {/* 1. Top-Left Photo (Landscape) */}
         <div
@@ -152,7 +152,7 @@ export default function Collage() {
         {/* 3. Text Block 1 ("A little glimpse into our journey") */}
         <div
           className="collage-cell cell-text-1 absolute flex items-center justify-center text-center px-2"
-          style={{ left: "5.51%", top: "%", width: "51.38%", height: "8.79%" }}
+          style={{ left: "5.51%", top: "29.5%", width: "51.38%", height: "8.79%" }}
         >
           <p
             className="font-serif italic text-[#9D2C2D] text-[3.8cqi] leading-[2] font-medium"
