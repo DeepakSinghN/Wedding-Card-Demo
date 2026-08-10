@@ -223,6 +223,9 @@ export default function EventDetails() {
           />
         </div>
 
+        {/* Backdrop-blur glass overlay on the bottom envelope section */}
+        <div className="absolute bottom-0 left-0 w-full h-[43%] backdrop-blur-[6px] bg-[#FCEAEA]/20 z-10 pointer-events-none" />
+
         {/* Content area — sits in the cream space above the envelope flap */}
         <div className="absolute top-[12%] left-0 w-full h-[45%] flex items-center justify-center overflow-hidden z-20">
           {events.map((event, i) => (
