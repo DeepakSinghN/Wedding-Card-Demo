@@ -67,7 +67,7 @@ export default function Collage() {
         scrollTrigger: {
           trigger: triggerElement,
           scroller: scrollerElement,
-          start: "bottom bottom", // Animates when bottom of section hits the bottom of the viewport
+          start: "top 20%", // Animates when top of section hits 20% from the top of the viewport (80% scrolled into view)
           toggleActions: "play none none none"
         }
       });
