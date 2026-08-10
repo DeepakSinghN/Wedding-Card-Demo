@@ -77,28 +77,35 @@ export default function EventDetails() {
       const items = contentRefs.current.filter(Boolean) as HTMLDivElement[];
       if (items.length === 0) return;
 
-      // Set initial states: card wrapper is offset down, items are hidden and scaled down
-      gsap.set(".event-details-card-wrapper", { y: "100%" });
-      gsap.set(items, { opacity: 0, scale: 0.9, y: "0%" });
-
       const triggerElement = sectionRef.current;
       if (!triggerElement) return;
 
       const scrollerElement = triggerElement.closest("#card-scroll-container");
       if (!scrollerElement) return;
 
-      const revealStart = 0.35;
-      const revealDuration = 0.23;
-      const firstCardRevealDuration = 0.12;
-      const remainingProgress = 1.0 - revealStart;
-      const slotSize = remainingProgress / (items.length - 1);
+      // Set initial states: first card visible, rest hidden and offset below
+      gsap.set(items.slice(1), { opacity: 0, y: "120%" });
+      gsap.set(items[0], { opacity: 1, y: "0%" });
 
-      // Calculate custom snap points: 0 (wrapper down), revealStart (first card active), and subsequent slots
-      const snapPoints = [0, revealStart];
-      for (let i = 1; i < items.length; i++) {
-        snapPoints.push(revealStart + i * slotSize);
-      }
+      // 1. Entrance parallax slide-up for the envelope base card as the section scrolls into the viewport
+      gsap.fromTo(
+        ".envelope-base-frame",
+        { y: "100%" },
+        {
+          y: "0%",
+          ease: "none",
+          scrollTrigger: {
+            trigger: triggerElement,
+            scroller: scrollerElement,
+            start: "top bottom",
+            end: "top top",
+            scrub: isMobile ? 0.3 : 1,
+            invalidateOnRefresh: true,
+          }
+        }
+      );
 
+      // 2. Sticky Pin Timeline for event cards
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: triggerElement,
@@ -108,7 +115,7 @@ export default function EventDetails() {
           scrub: isMobile ? 0.3 : 1,
           snap: isMobile
             ? {
-                snapTo: snapPoints,
+                snapTo: 1 / (items.length - 1),
                 duration: { min: 0.15, max: 0.3 },
                 ease: "power2.inOut",
                 inertia: false,
@@ -118,20 +125,13 @@ export default function EventDetails() {
         },
       });
 
-      // 1. Reveal envelope card wrapper (slide up)
-      tl.to(".event-details-card-wrapper", { y: "0%", duration: revealDuration, ease: "power2.out" }, 0);
-
-      // 2. Reveal first card (fade + scale up)
-      tl.to(items[0], { opacity: 1, scale: 1, duration: firstCardRevealDuration, ease: "power2.out" }, revealDuration);
-
-      // 3. Transition subsequent cards
       items.forEach((item, i) => {
         if (i === 0) return;
-        const segmentStart = revealStart + (i - 1) * slotSize;
+        const segmentStart = (i - 1) / (items.length - 1);
 
-        // Symmetric card slide and crossfade
-        tl.to(items[i - 1], { opacity: 0, scale: 0.9, duration: slotSize * 0.8, ease: "power2.inOut" }, segmentStart);
-        tl.to(item, { opacity: 1, scale: 1, duration: slotSize * 0.8, ease: "power2.inOut" }, segmentStart + slotSize * 0.2);
+        // Unified, symmetric card slide and crossfade
+        tl.to(items[i - 1], { opacity: 0, y: "-120%", duration: 0.35, ease: "power2.inOut" }, segmentStart);
+        tl.to(item, { opacity: 1, y: "0%", duration: 0.35, ease: "power2.inOut" }, segmentStart);
       });
 
       // Refresh ScrollTrigger after layout animation finishes (e.g. 1.2s delay)
@@ -156,8 +156,8 @@ export default function EventDetails() {
             className="object-cover opacity-20 pointer-events-none"
           />
         </div>
-        
-        <h2 
+
+        <h2
           className="relative z-10 text-[10cqi] text-[#9B4B32] font-normal mb-2"
           style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
         >
@@ -212,75 +212,72 @@ export default function EventDetails() {
     <section ref={sectionRef} className="relative w-full flex-shrink-0">
       {/* Pinned inner wrapper */}
       <div className="sticky top-0 h-screen w-full flex flex-col overflow-hidden bg-[#FCEAEA]">
-        {/* Wrapper to animate the entire card and content coming from the bottom */}
-        <div className="event-details-card-wrapper absolute inset-0 w-full h-full">
-          {/* Base Illustrated Card Frame (includes red envelope flap and bow) */}
-          <div className="absolute inset-0 z-0">
-            <Image
-              src={BottomCard}
-              alt="Event Base Card"
-              fill
-              priority
-              className="object-cover pointer-events-none select-none"
-            />
-          </div>
+        {/* Base Illustrated Card Frame (includes red envelope flap and bow) */}
+        <div className="envelope-base-frame absolute inset-0 z-0">
+          <Image
+            src={BottomCard}
+            alt="Event Base Card"
+            fill
+            priority
+            className="object-cover pointer-events-none select-none"
+          />
+        </div>
 
-          {/* Content area — sits in the cream space above the envelope flap */}
-          <div className="absolute top-[12%] left-0 w-full h-[45%] flex items-center justify-center overflow-hidden z-20">
-            {events.map((event, i) => (
-              <div
-                key={event.id}
-                ref={(el) => {
-                  contentRefs.current[i] = el;
-                }}
-                className="absolute w-[86%] h-[88%] flex items-center justify-center"
-              >
-                {/* Card Background - static inside the wrapper (moves with it) */}
-                <div className="absolute inset-0 bg-[#FFFDFE]/95 border border-[#9B4B32]/15 rounded-2xl shadow-[0_8px_24px_rgba(155,75,50,0.06)]" />
+        {/* Content area — sits in the cream space above the envelope flap */}
+        <div className="absolute top-[12%] left-0 w-full h-[45%] flex items-center justify-center overflow-hidden z-20">
+          {events.map((event, i) => (
+            <div
+              key={event.id}
+              ref={(el) => {
+                contentRefs.current[i] = el;
+              }}
+              className="absolute w-[86%] h-[88%] flex items-center justify-center"
+            >
+              {/* Card Background - static inside the wrapper (moves with it) */}
+              <div className="absolute inset-0 bg-[#FFFDFE]/95 border border-[#9B4B32]/15 rounded-2xl shadow-[0_8px_24px_rgba(155,75,50,0.06)]" />
 
-                {/* Text Content - static inside the wrapper (moves with it) */}
-                <div className="absolute inset-0 flex flex-col items-center justify-center p-[5cqi] text-center z-20">
-                  <h3
-                    className="text-[9cqi] font-normal text-[#9B4B32] mb-3"
-                    style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
-                  >
-                    {event.title}
-                  </h3>
-                  
-                  <p
-                    className="text-[3.6cqi] font-semibold text-[#9B4B32] tracking-wide"
-                    style={{ fontFamily: "var(--font-body), sans-serif" }}
-                  >
-                    {event.dateTime}
-                  </p>
-                  
-                  <p
-                    className="text-[3.4cqi] text-[#9B4B32]/85 mt-2 max-w-[80%] font-medium"
-                    style={{ fontFamily: "var(--font-body), sans-serif" }}
-                  >
-                    {event.location}
-                  </p>
-                  
-                  <p
-                    className="text-[3.2cqi] italic text-[#9B4B32]/70 mt-3"
-                    style={{ fontFamily: "var(--font-display), Georgia, serif" }}
-                  >
-                    Dress Code: {event.dressCode}
-                  </p>
-                  
-                  <a
-                    href={event.mapLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-5 text-[3cqi] uppercase tracking-widest border-b border-[#9B4B32] text-[#9B4B32] pb-1 font-semibold"
-                    style={{ fontFamily: "var(--font-body), sans-serif" }}
-                  >
-                    Get Directions
-                  </a>
-                </div>
+              {/* Text Content - static inside the wrapper (moves with it) */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-[5cqi] text-center z-20">
+                <h3
+                  className="text-[9cqi] font-normal text-[#9B4B32] mb-3"
+                  style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
+                >
+                  {event.title}
+                </h3>
+
+                <p
+                  className="text-[3.6cqi] font-semibold text-[#9B4B32] tracking-wide"
+                  style={{ fontFamily: "var(--font-body), sans-serif" }}
+                >
+                  {event.dateTime}
+                </p>
+
+                <p
+                  className="text-[3.4cqi] text-[#9B4B32]/85 mt-2 max-w-[80%] font-medium"
+                  style={{ fontFamily: "var(--font-body), sans-serif" }}
+                >
+                  {event.location}
+                </p>
+
+                <p
+                  className="text-[3.2cqi] italic text-[#9B4B32]/70 mt-3"
+                  style={{ fontFamily: "var(--font-display), Georgia, serif" }}
+                >
+                  Dress Code: {event.dressCode}
+                </p>
+
+                <a
+                  href={event.mapLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 text-[3cqi] uppercase tracking-widest border-b border-[#9B4B32] text-[#9B4B32] pb-1 font-semibold"
+                  style={{ fontFamily: "var(--font-body), sans-serif" }}
+                >
+                  Get Directions
+                </a>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
