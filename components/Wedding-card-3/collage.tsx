@@ -67,7 +67,7 @@ export default function Collage() {
         scrollTrigger: {
           trigger: triggerElement,
           scroller: scrollerElement,
-          start: "top 90%", // Animates when section top is 70% down the screen
+          start: "bottom bottom", // Animates when bottom of section hits the bottom of the viewport
           toggleActions: "play none none none"
         }
       });
@@ -115,7 +115,7 @@ export default function Collage() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex flex-col items-center justify-start mt-30 pt-6 pb-6"
+      className="relative w-full h-content flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex flex-col items-center justify-start mt-30 pt-6 pb-6"
     >
       {/* Section Heading */}
       <h2
@@ -127,10 +127,10 @@ export default function Collage() {
 
       <div
         ref={containerRef}
-        className="w-full flex-1 max-h-[83vh] flex flex-col justify-between "
+        className="w-full flex-1 max-h-[90vh] flex flex-col justify-between "
       >
         {/* 1. Top Landscape Photo */}
-        <div className="collage-cell cell-top w-[89%] aspect-[1.1/1] relative overflow-hidden rounded-2xl mx-auto shadow-sm">
+        <div className="collage-cell cell-top w-[89%] aspect-[1/1] relative overflow-hidden mx-auto shadow-sm">
           <div className="w-full h-full overflow-hidden transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03]">
             <Image
               src={PhotoTopLeft}
@@ -204,7 +204,7 @@ export default function Collage() {
         </div>
 
         {/* 5. Bottom Landscape Photo */}
-        <div className="collage-cell cell-bottom w-[89%] aspect-[1.1/1] relative overflow-hidden rounded-2xl mx-auto shadow-sm">
+        <div className="collage-cell cell-bottom w-[89%] aspect-[1/1] relative overflow-hidden  mx-auto shadow-sm">
           <div className="w-full h-full overflow-hidden transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03]">
             <Image
               src={PhotoBottomRight}
