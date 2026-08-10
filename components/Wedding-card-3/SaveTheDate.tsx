@@ -77,7 +77,7 @@ export default function SaveTheDate() {
     }, { scope: containerRef });
 
     return (
-        <section 
+        <section
             ref={containerRef}
             className="@container relative flex h-screen w-full flex-shrink-0 flex-col items-center justify-between p-8 bg-[#FCEDEC] text-[#9D2C2D] overflow-hidden select-none z-10"
         >
@@ -98,15 +98,15 @@ export default function SaveTheDate() {
                 </h2>
 
                 {/* 2. Names: Lars & Rosa (Elegant cursive/script) */}
-                <h3 
-                    className="std-names text-[11cqi] font-normal leading-tight select-none my-1"
+                <h3
+                    className="std-names text-[8cqi] font-normal leading-tight select-none my-1 mt-6"
                     style={{ fontFamily: "var(--font-anastasia), var(--font-script), cursive" }}
                 >
-                    Lars & Rosa
+                    Daniel & Maria
                 </h3>
 
                 {/* 3. Decorative Underline Flourish */}
-                <div className="relative h-4 w-[35cqi] flex items-center justify-center mb-4">
+                <div className="relative h-3 w-[70cqi] flex items-center justify-center mb-4">
                     <svg viewBox="0 0 100 10" className="w-full h-full text-[#9D2C2D] opacity-80" preserveAspectRatio="none">
                         <path
                             className="underline-flourish"
@@ -120,12 +120,12 @@ export default function SaveTheDate() {
                 </div>
 
                 {/* 4. Date details (Compact serif with pipes) */}
-                <div className="std-date flex items-center justify-center gap-3 text-[4.8cqi] font-serif font-normal tracking-wider mb-8">
-                    <span>05</span>
-                    <span className="text-[#9D2C2D]/40 font-light">|</span>
+                <div className="std-date flex items-center justify-center gap-3 text-[9cqi] font-serif font-normal tracking-wider mb-8 mt-10">
                     <span>13</span>
                     <span className="text-[#9D2C2D]/40 font-light">|</span>
-                    <span>24</span>
+                    <span>DEC</span>
+                    <span className="text-[#9D2C2D]/40 font-light">|</span>
+                    <span>2026</span>
                 </div>
 
                 {/* 5. Disclaimer Footnote (Smallest uppercase serif, wide spacing) */}
