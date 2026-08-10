@@ -115,11 +115,11 @@ export default function EventDetails() {
           scrub: isMobile ? 0.3 : 1,
           snap: isMobile
             ? {
-                snapTo: 1 / (items.length - 1),
-                duration: { min: 0.15, max: 0.3 },
-                ease: "power2.inOut",
-                inertia: false,
-              }
+              snapTo: 1 / (items.length - 1),
+              duration: { min: 0.15, max: 0.3 },
+              ease: "power2.inOut",
+              inertia: false,
+            }
             : undefined,
           invalidateOnRefresh: true,
         },
@@ -222,9 +222,6 @@ export default function EventDetails() {
             className="object-cover pointer-events-none select-none"
           />
         </div>
-
-        {/* Backdrop-blur glass overlay at the very bottom edge (section ending) */}
-        <div className="absolute bottom-0 left-0 w-full h-[8%] backdrop-blur-[6px] bg-gradient-to-t from-[#FCEAEA]/80 to-transparent z-30 pointer-events-none" />
 
         {/* Content area — sits in the cream space above the envelope flap */}
         <div className="absolute top-[12%] left-0 w-full h-[45%] flex items-center justify-center overflow-hidden z-20">
