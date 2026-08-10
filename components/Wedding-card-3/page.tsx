@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Hero from "./hero";
 import SaveTheDate from "./SaveTheDate";
 import Invitation from "./invitation";
+import Collage from "./collage";
 import EventDetails from "./EventDetails";
 
 export default function WeddingCardThreePage() {
@@ -42,6 +43,7 @@ export default function WeddingCardThreePage() {
             >
               <SaveTheDate />
               <Invitation />
+              <Collage />
               <EventDetails />
             </motion.div>
           )}
