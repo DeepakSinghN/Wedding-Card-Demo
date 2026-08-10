@@ -84,7 +84,7 @@ export default function EventDetails() {
       if (!scrollerElement) return;
 
       // Set initial states: first card visible, rest hidden and offset below
-      gsap.set(items.slice(1), { opacity: 0, y: "120%" });
+      gsap.set(items.slice(1), { opacity: 0, y: "100%" });
       gsap.set(items[0], { opacity: 1, y: "0%" });
 
       // 1. Entrance parallax slide-up for the envelope base card as the section scrolls into the viewport
@@ -130,7 +130,7 @@ export default function EventDetails() {
         const segmentStart = (i - 1) / (items.length - 1);
 
         // Unified, symmetric card slide and crossfade
-        tl.to(items[i - 1], { opacity: 0, y: "-120%", duration: 0.35, ease: "power2.inOut" }, segmentStart);
+        tl.to(items[i - 1], { opacity: 0, y: "-100%", duration: 0.35, ease: "power2.inOut" }, segmentStart);
         tl.to(item, { opacity: 1, y: "0%", duration: 0.35, ease: "power2.inOut" }, segmentStart);
       });
 
