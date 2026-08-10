@@ -54,6 +54,8 @@ export default function Collage() {
       const cells = gsap.utils.toArray(".collage-cell") as HTMLElement[];
       gsap.set(cells, { opacity: 0, y: 30 });
       gsap.set(".collage-heading", { opacity: 0, y: -20 });
+      gsap.set(".collage-cell img", { scale: 1.15 });
+      gsap.set(".parallax-img", { scale: 1.15 });
       gsap.set([".cell-text-1", ".cell-text-2"], { letterSpacing: "0.01em" });
 
       // Create entrance timeline
@@ -68,17 +70,31 @@ export default function Collage() {
 
       // Stagger entrance row-by-row with custom timings & spacing for text beats
       tl.to(".collage-heading", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.0)
+      
         .to(".cell-top-left", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1)
+        .to(".cell-top-left img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.1)
+        
         .to(".cell-top-right", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.18)
+        .to(".cell-top-right img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.18)
+        
         .to(".cell-text-1", { opacity: 1, y: 0, letterSpacing: "0.05em", duration: 0.8, ease: "power2.out" }, 0.32)
 
         .to(".cell-mid-left", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.46)
+        .to(".cell-mid-left img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.46)
+        
         .to(".cell-mid-center", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.54)
+        .to(".cell-mid-center img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.54)
+        
         .to(".cell-mid-right", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.62)
+        .to(".cell-mid-right img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.62)
 
         .to(".cell-bottom-left", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.76)
+        .to(".cell-bottom-left .parallax-img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.76)
+
         .to(".cell-text-2", { opacity: 1, y: 0, letterSpacing: "0.05em", duration: 0.8, ease: "power2.out" }, 0.90)
-        .to(".cell-bottom-right", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 1.04);
+        
+        .to(".cell-bottom-right", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 1.04)
+        .to(".cell-bottom-right img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 1.04);
 
       // 2. Parallax depth scroll effect for the tall bottom-left photo
       gsap.fromTo(
@@ -103,11 +119,11 @@ export default function Collage() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex flex-col items-center justify-start pt-12 pb-6"
+      className="relative w-full h-screen flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex flex-col items-center justify-start pt-12 pb-6 mt-10"
     >
       {/* Section Heading */}
       <h2
-        className="collage-heading text-[12cqi] text-[#9D2C2D] font-normal z-20 mb-6"
+        className="collage-heading text-[12cqi] text-[#9D2C2D] font-normal z-20 mb-10"
         style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
       >
         Our moments
@@ -152,13 +168,13 @@ export default function Collage() {
         {/* 3. Text Block 1 ("A little glimpse into our journey") */}
         <div
           className="collage-cell cell-text-1 absolute flex items-center justify-center text-center px-2"
-          style={{ left: "5.51%", top: "29.5%", width: "51.38%", height: "8.79%" }}
+          style={{ left: "5.51%", top: "29.5%", width: "49%", height: "8.79%" }}
         >
           <p
-            className="font-serif italic text-[#9D2C2D] text-[3.8cqi] leading-[2] font-medium"
+            className="font-serif italic text-[#9D2C2D] text-[3cqi] leading-[2] font-medium"
             style={{ fontFamily: "Georgia, serif" }}
           >
-            A little glimpse into<br />our journey
+            A little glimpse into our journey
           </p>
         </div>
 
@@ -231,13 +247,13 @@ export default function Collage() {
         {/* 8. Text Block 2 ("from where it started to where we are now.") */}
         <div
           className="collage-cell cell-text-2 absolute flex items-center justify-center text-center px-2"
-          style={{ left: "43.25%", top: "62%", width: "51.38%", height: "8.30%" }}
+          style={{ left: "43.25%", top: "62%", width: "49%", height: "8.30%" }}
         >
           <p
-            className="font-serif italic text-[#9D2C2D] text-[3.8cqi] leading-[1.4] font-medium"
+            className="font-serif italic text-[#9D2C2D] text-[3cqi] leading-[1.4] font-medium"
             style={{ fontFamily: "Georgia, serif" }}
           >
-            from where it started to<br />where we are now.
+            from where it started to where we are now.
           </p>
         </div>
 
