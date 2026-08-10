@@ -101,11 +101,11 @@ export default function Collage() {
   return (
     <section 
       ref={sectionRef} 
-      className="relative w-full bg-[#FBEAEA] py-[8%] px-[6%] flex-shrink-0 select-none overflow-hidden"
+      className="relative w-full h-screen flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex items-center justify-center"
     >
       <div 
         ref={containerRef} 
-        className="relative w-full aspect-[726/1024] mx-auto border border-[#5e7b60]/20"
+        className="relative w-full h-full max-h-screen max-w-full aspect-[726/1024] mx-auto"
       >
         {/* 1. Top-Left Photo (Landscape) */}
         <div 

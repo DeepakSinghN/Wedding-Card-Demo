@@ -43,8 +43,8 @@ export default function WeddingCardThreePage() {
             >
               <SaveTheDate />
               <Invitation />
-              <Collage />
               <EventDetails />
+              <Collage />
             </motion.div>
           )}
         </AnimatePresence>
