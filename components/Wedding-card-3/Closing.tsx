@@ -56,7 +56,7 @@ export default function Closing() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen flex-shrink-0 bg-[#121212] select-none overflow-hidden flex flex-col items-center justify-center p-6 text-center"
+      className="relative w-full h-screen flex-shrink-0 bg-[#f2d3d3] select-none overflow-hidden flex flex-col items-center justify-center p-6 text-center"
     >
       {/* Decorative Muted Gold Borders */}
       <div className="absolute inset-[6%] border border-[#C5A880]/30 pointer-events-none rounded-3xl" />

@@ -52,7 +52,14 @@ export default function Collage() {
       const cells = gsap.utils.toArray(".collage-cell") as HTMLElement[];
       gsap.set(cells, { opacity: 0, y: 30 });
       gsap.set(".collage-heading", { opacity: 0, y: -20 });
-      gsap.set(".collage-cell img", { scale: 1.15 });
+      
+      // Set initial clip-path wipe states
+      gsap.set(".cell-top img", { clipPath: "inset(0% 100% 0% 0%)", scale: 1.15 });
+      gsap.set(".cell-mid-left img", { clipPath: "inset(0% 0% 100% 0%)", scale: 1.15 });
+      gsap.set(".cell-mid-center img", { clipPath: "inset(100% 0% 0% 0%)", scale: 1.15 });
+      gsap.set(".cell-mid-right img", { clipPath: "inset(0% 0% 100% 0%)", scale: 1.15 });
+      gsap.set(".cell-bottom img", { clipPath: "inset(0% 0% 0% 100%)", scale: 1.15 });
+      
       gsap.set([".cell-text-1", ".cell-text-2"], { letterSpacing: "0.01em" });
 
       // Create entrance timeline
@@ -68,29 +75,32 @@ export default function Collage() {
       // Stagger entrance row-by-row with custom timings & spacing for text beats
       tl.to(".collage-heading", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.0)
 
-        // Row 1: Top Landscape photo
+        // Row 1: Top Landscape photo (left-to-right wipe)
         .to(".cell-top", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1)
-        .to(".cell-top img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.1)
+        .to(".cell-top img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.1)
 
         // Row 2: Text 1
         .to(".cell-text-1", { opacity: 1, y: 0, letterSpacing: "0.03em", duration: 0.8, ease: "power2.out" }, 0.22)
 
         // Row 3: Middle 3 Square photos
+        // Left (top-to-bottom wipe)
         .to(".cell-mid-left", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.36)
-        .to(".cell-mid-left img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.36)
+        .to(".cell-mid-left img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.36)
 
+        // Center (bottom-to-top wipe)
         .to(".cell-mid-center", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.44)
-        .to(".cell-mid-center img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.44)
+        .to(".cell-mid-center img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.44)
 
+        // Right (top-to-bottom wipe)
         .to(".cell-mid-right", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.52)
-        .to(".cell-mid-right img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.52)
+        .to(".cell-mid-right img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.52)
 
         // Row 4: Text 2
         .to(".cell-text-2", { opacity: 1, y: 0, letterSpacing: "0.03em", duration: 0.8, ease: "power2.out" }, 0.66)
 
-        // Row 5: Bottom Landscape photo
+        // Row 5: Bottom Landscape photo (right-to-left wipe)
         .to(".cell-bottom", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.80)
-        .to(".cell-bottom img", { scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.80);
+        .to(".cell-bottom img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.80);
 
       // Refresh ScrollTrigger after layouts render
       const refreshTimeout = setTimeout(() => {
@@ -105,7 +115,7 @@ export default function Collage() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex flex-col items-center justify-start pt-30 pb-6"
+      className="relative w-full h-screen flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex flex-col items-center justify-start mt-30 pt-6 pb-6"
     >
       {/* Section Heading */}
       <h2
