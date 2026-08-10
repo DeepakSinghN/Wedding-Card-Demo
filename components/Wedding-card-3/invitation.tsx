@@ -43,7 +43,8 @@ export default function Invitation() {
       <motion.div
         className="absolute -top-[2%] -right-[20%] w-[100cqi] h-[100cqi] z-20 pointer-events-none"
         initial={{ x: 50, y: -50, opacity: 0 }}
-        animate={{ x: 0, y: 0, opacity: 1 }}
+        whileInView={{ x: 0, y: 0, opacity: 1 }}
+        viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
       >
         <Image
@@ -59,7 +60,8 @@ export default function Invitation() {
       <motion.div
         className="absolute -bottom-[2%] -left-[20%] w-[100cqi] h-[100cqi] z-20 pointer-events-none"
         initial={{ x: -50, y: 50, opacity: 0 }}
-        animate={{ x: 0, y: 0, opacity: 1 }}
+        whileInView={{ x: 0, y: 0, opacity: 1 }}
+        viewport={{ once: true, amount: 0.2 }}
         transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
       >
         <div className="relative w-full h-full scale-x-[-1] scale-y-[-1]">
@@ -81,7 +83,8 @@ export default function Invitation() {
             className="text-[18cqi] leading-none select-none font-thin text-[#ac4052] drop-shadow-[0_1px_1px_rgba(255,255,255,0.7)]"
             style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
             initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
           >
             Welcome
@@ -91,7 +94,8 @@ export default function Invitation() {
             className="text-[18cqi] leading-none select-none font-thin text-[#ac4052] mt-[-2cqi] ml-[16cqi] drop-shadow-[0_1px_1px_rgba(255,255,255,0.7)]"
             style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
             initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 1.2, ease: "easeOut", delay: 0.4 }}
           >
             Note
@@ -102,7 +106,8 @@ export default function Invitation() {
         <motion.div
           className="absolute top-[56%] left-[0%] flex flex-col items-center justify-center w-full"
           initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true, amount: 0.2 }}
           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.6 }}
         >
           <p
