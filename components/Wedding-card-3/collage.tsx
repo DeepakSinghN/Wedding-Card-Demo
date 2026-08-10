@@ -67,40 +67,40 @@ export default function Collage() {
         scrollTrigger: {
           trigger: triggerElement,
           scroller: scrollerElement,
-          start: "top 80%", // Animates when section top is 80% down the screen
+          start: "top 70%", // Animates when section top is 70% down the screen
           toggleActions: "play none none none"
         }
       });
 
       // Stagger entrance row-by-row with custom timings & spacing for text beats
-      tl.to(".collage-heading", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.0)
+      tl.to(".collage-heading", { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" }, 0.0)
 
         // Row 1: Top Landscape photo (left-to-right wipe)
-        .to(".cell-top", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1)
-        .to(".cell-top img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.1)
+        .to(".cell-top", { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.15)
+        .to(".cell-top img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 1.4, ease: "power2.out" }, 0.15)
 
         // Row 2: Text 1
-        .to(".cell-text-1", { opacity: 1, y: 0, letterSpacing: "0.03em", duration: 0.8, ease: "power2.out" }, 0.22)
+        .to(".cell-text-1", { opacity: 1, y: 0, letterSpacing: "0.03em", duration: 1.2, ease: "power2.out" }, 0.35)
 
         // Row 3: Middle 3 Square photos
         // Left (top-to-bottom wipe)
-        .to(".cell-mid-left", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.36)
-        .to(".cell-mid-left img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.36)
+        .to(".cell-mid-left", { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.55)
+        .to(".cell-mid-left img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 1.4, ease: "power2.out" }, 0.55)
 
         // Center (bottom-to-top wipe)
-        .to(".cell-mid-center", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.44)
-        .to(".cell-mid-center img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.44)
+        .to(".cell-mid-center", { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.67)
+        .to(".cell-mid-center img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 1.4, ease: "power2.out" }, 0.67)
 
         // Right (top-to-bottom wipe)
-        .to(".cell-mid-right", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.52)
-        .to(".cell-mid-right img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.52)
+        .to(".cell-mid-right", { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.79)
+        .to(".cell-mid-right img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 1.4, ease: "power2.out" }, 0.79)
 
         // Row 4: Text 2
-        .to(".cell-text-2", { opacity: 1, y: 0, letterSpacing: "0.03em", duration: 0.8, ease: "power2.out" }, 0.66)
+        .to(".cell-text-2", { opacity: 1, y: 0, letterSpacing: "0.03em", duration: 1.2, ease: "power2.out" }, 0.99)
 
         // Row 5: Bottom Landscape photo (right-to-left wipe)
-        .to(".cell-bottom", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.80)
-        .to(".cell-bottom img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 0.8, ease: "power2.out" }, 0.80);
+        .to(".cell-bottom", { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 1.19)
+        .to(".cell-bottom img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 1.4, ease: "power2.out" }, 1.19);
 
       // Refresh ScrollTrigger after layouts render
       const refreshTimeout = setTimeout(() => {
