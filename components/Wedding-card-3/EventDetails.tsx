@@ -196,7 +196,7 @@ export default function EventDetails() {
   }
 
   return (
-    <section ref={sectionRef} className="relative w-full bg-[#FCEAEA] overflow-visible mb-20" style={{ height: "400vh" }}>
+    <section ref={sectionRef} className="relative w-full bg-[#FCEAEA] overflow-visible mb-20" style={{ height: "490vh" }}>
 
 
       {/* Front flap overlay — duplicates the bottom card but clips the top to let cards stack behind the red flap */}
@@ -216,7 +216,7 @@ export default function EventDetails() {
       {/* Content area — sits in the cream space above the envelope flap */}
       <div
         className="absolute left-0 w-full flex flex-col items-center z-20 cards-scrolling-container"
-        style={{ top: "12vh", paddingBottom: "80vh" }}
+        style={{ top: "12vh", paddingBottom: "100vh" }}
       >
         {events.map((event, i) => (
           <div
@@ -228,7 +228,7 @@ export default function EventDetails() {
             style={{
               top: "12vh",
               zIndex: 20 + i,
-              marginBottom: i === events.length - 1 ? 0 : "30vh"
+              marginBottom: i === events.length - 1 ? 0 : "45vh"
             }}
           >
             {/* Card Background - solid white background to hide the stacked card beneath */}
