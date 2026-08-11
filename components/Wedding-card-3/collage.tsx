@@ -6,12 +6,12 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
-// Import cropped photos
-import PhotoTopLeft from "./Collage-section-resources/photo-top-left.jpg";
-import PhotoMidLeft from "./Collage-section-resources/photo-mid-left.jpg";
-import PhotoMidCenter from "./Collage-section-resources/photo-mid-center.jpg";
-import PhotoMidRight from "./Collage-section-resources/photo-mid-right.jpg";
-import PhotoBottomRight from "./Collage-section-resources/photo-bottom-right.jpg";
+// Import gallery photos
+import PhotoTop from "./Gallery-section-resources/virat-anuskha-6.jpg";
+import PhotoMidLeft from "./Gallery-section-resources/virat-anuskha.jpg";
+import PhotoMidCenter from "./Gallery-section-resources/virat-anuskha-2.jpg";
+import PhotoMidRight from "./Gallery-section-resources/virat-anuskha-4.jpg";
+import PhotoBottom from "./Gallery-section-resources/virat-anuskha-5.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -133,7 +133,7 @@ export default function Collage() {
         <div className="collage-cell cell-top w-[89%] aspect-[1/1] relative overflow-hidden mx-auto shadow-sm">
           <div className="w-full h-full overflow-hidden transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03]">
             <Image
-              src={PhotoTopLeft}
+              src={PhotoTop}
               alt="Couple moments top"
               fill
               sizes="(max-width: 480px) 90vw, 420px"
@@ -207,7 +207,7 @@ export default function Collage() {
         <div className="collage-cell cell-bottom w-[89%] aspect-[1/1] relative overflow-hidden  mx-auto shadow-sm">
           <div className="w-full h-full overflow-hidden transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03]">
             <Image
-              src={PhotoBottomRight}
+              src={PhotoBottom}
               alt="Couple moments bottom"
               fill
               sizes="(max-width: 480px) 90vw, 420px"
