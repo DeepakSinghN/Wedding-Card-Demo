@@ -31,7 +31,7 @@ export default function WeddingCardThreePage() {
       content: content,
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      syncTouch: true,
+      syncTouch: false, // Use native touch scroll on mobile for buttery smooth inertial scrolling
     });
 
     const updateLenis = (time: number) => {
