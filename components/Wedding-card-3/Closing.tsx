@@ -69,7 +69,7 @@ export default function Closing() {
           We look forward to
         </h2>
         <h2
-          className="closing-heading text-[10cqi] text-[#C5A880] font-normal mb-8"
+          className="closing-heading text-[10cqi] text-[#C5A880] font-normal mb-16"
           style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
         >
           celebrating with you
@@ -80,10 +80,10 @@ export default function Closing() {
 
         {/* Signatures */}
         <p
-          className="closing-text text-[11cqi] text-[#A02C2D] font-normal"
+          className="closing-text text-[11cqi] text-[#A02C2D] font-normal tracking-[2px] leading-[5rem]"
           style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
         >
-          Daniel & Maria
+          Daniel <br /> & <br /> Maria
         </p>
       </div>
     </section>
