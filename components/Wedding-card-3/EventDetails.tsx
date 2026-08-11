@@ -66,10 +66,12 @@ const events: WeddingEvent[] = [
 export default function EventDetails() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [mounted, setMounted] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     setPrefersReducedMotion(motionQuery.matches);
     const motionListener = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
@@ -123,6 +125,11 @@ export default function EventDetails() {
     },
     { scope: sectionRef, dependencies: [prefersReducedMotion, isMobile] }
   );
+
+  // Prevent hydration mismatches by returning null during server-side rendering
+  if (!mounted) {
+    return null;
+  }
 
   // Fallback for accessibility or reduced-motion
   if (prefersReducedMotion) {
