@@ -90,22 +90,15 @@ export default function EventDetails() {
     () => {
       if (prefersReducedMotion) return;
 
-      const items = contentRefs.current.filter(Boolean) as HTMLDivElement[];
-      if (items.length === 0) return;
-
       const triggerElement = sectionRef.current;
       if (!triggerElement) return;
 
       const scrollerElement = triggerElement.closest("#card-scroll-container");
       if (!scrollerElement) return;
 
-      // Set initial states: first card visible, rest hidden and offset slightly down
-      gsap.set(items.slice(1), { opacity: 0, y: "15%" });
-      gsap.set(items[0], { opacity: 1, y: "0%" });
-
-      // 1. Entrance parallax slide-up for the envelope base card as the section scrolls into the viewport
+      // 1. Entrance parallax slide-up for both the envelope base card and the front flap overlay
       gsap.fromTo(
-        ".envelope-base-frame",
+        ".envelope-base-frame, .envelope-front-flap",
         { y: "100%" },
         {
           y: "0%",
@@ -120,37 +113,6 @@ export default function EventDetails() {
           }
         }
       );
-
-      // 2. Sticky Pin Timeline for event cards
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: triggerElement,
-          scroller: scrollerElement,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: isMobile ? true : 1, // Instantly match scroll on mobile, smooth delay on desktop
-          snap: undefined, // Disable snapping on both desktop and mobile for standard scrolling
-          invalidateOnRefresh: true,
-        },
-      });
-
-      // Explicitly enforce starting states inside the timeline at progress 0
-      tl.set(items.slice(1), { opacity: 0, y: "15%" }, 0);
-      tl.set(items[0], { opacity: 1, y: "0%" }, 0);
-
-      const totalItems = items.length;
-      const spacing = 1 / (totalItems - 1);
-      const transitionDuration = spacing * 0.4; // 40% of the segment is transition, 60% is static/readable
-
-      items.forEach((item, i) => {
-        if (i === 0) return;
-        const segmentStart = (i - 1) / (items.length - 1);
-
-        // Slide out previous item (micro-slide up and fade out)
-        tl.to(items[i - 1], { opacity: 0, y: "-15%", duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
-        // Slide in current item (micro-slide up from bottom flap and fade in)
-        tl.to(item, { opacity: 1, y: "0%", duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
-      });
 
       // Refresh ScrollTrigger after layouts render and settle (e.g. 1.2s delay)
       const refreshTimeout = setTimeout(() => {
@@ -227,85 +189,96 @@ export default function EventDetails() {
   }
 
   return (
-    <section ref={sectionRef} className="relative w-full flex-shrink-0 bg-[#FCEAEA] mb-20">
-      {/* Pinned inner wrapper */}
-      <div className="sticky top-0 h-screen w-full flex flex-col overflow-hidden bg-[#FCEAEA]">
-        {/* Base Illustrated Card Frame (includes red envelope flap and bow) */}
-        <div className="envelope-base-frame absolute inset-0 z-0 bg-[#FCEAEA]">
-          <Image
-            src={BottomCard}
-            alt="Event Base Card"
-            fill
-            priority
-            className="object-cover pointer-events-none select-none"
-          />
-        </div>
-
-        {/* Content area — sits in the cream space above the envelope flap and clips scrolling cards */}
-        <div className="absolute top-[12%] left-0 w-full h-[45%] flex items-center justify-center overflow-hidden z-20">
-          {events.map((event, i) => (
-            <div
-              key={event.id}
-              ref={(el) => {
-                contentRefs.current[i] = el;
-              }}
-              className="absolute w-[86%] h-[88%] flex items-center justify-center"
-              style={{ 
-                willChange: "transform, opacity", 
-                transform: i === 0 ? "translate3d(0, 0px, 0)" : "translate3d(0, 15%, 0)",
-                opacity: i === 0 ? 1 : 0 
-              }}
-            >
-              {/* Card Background - static inside the wrapper (moves with it) */}
-              <div className="absolute inset-0 bg-[#FFFDFE]/95 border border-[#9B4B32]/15 rounded-2xl shadow-[0_8px_24px_rgba(155,75,50,0.06)]" />
-
-              {/* Text Content - static inside the wrapper (moves with it) */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-[5cqi] text-center z-20">
-                <h3
-                  className="text-[9cqi] font-normal text-[#9B4B32] mb-3"
-                  style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
-                >
-                  {event.title}
-                </h3>
-
-                <p
-                  className="text-[3.6cqi] font-semibold text-[#9B4B32] tracking-wide"
-                  style={{ fontFamily: "var(--font-body), sans-serif" }}
-                >
-                  {event.dateTime}
-                </p>
-
-                <p
-                  className="text-[3.4cqi] text-[#9B4B32]/85 mt-2 max-w-[80%] font-medium"
-                  style={{ fontFamily: "var(--font-body), sans-serif" }}
-                >
-                  {event.location}
-                </p>
-
-                <p
-                  className="text-[3.2cqi] italic text-[#9B4B32]/70 mt-3"
-                  style={{ fontFamily: "var(--font-display), Georgia, serif" }}
-                >
-                  Dress Code: {event.dressCode}
-                </p>
-
-                <a
-                  href={event.mapLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-5 text-[3cqi] uppercase tracking-widest border-b border-[#9B4B32] text-[#9B4B32] pb-1 font-semibold"
-                  style={{ fontFamily: "var(--font-body), sans-serif" }}
-                >
-                  Get Directions
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
+    <section ref={sectionRef} className="relative w-full bg-[#FCEAEA] overflow-visible pb-[20vh] mb-20">
+      {/* Base Illustrated Card Frame (includes red envelope flap and bow) */}
+      <div className="envelope-base-frame sticky top-0 h-screen w-full z-0 bg-[#FCEAEA] pointer-events-none">
+        <Image
+          src={BottomCard}
+          alt="Event Base Card"
+          fill
+          priority
+          className="object-cover pointer-events-none select-none"
+        />
       </div>
 
-      {/* Spacer — gives scroll distance for all events to play through */}
-      <div style={{ height: `${events.length * (isMobile ? 45 : 60)}vh` }} className="pointer-events-none" />
+      {/* Front flap overlay — duplicates the bottom card but clips the top to let cards stack behind the red flap */}
+      <div 
+        className="envelope-front-flap sticky top-0 h-screen w-full z-30 pointer-events-none"
+        style={{ clipPath: "polygon(0 57%, 100% 57%, 100% 100%, 0 100%)" }}
+      >
+        <Image
+          src={BottomCard}
+          alt=""
+          fill
+          priority
+          className="object-cover pointer-events-none select-none"
+        />
+      </div>
+
+      {/* Content area — sits in the cream space above the envelope flap */}
+      <div 
+        className="relative z-20 flex flex-col items-center w-full" 
+        style={{ marginTop: "-88vh", paddingBottom: "55vh" }}
+      >
+        {events.map((event, i) => (
+          <div
+            key={event.id}
+            ref={(el) => {
+              contentRefs.current[i] = el;
+            }}
+            className="sticky w-[86%] h-[38vh] flex items-center justify-center flex-shrink-0"
+            style={{ 
+              top: "12vh",
+              zIndex: 20 + i,
+              marginBottom: i === events.length - 1 ? 0 : "45vh" 
+            }}
+          >
+            {/* Card Background - solid white background to hide the stacked card beneath */}
+            <div className="absolute inset-0 bg-[#FFFDFE] border border-[#9B4B32]/15 rounded-2xl shadow-[0_8px_24px_rgba(155,75,50,0.06)]" />
+
+            {/* Text Content */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-[5cqi] text-center z-20">
+              <h3
+                className="text-[9cqi] font-normal text-[#9B4B32] mb-3"
+                style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
+              >
+                {event.title}
+              </h3>
+
+              <p
+                className="text-[3.6cqi] font-semibold text-[#9B4B32] tracking-wide"
+                style={{ fontFamily: "var(--font-body), sans-serif" }}
+              >
+                {event.dateTime}
+              </p>
+
+              <p
+                className="text-[3.4cqi] text-[#9B4B32]/85 mt-2 max-w-[80%] font-medium"
+                style={{ fontFamily: "var(--font-body), sans-serif" }}
+              >
+                {event.location}
+              </p>
+
+              <p
+                className="text-[3.2cqi] italic text-[#9B4B32]/70 mt-3"
+                style={{ fontFamily: "var(--font-display), Georgia, serif" }}
+              >
+                Dress Code: {event.dressCode}
+              </p>
+
+              <a
+                href={event.mapLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-5 text-[3cqi] uppercase tracking-widest border-b border-[#9B4B32] text-[#9B4B32] pb-1 font-semibold"
+                style={{ fontFamily: "var(--font-body), sans-serif" }}
+              >
+                Get Directions
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
