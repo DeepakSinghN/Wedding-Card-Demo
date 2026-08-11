@@ -146,19 +146,9 @@ export default function EventDetails() {
         if (i === 0) return;
         const segmentStart = (i - 1) / (items.length - 1);
 
-        // Unified, symmetric card slide and crossfade utilizing fromTo for robust scroll-up state recovery
-        tl.fromTo(
-          items[i - 1],
-          { opacity: 1, y: "0%" },
-          { opacity: 0, y: "-100%", duration: transitionDuration, ease: "power2.inOut" },
-          segmentStart
-        );
-        tl.fromTo(
-          item,
-          { opacity: 0, y: "100%" },
-          { opacity: 1, y: "0%", duration: transitionDuration, ease: "power2.inOut" },
-          segmentStart
-        );
+        // Unified, symmetric card slide and crossfade utilizing simple to tweens for 60fps scrolling performance
+        tl.to(items[i - 1], { opacity: 0, y: "-100%", duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
+        tl.to(item, { opacity: 1, y: "0%", duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
       });
 
       // Refresh ScrollTrigger after layout animation finishes (e.g. 1.2s delay)
