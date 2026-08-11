@@ -134,6 +134,10 @@ export default function EventDetails() {
         },
       });
 
+      // Explicitly enforce starting states inside the timeline at progress 0
+      tl.set(items.slice(1), { opacity: 0, y: "100%" }, 0);
+      tl.set(items[0], { opacity: 1, y: "0%" }, 0);
+
       const totalItems = items.length;
       const spacing = 1 / (totalItems - 1);
       const transitionDuration = spacing * 0.4; // 40% of the segment is transition, 60% is static/readable
@@ -142,9 +146,19 @@ export default function EventDetails() {
         if (i === 0) return;
         const segmentStart = (i - 1) / (items.length - 1);
 
-        // Unified, symmetric card slide and crossfade
-        tl.to(items[i - 1], { opacity: 0, y: "-100%", duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
-        tl.to(item, { opacity: 1, y: "0%", duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
+        // Unified, symmetric card slide and crossfade utilizing fromTo for robust scroll-up state recovery
+        tl.fromTo(
+          items[i - 1],
+          { opacity: 1, y: "0%" },
+          { opacity: 0, y: "-100%", duration: transitionDuration, ease: "power2.inOut" },
+          segmentStart
+        );
+        tl.fromTo(
+          item,
+          { opacity: 0, y: "100%" },
+          { opacity: 1, y: "0%", duration: transitionDuration, ease: "power2.inOut" },
+          segmentStart
+        );
       });
 
       // Refresh ScrollTrigger after layout animation finishes (e.g. 1.2s delay)
@@ -245,7 +259,11 @@ export default function EventDetails() {
                 contentRefs.current[i] = el;
               }}
               className="absolute w-[86%] h-[88%] flex items-center justify-center"
-              style={{ willChange: "transform, opacity", transform: "translate3d(0,0,0)" }}
+              style={{ 
+                willChange: "transform, opacity", 
+                transform: i === 0 ? "translate3d(0, 0px, 0)" : "translate3d(0, 100%, 0)",
+                opacity: i === 0 ? 1 : 0 
+              }}
             >
               {/* Card Background - static inside the wrapper (moves with it) */}
               <div className="absolute inset-0 bg-[#FFFDFE]/95 border border-[#9B4B32]/15 rounded-2xl shadow-[0_8px_24px_rgba(155,75,50,0.06)]" />
