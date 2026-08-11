@@ -38,11 +38,27 @@ const events: WeddingEvent[] = [
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
   },
   {
+    id: "cocktail",
+    title: "Cocktail Party",
+    dateTime: "Saturday, Nov 28 • 7:00 PM Onwards",
+    location: "Poolside Club, The Oberoi Amarvilas",
+    dressCode: "Cocktail Chic / Evening Gown",
+    mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
+  },
+  {
     id: "wedding",
     title: "Wedding Ceremony",
     dateTime: "Sunday, Nov 29 • 11:00 AM Onwards",
     location: "Main Hall, The Oberoi Amarvilas",
     dressCode: "Traditional Formal",
+    mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
+  },
+  {
+    id: "reception",
+    title: "Grand Reception",
+    dateTime: "Monday, Nov 30 • 7:00 PM Onwards",
+    location: "Grand Lawn, The Oberoi Amarvilas",
+    dressCode: "Western Formal / Tuxedo",
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
   },
 ];
@@ -118,13 +134,17 @@ export default function EventDetails() {
         },
       });
 
+      const totalItems = items.length;
+      const spacing = 1 / (totalItems - 1);
+      const transitionDuration = spacing * 0.4; // 40% of the segment is transition, 60% is static/readable
+
       items.forEach((item, i) => {
         if (i === 0) return;
         const segmentStart = (i - 1) / (items.length - 1);
 
         // Unified, symmetric card slide and crossfade
-        tl.to(items[i - 1], { opacity: 0, y: "-100%", duration: 0.35, ease: "power2.inOut" }, segmentStart);
-        tl.to(item, { opacity: 1, y: "0%", duration: 0.35, ease: "power2.inOut" }, segmentStart);
+        tl.to(items[i - 1], { opacity: 0, y: "-100%", duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
+        tl.to(item, { opacity: 1, y: "0%", duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
       });
 
       // Refresh ScrollTrigger after layout animation finishes (e.g. 1.2s delay)
@@ -276,7 +296,7 @@ export default function EventDetails() {
       </div>
 
       {/* Spacer — gives scroll distance for all events to play through */}
-      <div style={{ height: `${events.length * (isMobile ? 70 : 100)}vh` }} className="pointer-events-none" />
+      <div style={{ height: `${events.length * (isMobile ? 45 : 60)}vh` }} className="pointer-events-none" />
     </section>
   );
 }
