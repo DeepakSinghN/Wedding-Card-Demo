@@ -96,12 +96,12 @@ export default function EventDetails() {
       const scrollerElement = triggerElement.closest("#card-scroll-container");
       if (!scrollerElement) return;
 
-      // 1. Entrance parallax slide-up for both the envelope base card and the front flap overlay
+      // 1. Entrance parallax slide-up for the envelope base card, front overlay, and cards container in unison
       gsap.fromTo(
-        ".envelope-base-frame, .envelope-front-flap",
-        { y: "100%" },
+        ".envelope-base-frame, .envelope-front-flap, .cards-scrolling-container",
+        { y: "100vh" },
         {
-          y: "0%",
+          y: "0vh",
           ease: "none",
           scrollTrigger: {
             trigger: triggerElement,
@@ -189,7 +189,7 @@ export default function EventDetails() {
   }
 
   return (
-    <section ref={sectionRef} className="relative w-full bg-[#FCEAEA] overflow-visible pb-[20vh] mb-20">
+    <section ref={sectionRef} className="relative w-full bg-[#FCEAEA] overflow-visible mb-20" style={{ height: "460vh" }}>
       {/* Base Illustrated Card Frame (includes red envelope flap and bow) */}
       <div className="envelope-base-frame sticky top-0 h-screen w-full z-0 bg-[#FCEAEA] pointer-events-none">
         <Image
@@ -217,8 +217,8 @@ export default function EventDetails() {
 
       {/* Content area — sits in the cream space above the envelope flap */}
       <div 
-        className="relative z-20 flex flex-col items-center w-full" 
-        style={{ marginTop: "-88vh", paddingBottom: "55vh" }}
+        className="absolute left-0 w-full flex flex-col items-center z-20 cards-scrolling-container" 
+        style={{ top: "12vh", paddingBottom: "75vh" }}
       >
         {events.map((event, i) => (
           <div
