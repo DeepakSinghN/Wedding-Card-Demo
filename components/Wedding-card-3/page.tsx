@@ -15,7 +15,7 @@ export default function WeddingCardThreePage() {
 
   return (
     <main className="w-full h-screen bg-[#96390f]/15 flex flex-col items-center justify-center overflow-hidden">
-      <div 
+      <div
         id="card-scroll-container"
         className={`w-full max-w-[480px] h-full shadow-[0_0_60px_rgba(0,0,0,0.75)] relative bg-[#FFECEF] flex flex-col ${isRevealed ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden cursor-pointer"}`}
         onClick={() => {
@@ -45,8 +45,8 @@ export default function WeddingCardThreePage() {
             >
               <SaveTheDate />
               <Invitation />
-              <EventDetails />
               <Collage />
+              <EventDetails />
               <RSVP />
               <Closing />
             </motion.div>

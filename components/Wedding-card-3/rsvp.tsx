@@ -52,34 +52,34 @@ export default function RSVP() {
       });
 
       // 1. Card Entrance
-      tl.to(cardElement, { 
-        opacity: 1, 
-        y: 0, 
-        scale: 1, 
-        duration: 0.6, 
-        ease: "power3.out" 
+      tl.to(cardElement, {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.6,
+        ease: "power3.out"
       })
-      // 2. Photo settle (Ken Burns)
-      .to(".rsvp-photo", { 
-        scale: 1, 
-        duration: 1.0, 
-        ease: "power2.out" 
-      }, 0.0) // runs in parallel with card entrance
-      // 3. Staggered form fields
-      .to(".rsvp-animate-item", {
-        opacity: 1,
-        y: 0,
-        stagger: 0.08,
-        duration: 0.4,
-        ease: "power2.out"
-      }, "-=0.4")
-      // 4. Submit button slide in
-      .to(".rsvp-submit-btn", {
-        opacity: 1,
-        y: 0,
-        duration: 0.4,
-        ease: "power2.out"
-      }, "-=0.1");
+        // 2. Photo settle (Ken Burns)
+        .to(".rsvp-photo", {
+          scale: 1,
+          duration: 1.0,
+          ease: "power2.out"
+        }, 0.0) // runs in parallel with card entrance
+        // 3. Staggered form fields
+        .to(".rsvp-animate-item", {
+          opacity: 1,
+          y: 0,
+          stagger: 0.08,
+          duration: 0.4,
+          ease: "power2.out"
+        }, "-=0.4")
+        // 4. Submit button slide in
+        .to(".rsvp-submit-btn", {
+          opacity: 1,
+          y: 0,
+          duration: 0.4,
+          ease: "power2.out"
+        }, "-=0.1");
 
       // 5. Submit Button Idle Pulse Animation
       gsap.to(".rsvp-submit-btn", {
@@ -109,20 +109,20 @@ export default function RSVP() {
 
   // Input Focus Feedback
   const handleFocus = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    gsap.to(e.target, { 
-      borderColor: "rgba(157, 44, 45, 0.4)", 
-      backgroundColor: "#ffffff", 
+    gsap.to(e.target, {
+      borderColor: "rgba(157, 44, 45, 0.4)",
+      backgroundColor: "#ffffff",
       boxShadow: "0 0 0 1px rgba(157, 44, 45, 0.2)",
-      duration: 0.2 
+      duration: 0.2
     });
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
-    gsap.to(e.target, { 
-      borderColor: "rgba(243, 244, 246, 1)", 
-      backgroundColor: "rgba(249, 250, 251, 1)", 
+    gsap.to(e.target, {
+      borderColor: "rgba(243, 244, 246, 1)",
+      backgroundColor: "rgba(249, 250, 251, 1)",
       boxShadow: "none",
-      duration: 0.2 
+      duration: 0.2
     });
   };
 
@@ -142,7 +142,7 @@ export default function RSVP() {
         className="relative w-[92%] max-w-[360px] h-[92%] bg-white rounded-[24px] shadow-[0_12px_36px_rgba(155,75,50,0.12)] overflow-hidden flex flex-col z-20"
       >
         {/* Photo Zone */}
-        <div className="relative w-full h-[40%] overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-[54%] overflow-hidden z-0">
           <Image
             src={PhotoTopRight}
             alt="Couple RSVP Header"
@@ -150,26 +150,10 @@ export default function RSVP() {
             priority
             className="rsvp-photo object-cover"
           />
-          {/* Back Button */}
-          <button 
-            type="button"
-            onClick={() => {
-              const scroller = sectionRef.current?.closest("#card-scroll-container");
-              if (scroller) {
-                scroller.scrollBy({ top: -window.innerHeight, behavior: "smooth" });
-              }
-            }}
-            className="absolute top-5 left-5 flex items-center gap-1 text-white font-semibold text-[3.8cqi] drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)] active:scale-95 transition-all z-20"
-          >
-            <svg className="w-4 h-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            Back
-          </button>
         </div>
 
         {/* White Form Zone */}
-        <div className="relative w-full flex-1 bg-white rounded-t-[24px] mt-[-24px] pt-6 px-6 pb-6 flex flex-col justify-between z-10 overflow-hidden">
+        <div className="absolute bottom-[3%] left-[4%] right-[4%] bg-white rounded-[20px] shadow-[0_8px_24px_rgba(0,0,0,0.08)] pt-5 px-5 pb-5 flex flex-col justify-between z-10 overflow-hidden">
           {isSubmitted ? (
             /* Success state */
             <div className="rsvp-success-state absolute inset-0 bg-white flex flex-col items-center justify-center p-6 text-center z-30">
