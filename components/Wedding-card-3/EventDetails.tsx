@@ -204,7 +204,7 @@ export default function EventDetails() {
       {/* Front flap overlay — duplicates the bottom card but clips the top to let cards stack behind the red flap */}
       <div 
         className="envelope-front-flap sticky top-0 h-screen w-full z-30 pointer-events-none"
-        style={{ clipPath: "polygon(0 57%, 100% 57%, 100% 100%, 0 100%)" }}
+        style={{ clipPath: "polygon(0 42%, 100% 42%, 100% 100%, 0 100%)" }}
       >
         <Image
           src={BottomCard}
