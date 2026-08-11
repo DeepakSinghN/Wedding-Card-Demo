@@ -6,7 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
-import PhotoTopRight from "./Collage-section-resources/photo-top-right.jpg";
+import PhotoRSVP from "./RSVP-section-resources/rsvp-5.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -151,7 +151,7 @@ export default function RSVP() {
         {/* Photo Zone */}
         <div className="absolute top-0 left-0 w-full h-[54%] overflow-hidden z-0">
           <Image
-            src={PhotoTopRight}
+            src={PhotoRSVP}
             alt="Couple RSVP Header"
             fill
             priority
