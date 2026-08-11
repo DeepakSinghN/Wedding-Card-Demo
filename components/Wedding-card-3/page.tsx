@@ -7,6 +7,7 @@ import SaveTheDate from "./SaveTheDate";
 import Invitation from "./invitation";
 import Collage from "./collage";
 import EventDetails from "./EventDetails";
+import RSVP from "./rsvp";
 import Closing from "./Closing";
 
 export default function WeddingCardThreePage() {
@@ -46,6 +47,7 @@ export default function WeddingCardThreePage() {
               <Invitation />
               <EventDetails />
               <Collage />
+              <RSVP />
               <Closing />
             </motion.div>
           )}

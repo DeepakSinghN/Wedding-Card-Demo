@@ -115,11 +115,11 @@ export default function Collage() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-content flex-shrink-0 bg-[#FBEAEA] select-none overflow-hidden flex flex-col items-center justify-start mt-30 pt-6 pb-6"
+      className="relative w-full h-content flex-shrink-0 bg-[#FCEAEA] select-none overflow-hidden flex flex-col items-center justify-start mt-20 pt-6 pb-6"
     >
       {/* Section Heading */}
       <h2
-        className="collage-heading text-[12cqi] text-[#9D2C2D] font-normal z-20 mb-16"
+        className="collage-heading text-[12cqi] text-[#9D2C2D] bg-[#FCEAEA] font-normal z-20 mb-16"
         style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
       >
         Our moments
@@ -127,7 +127,7 @@ export default function Collage() {
 
       <div
         ref={containerRef}
-        className="w-full flex-1 max-h-[90vh] flex flex-col justify-between "
+        className="w-full flex-1 max-h-[90vh] flex flex-col justify-between bg-[#FCEAEA]"
       >
         {/* 1. Top Landscape Photo */}
         <div className="collage-cell cell-top w-[89%] aspect-[1/1] relative overflow-hidden mx-auto shadow-sm">

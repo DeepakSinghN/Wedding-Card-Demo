@@ -151,7 +151,7 @@ export default function Hero() {
                             animate={{ scale: 1, opacity: 1 }}
                             transition={{ duration: 1.2, ease: "easeOut", delay: 0.8 }}
                         >
-                            &
+                            weds
                         </motion.span>
 
                         <motion.h1

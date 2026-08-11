@@ -209,11 +209,11 @@ export default function EventDetails() {
   }
 
   return (
-    <section ref={sectionRef} className="relative w-full flex-shrink-0">
+    <section ref={sectionRef} className="relative w-full flex-shrink-0 bg-[#FCEAEA]">
       {/* Pinned inner wrapper */}
       <div className="sticky top-0 h-screen w-full flex flex-col overflow-hidden bg-[#FCEAEA]">
         {/* Base Illustrated Card Frame (includes red envelope flap and bow) */}
-        <div className="envelope-base-frame absolute inset-0 z-0">
+        <div className="envelope-base-frame absolute inset-0 z-0 bg-[#FCEAEA]">
           <Image
             src={BottomCard}
             alt="Event Base Card"
