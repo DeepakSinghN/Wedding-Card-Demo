@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Hero from "./hero";
 import SaveTheDate from "./SaveTheDate";
@@ -10,8 +10,43 @@ import EventDetails from "./EventDetails";
 import RSVP from "./rsvp";
 import Closing from "./Closing";
 
+import Lenis from "lenis";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
+
 export default function WeddingCardThreePage() {
   const [isRevealed, setIsRevealed] = useState(false);
+
+  useEffect(() => {
+    if (!isRevealed) return;
+
+    const wrapper = document.getElementById("card-scroll-container");
+    const content = document.getElementById("card-scroll-content");
+    if (!wrapper || !content) return;
+
+    const lenis = new Lenis({
+      wrapper: wrapper,
+      content: content,
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      syncTouch: true,
+    });
+
+    const updateLenis = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+
+    lenis.on("scroll", ScrollTrigger.update);
+    gsap.ticker.add(updateLenis);
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      gsap.ticker.remove(updateLenis);
+      lenis.destroy();
+    };
+  }, [isRevealed]);
 
   return (
     <main className="w-full h-screen bg-[#96390f]/15 flex flex-col items-center justify-center overflow-hidden">
@@ -38,6 +73,7 @@ export default function WeddingCardThreePage() {
           ) : (
             <motion.div
               key="revealed-content"
+              id="card-scroll-content"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 1 }}
