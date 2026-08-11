@@ -86,8 +86,6 @@ export default function EventDetails() {
     };
   }, []);
 
-  const [isSticky, setIsSticky] = useState(false);
-
   useGSAP(
     () => {
       if (prefersReducedMotion) return;
@@ -115,15 +113,6 @@ export default function EventDetails() {
           }
         }
       );
-
-      // 2. ScrollTrigger to track the active sticky stacking region
-      ScrollTrigger.create({
-        trigger: triggerElement,
-        scroller: scrollerElement,
-        start: "top top",
-        end: "bottom bottom",
-        onToggle: (self) => setIsSticky(self.isActive),
-      });
 
       // Refresh ScrollTrigger after layouts render and settle (e.g. 1.2s delay)
       const refreshTimeout = setTimeout(() => {
@@ -200,22 +189,13 @@ export default function EventDetails() {
   }
 
   return (
-    <section ref={sectionRef} className="relative w-full bg-[#FCEAEA] overflow-visible mb-20" style={{ height: "460vh" }}>
-      {/* Base Illustrated Card Frame (includes red envelope flap and bow) */}
-      <div className={`envelope-base-frame h-screen w-full z-0 bg-[#FCEAEA] pointer-events-none ${isSticky ? "sticky top-0" : "absolute top-0"}`}>
-        <Image
-          src={BottomCard}
-          alt="Event Base Card"
-          fill
-          priority
-          className="object-cover pointer-events-none select-none"
-        />
-      </div>
+    <section ref={sectionRef} className="relative w-full bg-[#FCEAEA] overflow-visible mb-20" style={{ height: "550vh" }}>
+
 
       {/* Front flap overlay — duplicates the bottom card but clips the top to let cards stack behind the red flap */}
-      <div 
-        className={`envelope-front-flap h-screen w-full z-30 pointer-events-none ${isSticky ? "sticky top-0" : "absolute top-0"}`}
-        style={{ clipPath: "polygon(0 44%, 100% 44%, 100% 100%, 0 100%)" }}
+      <div
+        className="envelope-front-flap sticky top-0 h-screen w-full z-30 pointer-events-none"
+        style={{ clipPath: "polygon(0 57%, 100% 57%, 100% 100%, 0 100%)" }}
       >
         <Image
           src={BottomCard}
@@ -227,9 +207,9 @@ export default function EventDetails() {
       </div>
 
       {/* Content area — sits in the cream space above the envelope flap */}
-      <div 
-        className="absolute left-0 w-full flex flex-col items-center z-20 cards-scrolling-container" 
-        style={{ top: "12vh", paddingBottom: "75vh" }}
+      <div
+        className="absolute left-0 w-full flex flex-col items-center z-20 cards-scrolling-container"
+        style={{ top: "12vh", paddingBottom: "150vh" }}
       >
         {events.map((event, i) => (
           <div
@@ -237,11 +217,11 @@ export default function EventDetails() {
             ref={(el) => {
               contentRefs.current[i] = el;
             }}
-            className={`${isSticky ? "sticky" : "relative"} w-[86%] h-[38vh] flex items-center justify-center flex-shrink-0`}
-            style={{ 
-              top: isSticky ? "12vh" : "auto",
+            className="sticky w-[86%] h-[38vh] flex items-center justify-center flex-shrink-0"
+            style={{
+              top: "12vh",
               zIndex: 20 + i,
-              marginBottom: i === events.length - 1 ? 0 : "45vh" 
+              marginBottom: i === events.length - 1 ? 0 : "45vh"
             }}
           >
             {/* Card Background - solid white background to hide the stacked card beneath */}

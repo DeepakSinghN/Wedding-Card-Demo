@@ -42,12 +42,8 @@ export default function WeddingCardThreePage() {
     gsap.ticker.add(updateLenis);
     gsap.ticker.lagSmoothing(0);
 
-    const resizeSync = () => lenis.resize();
-    ScrollTrigger.addEventListener("refresh", resizeSync);
-
     return () => {
       gsap.ticker.remove(updateLenis);
-      ScrollTrigger.removeEventListener("refresh", resizeSync);
       lenis.destroy();
     };
   }, [isRevealed]);
