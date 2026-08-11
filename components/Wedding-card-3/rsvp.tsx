@@ -46,7 +46,7 @@ export default function RSVP() {
         scrollTrigger: {
           trigger: triggerElement,
           scroller: scrollerElement,
-          start: "top 75%",
+          start: "top 40%", // Animates when section top is 40% from top of screen (60% scrolled into view)
           toggleActions: "play none none none"
         }
       });
@@ -90,6 +90,13 @@ export default function RSVP() {
         ease: "sine.inOut",
         delay: 1.2
       });
+
+      // Refresh ScrollTrigger after layouts render
+      const refreshTimeout = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 1200);
+
+      return () => clearTimeout(refreshTimeout);
     },
     { scope: sectionRef, dependencies: [prefersReducedMotion] }
   );
@@ -134,12 +141,12 @@ export default function RSVP() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen flex-shrink-0 bg-[#FCEDEC] select-none overflow-hidden flex flex-col items-center justify-center p-4 text-left"
+      className="relative w-full h-[100vh] flex-shrink-0 bg-[#FCEDEC] select-none overflow-hidden flex flex-col items-center justify-center p-4 text-left my-20"
     >
       {/* Elevated Card */}
       <div
         ref={cardRef}
-        className="relative w-[92%] max-w-[360px] h-[92%] bg-white rounded-[24px] shadow-[0_12px_36px_rgba(155,75,50,0.12)] overflow-hidden flex flex-col z-20"
+        className="relative w-[92%] max-w-[360px] h-[100%] rounded-[24px]  overflow-hidden flex flex-col z-20"
       >
         {/* Photo Zone */}
         <div className="absolute top-0 left-0 w-full h-[54%] overflow-hidden z-0">
@@ -153,7 +160,7 @@ export default function RSVP() {
         </div>
 
         {/* White Form Zone */}
-        <div className="absolute bottom-[3%] left-[4%] right-[4%] bg-white rounded-[20px] shadow-[0_8px_24px_rgba(0,0,0,0.08)] pt-5 px-5 pb-5 flex flex-col justify-between z-10 overflow-hidden">
+        <div className="absolute bottom-[-0%] left-[4%] right-[4%] bg-white rounded-[20px] shadow-[0_8px_24px_rgba(0,0,0,0.08)] pt-5 px-5 pb-5 flex flex-col justify-between z-10 overflow-hidden">
           {isSubmitted ? (
             /* Success state */
             <div className="rsvp-success-state absolute inset-0 bg-white flex flex-col items-center justify-center p-6 text-center z-30">
@@ -182,12 +189,12 @@ export default function RSVP() {
                   </div>
 
                   {/* Couple Names */}
-                  <h3 className="rsvp-animate-item text-[5.2cqi] text-[#9D2C2D] font-normal leading-tight mb-4" style={{ fontFamily: "Georgia, serif" }}>
+                  <h3 className="rsvp-animate-item text-[5.2cqi] text-[#9D2C2D] font-normal leading-tight mb-8" style={{ fontFamily: "Georgia, serif" }}>
                     Daniel & Maria
                   </h3>
 
                   {/* Form Fields */}
-                  <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-8">
                     {/* Your Name */}
                     <div className="rsvp-animate-item flex flex-col gap-1">
                       <label className="text-[3cqi] font-semibold text-gray-600 tracking-wide">

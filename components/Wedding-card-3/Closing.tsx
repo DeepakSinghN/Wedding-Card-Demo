@@ -39,7 +39,7 @@ export default function Closing() {
         scrollTrigger: {
           trigger: triggerElement,
           scroller: scrollerElement,
-          start: "top 80%",
+          start: "top 40%", // Animates when section top is 40% from top of screen (60% scrolled into view)
           toggleActions: "play none none none"
         }
       });
@@ -47,6 +47,13 @@ export default function Closing() {
       tl.to(".closing-heading", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" })
         .to(".closing-line", { scaleX: 1, duration: 1.0, ease: "power3.out" }, "-=0.4")
         .to(".closing-text", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", stagger: 0.2 }, "-=0.6");
+
+      // Refresh ScrollTrigger after layouts render
+      const refreshTimeout = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 1200);
+
+      return () => clearTimeout(refreshTimeout);
     },
     { scope: sectionRef, dependencies: [prefersReducedMotion] }
   );

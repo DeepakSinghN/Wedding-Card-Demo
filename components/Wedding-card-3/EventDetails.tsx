@@ -147,7 +147,7 @@ export default function EventDetails() {
   // Fallback for accessibility or reduced-motion
   if (prefersReducedMotion) {
     return (
-      <div className="relative w-full py-[6vh] px-6 bg-[#FCEAEA] flex flex-col gap-[4vh] text-center flex-shrink-0">
+      <div className="relative w-full py-[6vh] px-6 bg-[#FCEAEA] flex flex-col gap-[4vh] text-center flex-shrink-0 ">
         <div className="absolute inset-0 z-0">
           <Image
             src={BottomCard}
@@ -209,7 +209,7 @@ export default function EventDetails() {
   }
 
   return (
-    <section ref={sectionRef} className="relative w-full flex-shrink-0 bg-[#FCEAEA]">
+    <section ref={sectionRef} className="relative w-full flex-shrink-0 bg-[#FCEAEA] mb-20">
       {/* Pinned inner wrapper */}
       <div className="sticky top-0 h-screen w-full flex flex-col overflow-hidden bg-[#FCEAEA]">
         {/* Base Illustrated Card Frame (includes red envelope flap and bow) */}
