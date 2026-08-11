@@ -99,9 +99,9 @@ export default function EventDetails() {
       const scrollerElement = triggerElement.closest("#card-scroll-container");
       if (!scrollerElement) return;
 
-      // Set initial states: first card visible, rest hidden and offset below
-      gsap.set(items.slice(1), { opacity: 0, y: "100%" });
-      gsap.set(items[0], { opacity: 1, y: "0%" });
+      // Set initial states: first card visible, rest hidden and scale down
+      gsap.set(items.slice(1), { opacity: 0, scale: 0.95 });
+      gsap.set(items[0], { opacity: 1, scale: 1 });
 
       // 1. Entrance parallax slide-up for the envelope base card as the section scrolls into the viewport
       gsap.fromTo(
@@ -135,8 +135,8 @@ export default function EventDetails() {
       });
 
       // Explicitly enforce starting states inside the timeline at progress 0
-      tl.set(items.slice(1), { opacity: 0, y: "100%" }, 0);
-      tl.set(items[0], { opacity: 1, y: "0%" }, 0);
+      tl.set(items.slice(1), { opacity: 0, scale: 0.95 }, 0);
+      tl.set(items[0], { opacity: 1, scale: 1 }, 0);
 
       const totalItems = items.length;
       const spacing = 1 / (totalItems - 1);
@@ -146,9 +146,9 @@ export default function EventDetails() {
         if (i === 0) return;
         const segmentStart = (i - 1) / (items.length - 1);
 
-        // Unified, symmetric card slide and crossfade utilizing simple to tweens for 60fps scrolling performance
-        tl.to(items[i - 1], { opacity: 0, y: "-100%", duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
-        tl.to(item, { opacity: 1, y: "0%", duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
+        // Fade + Subtle Scale Depth Transition (No Sliding) for buttery smooth performance
+        tl.to(items[i - 1], { opacity: 0, scale: 1.05, duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
+        tl.to(item, { opacity: 1, scale: 1, duration: transitionDuration, ease: "power2.inOut" }, segmentStart);
       });
 
       // Refresh ScrollTrigger after layout animation finishes (e.g. 1.2s delay)
@@ -251,7 +251,7 @@ export default function EventDetails() {
               className="absolute w-[86%] h-[88%] flex items-center justify-center"
               style={{ 
                 willChange: "transform, opacity", 
-                transform: i === 0 ? "translate3d(0, 0px, 0)" : "translate3d(0, 100%, 0)",
+                transform: i === 0 ? "scale(1)" : "scale(0.95)",
                 opacity: i === 0 ? 1 : 0 
               }}
             >
