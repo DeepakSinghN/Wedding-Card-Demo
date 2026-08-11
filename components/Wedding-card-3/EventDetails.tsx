@@ -99,7 +99,7 @@ export default function EventDetails() {
             scroller: scrollerElement,
             start: "top bottom",
             end: "top top",
-            scrub: isMobile ? 0.3 : 1,
+            scrub: isMobile ? true : 1, // Instantly match scroll on mobile, smooth delay on desktop
             invalidateOnRefresh: true,
           }
         }
@@ -112,15 +112,8 @@ export default function EventDetails() {
           scroller: scrollerElement,
           start: "top top",
           end: "bottom bottom",
-          scrub: isMobile ? 0.3 : 1,
-          snap: isMobile
-            ? {
-              snapTo: 1 / (items.length - 1),
-              duration: { min: 0.15, max: 0.3 },
-              ease: "power2.inOut",
-              inertia: false,
-            }
-            : undefined,
+          scrub: isMobile ? true : 1, // Instantly match scroll on mobile, smooth delay on desktop
+          snap: undefined, // Disable snapping on both desktop and mobile for standard scrolling
           invalidateOnRefresh: true,
         },
       });
@@ -232,6 +225,7 @@ export default function EventDetails() {
                 contentRefs.current[i] = el;
               }}
               className="absolute w-[86%] h-[88%] flex items-center justify-center"
+              style={{ willChange: "transform, opacity", transform: "translate3d(0,0,0)" }}
             >
               {/* Card Background - static inside the wrapper (moves with it) */}
               <div className="absolute inset-0 bg-[#FFFDFE]/95 border border-[#9B4B32]/15 rounded-2xl shadow-[0_8px_24px_rgba(155,75,50,0.06)]" />
