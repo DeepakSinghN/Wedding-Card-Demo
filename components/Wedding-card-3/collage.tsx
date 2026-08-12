@@ -71,15 +71,9 @@ export default function Collage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [mounted, setMounted] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const mobileQuery = window.matchMedia("(max-width: 768px)");
-    setIsMobile(mobileQuery.matches);
-    const listener = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mobileQuery.addEventListener("change", listener);
-    return () => mobileQuery.removeEventListener("change", listener);
   }, []);
 
   useGSAP(
@@ -95,79 +89,42 @@ export default function Collage() {
       const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
       if (wrappers.length === 0 || cards.length === 0) return;
 
-      // ── Entrance Batch Animation (on wrappers) ───────────────────────────
-      // We set starting states for card wrappers: scaled up slightly, transparent
-      // Note: We avoid animating the heavy CSS 'blur' filter as it causes GPU repaint lag.
-      gsap.set(wrappers, {
-        opacity: 0,
-        scale: 1.05,
-      });
-
-      // Characters are hidden initially
-      const chars = gsap.utils.toArray(".caption-char") as HTMLElement[];
-      gsap.set(chars, { opacity: 0, y: 8 });
-
-      // Batches card wrapper reveals as they scroll into view to avoid lag spikes
-      ScrollTrigger.batch(wrappers, {
-        scroller,
-        start: "top 90%",
-        once: true, // Only animate once
-        onEnter: (batch) => {
-          // 1. Animate wrapper opacity and scaling (GPU-accelerated transform/opacity only)
-          gsap.to(batch, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.6,
-            ease: "power2.out",
-            stagger: 0.1,
-            willChange: "transform, opacity",
-            onComplete: function () {
-              // Remove will-change after animation to free up GPU memory
-              gsap.set(this.targets(), { clearProps: "willChange" });
-            },
-          });
-
-          // 2. Animate character stagger inside this batch
-          batch.forEach((wrapper) => {
-            const cardChars = wrapper.querySelectorAll(".caption-char");
-            if (cardChars.length > 0) {
-              gsap.to(cardChars, {
-                opacity: 1,
-                y: 0,
-                stagger: 0.03, // tight stagger for quick flourish
-                duration: 0.4,
-                ease: "power2.out",
-                delay: 0.25, // starts slightly after card finishes scaling
-              });
-            }
-          });
+      // ── Stacking Parallax Scroll Timeline ─────────────────────────────────
+      // We use a single scroll-linked timeline to drive the stacking reveal.
+      // Cards start shifted down and slide up sequentially to stack on Card 0.
+      // No opacity or blur fades are used, ensuring buttery-smooth performance.
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: containerRef.current,
+          scroller,
+          start: "top 75%", // Animation starts when section top is 75% down viewport
+          end: "bottom 25%", // Ends when section bottom is 25% down
+          scrub: 1.2,        // Smooth scrub follow
+          invalidateOnRefresh: true,
         },
       });
 
-      // ── Parallax Stacking Animation (on cards) ───────────────────────────
-      // Each card moves vertically at a rate proportional to its index.
-      // Card 0 moves the slowest, Card 4 moves the fastest, causing them to
-      // overlap as the scroll proceeds.
-      // ease: "none" is critical for scrub sync (GSAP skill rule)
-      cards.forEach((card, idx) => {
-        gsap.to(card, {
-          y: -240 * idx, // higher index cards move faster and overlap the ones above them
-          ease: "none",
-          scrollTrigger: {
-            trigger: wrappers[idx],
-            scroller,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
+      cards.forEach((card, i) => {
+        if (i === 0) return;
+
+        // Card starts shifted down below Card 0, and slides up to overlap/stack
+        // ease: "none" is critical for uniform scrub sync (GSAP skill rule)
+        tl.fromTo(
+          card,
+          { y: 380 * i },
+          {
+            y: -300 * i,
+            ease: "none",
           },
-        });
+          (i - 1) * 0.45 // Stagger the start of each card's slide-in on the timeline
+        );
       });
 
       // Refresh ScrollTrigger positions after layout settles
       const t = setTimeout(() => ScrollTrigger.refresh(), 600);
       return () => clearTimeout(t);
     },
-    { scope: containerRef, dependencies: [isMobile] }
+    { scope: containerRef }
   );
 
   if (!mounted) return null;
@@ -197,12 +154,11 @@ export default function Collage() {
       </div>
 
       {/* Cards List */}
-      <div className="w-full max-w-[340px] flex flex-col py-6 overflow-visible">
+      <div className="w-full max-w-[340px] flex flex-col gap-6 py-6 overflow-visible">
         {photos.map((photo, i) => (
           <div
             key={i}
-            // Use negative top margin on cards i > 0 so they overlap at start
-            className={`gallery-card-wrapper w-full overflow-visible ${i > 0 ? "-mt-44" : ""}`}
+            className="gallery-card-wrapper w-full overflow-visible"
             style={{ zIndex: i + 1 }}
           >
             <div
@@ -239,16 +195,7 @@ export default function Collage() {
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {/* Split string into letters for clean stagger animation */}
-                    {photo.caption.split("").map((char, charIdx) => (
-                      <span
-                        key={charIdx}
-                        className="caption-char inline-block"
-                        style={{ willChange: "transform, opacity" }}
-                      >
-                        {char === " " ? "\u00A0" : char}
-                      </span>
-                    ))}
+                    {photo.caption}
                   </p>
                 </div>
               </div>
