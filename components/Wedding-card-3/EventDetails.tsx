@@ -98,51 +98,30 @@ export default function EventDetails() {
       const scrollerElement = triggerElement.closest("#card-scroll-container");
       if (!scrollerElement) return;
 
-      // 1. Entrance parallax slide-up for the envelope base card, front overlay, and cards container in unison
-      gsap.fromTo(
-        ".envelope-base-frame, .envelope-front-flap, .cards-scrolling-container",
-        { y: "100vh" },
-        {
-          y: "0vh",
-          ease: "none",
-          scrollTrigger: {
-            trigger: triggerElement,
-            scroller: scrollerElement,
-            start: "top bottom",
-            end: "top top",
-            scrub: isMobile ? true : 1, // Instantly match scroll on mobile, smooth delay on desktop
-            invalidateOnRefresh: true,
-          }
+      // Pin the section and animate cards sequentially based on scroll scrub
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: triggerElement,
+          scroller: scrollerElement,
+          start: "top top",
+          end: "+=300%",
+          scrub: true,
+          pin: true,
+          invalidateOnRefresh: true,
         }
-      );
-
-      // 2. ScrollTrigger to lock the cards container when Card 4 is fully stacked
-      ScrollTrigger.create({
-        trigger: triggerElement,
-        scroller: scrollerElement,
-        start: () => {
-          const card4 = contentRefs.current[4];
-          if (card4) {
-            const card4Offset = card4.offsetTop + 0.01 * window.innerHeight;
-            return `top ${0.12 * window.innerHeight - card4Offset}px`;
-          }
-          return `top ${-3.21 * window.innerHeight}px`;
-        },
-        end: "max",
-        onToggle: (self) => {
-          contentRefs.current.forEach((card) => {
-            if (card) {
-              if (self.isActive) {
-                card.style.position = "absolute";
-                card.style.top = "332vh";
-              } else {
-                card.style.position = "sticky";
-                card.style.top = "12vh";
-              }
-            }
-          });
-        },
       });
+
+      // Animate Card 1, Card 2, Card 3, and Card 4 sliding up into view one by one
+      for (let i = 1; i < events.length; i++) {
+        const card = contentRefs.current[i];
+        if (card) {
+          tl.to(card, {
+            y: "0vh",
+            ease: "sine.inOut",
+            duration: 1,
+          }, `card-${i}`);
+        }
+      }
 
       // Refresh ScrollTrigger after layouts render and settle (e.g. 1.2s delay)
       const refreshTimeout = setTimeout(() => {
@@ -151,7 +130,7 @@ export default function EventDetails() {
 
       return () => clearTimeout(refreshTimeout);
     },
-    { scope: sectionRef, dependencies: [prefersReducedMotion, isMobile] }
+    { scope: sectionRef, dependencies: [prefersReducedMotion] }
   );
 
   // Prevent hydration mismatches by returning null during server-side rendering
@@ -203,7 +182,7 @@ export default function EventDetails() {
               {event.location}
             </p>
             <p
-              className="text-[3.2cqi] italic text-[#9B4B32]/70 mt-2"
+              className="text-[3.2cqi] italic text-[#9B4B32]/65 mt-2"
               style={{ fontFamily: "var(--font-display), Georgia, serif" }}
             >
               Dress Code: {event.dressCode}
@@ -224,17 +203,12 @@ export default function EventDetails() {
   }
 
   return (
-    <section ref={sectionRef} className="relative w-full bg-[#FCEAEA] overflow-visible mb-20" style={{ height: "432vh" }}>
-
-
-      {/* Front flap overlay — duplicates the bottom card but clips the top to let cards stack behind the red flap */}
-      <div
-        className="envelope-front-flap sticky top-0 h-screen w-full z-30 pointer-events-none"
-        style={{ clipPath: "polygon(0 57%, 100% 57%, 100% 100%, 0 100%)" }}
-      >
+    <section ref={sectionRef} className="relative w-full h-screen bg-[#FCEAEA] overflow-hidden">
+      {/* Base Illustrated Card Frame (includes red envelope flap and bow) */}
+      <div className="envelope-base-frame absolute top-0 left-0 w-full h-full z-0">
         <Image
           src={BottomCard}
-          alt=""
+          alt="Event Base Card"
           fill
           priority
           className="object-cover pointer-events-none select-none"
@@ -242,21 +216,18 @@ export default function EventDetails() {
       </div>
 
       {/* Content area — sits in the cream space above the envelope flap */}
-      <div
-        className="absolute left-0 w-full flex flex-col items-center z-20 cards-scrolling-container"
-        style={{ top: "1vh", paddingBottom: "50vh", height: "415vh" }}
-      >
+      <div className="absolute left-0 w-full h-full z-20 cards-scrolling-container">
         {events.map((event, i) => (
           <div
             key={event.id}
             ref={(el) => {
               contentRefs.current[i] = el;
             }}
-            className="sticky w-[86%] h-[38vh] flex items-center justify-center flex-shrink-0"
+            className="absolute w-[86%] h-[38vh] left-[7%] flex items-center justify-center flex-shrink-0"
             style={{
               top: "12vh",
               zIndex: 20 + i,
-              marginBottom: i === events.length - 1 ? 0 : "45vh"
+              transform: i === 0 ? "none" : "translateY(88vh)"
             }}
           >
             {/* Card Background - solid white background to hide the stacked card beneath */}
@@ -304,8 +275,20 @@ export default function EventDetails() {
             </div>
           </div>
         ))}
-        {/* Spacer to push container bottom down, keeping Card 4 sticky for longer */}
-        <div style={{ height: "45vh" }} />
+      </div>
+
+      {/* Front flap overlay — duplicates the bottom card but clips the top to let cards stack behind the red flap */}
+      <div
+        className="envelope-front-flap absolute top-0 left-0 w-full h-full z-30 pointer-events-none"
+        style={{ clipPath: "polygon(0 57%, 100% 57%, 100% 100%, 0 100%)" }}
+      >
+        <Image
+          src={BottomCard}
+          alt=""
+          fill
+          priority
+          className="object-cover pointer-events-none select-none"
+        />
       </div>
     </section>
   );
