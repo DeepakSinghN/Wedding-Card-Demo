@@ -1,10 +1,7 @@
-"use client";
+﻿"use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { useGSAP } from "@gsap/react";
 
 // Import gallery photos
 import PhotoTop from "./Gallery-section-resources/virat-anuskha-6.jpg";
@@ -12,8 +9,6 @@ import PhotoMidLeft from "./Gallery-section-resources/virat-anuskha.jpg";
 import PhotoMidCenter from "./Gallery-section-resources/virat-anuskha-2.jpg";
 import PhotoMidRight from "./Gallery-section-resources/virat-anuskha-4.jpg";
 import PhotoBottom from "./Gallery-section-resources/virat-anuskha-5.jpg";
-
-gsap.registerPlugin(ScrollTrigger);
 
 type GalleryPhoto = {
   src: any;
@@ -68,74 +63,20 @@ const positionClasses = {
 };
 
 export default function Collage() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  useGSAP(
-    () => {
-      // Guard: check prefers-reduced-motion (GSAP skill rule)
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      if (!containerRef.current) return;
-
-      const scroller = containerRef.current.closest("#card-scroll-container");
-      if (!scroller) return;
-
-      const wrappers = gsap.utils.toArray(".gallery-card-wrapper") as HTMLElement[];
-      const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
-      if (wrappers.length === 0 || cards.length === 0) return;
-
-      // ── Stacking Parallax Scroll Timeline ─────────────────────────────────
-      // We use a single scroll-linked timeline to drive the stacking reveal.
-      // Cards start shifted down and slide up sequentially to stack on Card 0.
-      // No opacity or blur fades are used, ensuring buttery-smooth performance.
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          scroller,
-          start: "top 75%", // Animation starts when section top is 75% down viewport
-          end: "bottom 25%", // Ends when section bottom is 25% down
-          scrub: 1.2,        // Smooth scrub follow
-          invalidateOnRefresh: true,
-        },
-      });
-
-      cards.forEach((card, i) => {
-        if (i === 0) return;
-
-        // Card starts shifted down below Card 0, and slides up to overlap/stack
-        // ease: "none" is critical for uniform scrub sync (GSAP skill rule)
-        tl.fromTo(
-          card,
-          { y: 380 * i },
-          {
-            y: -300 * i,
-            ease: "none",
-          },
-          (i - 1) * 0.45 // Stagger the start of each card's slide-in on the timeline
-        );
-      });
-
-      // Refresh ScrollTrigger positions after layout settles
-      const t = setTimeout(() => ScrollTrigger.refresh(), 600);
-      return () => clearTimeout(t);
-    },
-    { scope: containerRef }
-  );
-
   if (!mounted) return null;
 
   return (
     <section
-      ref={containerRef}
-      className="relative w-full bg-[#FCEAEA] py-16 px-6 flex flex-col items-center gap-12 select-none overflow-hidden mt-12"
+      className="relative w-full bg-[#FCEAEA] py-16 px-6 flex flex-col items-center select-none overflow-visible mt-12"
     >
       {/* Section Header */}
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-2 mb-12">
         <p
           className="tracking-[2px] text-[#9B4B32]/70"
           style={{
@@ -153,23 +94,31 @@ export default function Collage() {
         />
       </div>
 
-      {/* Cards List */}
-      <div className="w-full max-w-[340px] flex flex-col gap-6 py-6 overflow-visible">
+      {/* Cards List - CSS Sticky Stacking Container */}
+      {/* By using normal document flow with position: sticky on children,
+          cards naturally scroll up and stack on top of each other at top-offset heights. */}
+      <div className="w-full max-w-[340px] flex flex-col gap-0 overflow-visible">
         {photos.map((photo, i) => (
           <div
             key={i}
-            className="gallery-card-wrapper w-full overflow-visible"
-            style={{ zIndex: i + 1 }}
+            className="w-full flex items-center justify-center overflow-visible"
+            style={{
+              position: "sticky",
+              // Incremental top offset so the top headers/edges of all stacked cards remain visible
+              top: `${70 + i * 20}px`,
+              height: "85vh", // Height of the sticky viewport window per card
+              zIndex: i + 1,
+            }}
           >
+            {/* Polaroid card */}
             <div
-              ref={(el) => { cardRefs.current[i] = el; }}
-              className="gallery-card bg-white shadow-[0_12px_36px_rgba(155,75,50,0.15)] border border-[#9B4B32]/5 flex flex-col overflow-hidden"
+              className="gallery-card bg-white shadow-[0_12px_36px_rgba(155,75,50,0.18)] border border-[#9B4B32]/5 flex flex-col overflow-hidden transition-all duration-300"
               style={{
                 borderRadius: "28px",
-                padding: "16px 16px 16px 16px", // Thin border frame
+                padding: "16px 16px 16px 16px", // White border frame
+                width: "290px",
                 transform: `rotate(${photo.rotate}deg)`,
                 transformOrigin: "center",
-                willChange: "transform",
               }}
             >
               {/* Portrait Photo Container */}
@@ -178,7 +127,7 @@ export default function Collage() {
                   src={photo.src}
                   alt={photo.alt}
                   fill
-                  sizes="(max-width: 480px) 100vw, 340px"
+                  sizes="(max-width: 480px) 100vw, 290px"
                   className="object-cover pointer-events-none select-none"
                   priority={i < 2}
                 />
