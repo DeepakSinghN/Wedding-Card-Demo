@@ -99,7 +99,7 @@ export default function SaveTheDate() {
 
                 {/* 2. Names: Lars & Rosa (Elegant cursive/script) */}
                 <h3
-                    className="std-names text-[8cqi] font-normal leading-tight select-none my-1 mt-6"
+                    className="std-names text-[8cqi] font-normal leading-tight select-none my-1 mt-10"
                     style={{ fontFamily: "var(--font-anastasia), var(--font-script), cursive" }}
                 >
                     Daniel & Maria
@@ -120,7 +120,7 @@ export default function SaveTheDate() {
                 </div>
 
                 {/* 4. Date details (Compact serif with pipes) */}
-                <div className="std-date flex items-center justify-center gap-3 text-[9cqi] font-serif font-normal tracking-wider mb-8 mt-10">
+                <div className="std-date flex items-center justify-center gap-3 text-[9cqi] font-serif font-normal tracking-wider mb-8 mt-8">
                     <span>13</span>
                     <span className="text-[#9D2C2D]/40 font-light">|</span>
                     <span>DEC</span>

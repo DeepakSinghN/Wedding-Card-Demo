@@ -97,7 +97,7 @@ export default function Collage() {
       {/* Cards List - CSS Sticky Stacking Container */}
       {/* By using normal document flow with position: sticky on children,
           cards naturally scroll up and stack on top of each other at top-offset heights. */}
-      <div className="w-full max-w-[370px] flex flex-col gap-0 overflow-visible">
+      <div className="w-full max-w-[400px] flex flex-col gap-0 overflow-visible">
         {photos.map((photo, i) => (
           <div
             key={i}
@@ -116,13 +116,13 @@ export default function Collage() {
               style={{
                 borderRadius: "28px",
                 padding: "16px 16px 16px 16px", // White border frame
-                width: "330px",
+                width: "350px",
                 transform: `rotate(${photo.rotate}deg)`,
                 transformOrigin: "center",
               }}
             >
               {/* Portrait Photo Container */}
-              <div className="w-full aspect-[2/4] relative rounded-[16px] overflow-hidden bg-[#FAF6F0]">
+              <div className="w-full aspect-[3/4] relative rounded-[16px] overflow-hidden bg-[#FAF6F0]">
                 <Image
                   src={photo.src}
                   alt={photo.alt}
