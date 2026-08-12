@@ -61,11 +61,12 @@ const events: WeddingEvent[] = [
   },
 ];
 
-// 4 transitions for 5 events = 400% extra scroll distance
+// 4 transitions for 5 events
 const SCROLL_MULTIPLIER = events.length - 1;
 
 export default function EventDetails() {
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const outerRef = useRef<HTMLDivElement>(null);  // tall scroll-distance wrapper
+  const stageRef = useRef<HTMLDivElement>(null);  // sticky viewport-height stage
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [mounted, setMounted] = useState(false);
 
@@ -75,222 +76,259 @@ export default function EventDetails() {
 
   useGSAP(
     () => {
-      // Guard: always check prefers-reduced-motion (GSAP skill rule)
+      // GSAP skill rule: always guard with prefers-reduced-motion
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      if (!sectionRef.current) return;
+      if (!outerRef.current || !stageRef.current) return;
 
-      // Pass custom Lenis scroller explicitly (GSAP skill: Lenis section)
-      const scroller = sectionRef.current.closest("#card-scroll-container");
+      // GSAP skill (Lenis): pass custom Lenis wrapper as scroller
+      const scroller = outerRef.current.closest("#card-scroll-container");
       if (!scroller) return;
 
       const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
       if (cards.length === 0) return;
 
-      // Parked offset: 62vh hides cards fully behind the 46%-tall envelope overlay
-      const parkedY = () => window.innerHeight * 0.62;
-      const exitY = () => -window.innerHeight * 0.8;
+      // IMPORTANT: With a custom div scroller, GSAP pin:true does NOT use
+      // position:fixed -- it uses transforms which breaks inside Lenis.
+      // The CORRECT pattern for custom scrollers is:
+      //   - CSS position:sticky on stageRef handles the visual pin
+      //   - GSAP ScrollTrigger scrubs the animation progress (no pin:true)
+      // This is the most reliable approach per GSAP docs for custom scrollers.
 
-      // Initial states - only animate transform + opacity (GPU-composited, GSAP skill rule)
+      // Parked position: cards start 58vh below their resting point.
+      // The envelope is ~50% of the viewport height (set below).
+      // 58vh puts parked cards behind/below the top edge of the envelope.
+      const PARKED_Y = () => window.innerHeight * 0.58;
+      const EXIT_Y   = () => -window.innerHeight * 0.82;
+
+      // Initial states (GSAP skill: only animate transform + opacity)
       gsap.set(cards[0], { y: 0, opacity: 1 });
-      gsap.set(cards.slice(1), { y: parkedY, opacity: 0 });
+      gsap.set(cards.slice(1), { y: PARKED_Y, opacity: 0 });
 
-      // Pinned scrub timeline (GSAP skill recipe: Pinned Timeline)
-      // - pin: true   pins the trigger element at top:0
-      // - scrub: 1    smooth 1-second lag scrubbing
-      // - ease: none  REQUIRED for scrub - easing breaks scroll sync
-      // - anticipatePin: 1  prevents pin jump
-      // - invalidateOnRefresh: true  recalculates on resize
+      // Scrub timeline - NO pin:true, CSS sticky handles it
+      // GSAP skill recipe (Pinned Timeline variant for custom scroller):
+      //   trigger: outerRef (tall scroll-distance wrapper)
+      //   start/end: "top top" / "bottom bottom" maps full section scroll
+      //   scrub: 1 - smooth 1-second lag scrub
+      //   ease: "none" REQUIRED - easing breaks scroll sync in scrub
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: sectionRef.current,
+          trigger: outerRef.current,
           scroller,
-          pin: true,
-          pinSpacing: true,
-          anticipatePin: 1,
           start: "top top",
-          end: `+=${SCROLL_MULTIPLIER * 100}%`,
+          end: "bottom bottom",
           scrub: 1,
           invalidateOnRefresh: true,
         },
       });
 
-      // Card swap sequence - each swap gets 1 unit of timeline duration
+      // Card swap sequence
+      // Each swap = 1/(N-1) of total timeline progress
       cards.forEach((_, i) => {
         if (i === 0) return;
 
-        const pos = i - 1; // timeline position: 0, 1, 2, 3
+        const pos = i - 1; // 0, 1, 2, 3
 
-        // OUTGOING: current card exits upward
+        // OUTGOING: prev card slides up and fades out
+        // ease: "none" per GSAP skill rule for scrub animations
         tl.to(
           cards[i - 1],
-          { y: exitY, opacity: 0, duration: 0.45, ease: "none" },
+          { y: EXIT_Y, opacity: 0, duration: 0.45, ease: "none" },
           pos
         );
 
-        // INCOMING: next card rises from behind envelope (slight overlap)
+        // INCOMING: next card rises from behind envelope to resting position
         tl.fromTo(
           cards[i],
-          { y: parkedY, opacity: 0 },
+          { y: PARKED_Y, opacity: 0 },
           { y: 0, opacity: 1, duration: 0.55, ease: "none" },
-          pos + 0.05
+          pos + 0.08
         );
       });
 
-      // Refresh after layout settles (GSAP skill rule)
-      const t = setTimeout(() => ScrollTrigger.refresh(), 1000);
+      // GSAP skill: refresh after layout settles
+      const t = setTimeout(() => ScrollTrigger.refresh(), 800);
       return () => clearTimeout(t);
     },
-    { scope: sectionRef }
+    { scope: outerRef }
   );
 
   if (!mounted) return null;
 
   return (
-    // sectionRef = GSAP pin trigger
-    // height: 100vh - normal viewport-height section
-    // GSAP pinSpacing adds spacer below so next section follows correctly
-    // overflow: visible - cards must animate above/below clip boundary
-    <section
-      ref={sectionRef}
-      className="relative w-full flex-shrink-0 bg-[#FBEAEA]"
-      style={{ height: "100vh", overflow: "visible" }}
+    // outerRef: tall section that provides the scroll distance.
+    // Height = (events.length) * 100vh so each card gets a full viewport of scroll.
+    // CSS sticky on stageRef (the child) handles the visual pin - no GSAP pin needed.
+    <div
+      ref={outerRef}
+      className="relative w-full flex-shrink-0"
+      style={{ height: `${events.length * 100}vh` }}
     >
-      {/* Section label */}
-      <div
-        className="absolute top-0 left-0 w-full flex justify-center z-10"
-        style={{ paddingTop: "clamp(18px, 4.5vh, 36px)" }}
-      >
-        <p
-          className="uppercase tracking-[0.3em] text-[#9B4B32]/55"
-          style={{
-            fontFamily: "var(--font-body), sans-serif",
-            fontSize: "clamp(9px, 2.8cqi, 12px)",
-          }}
-        >
-          Event Schedule
-        </p>
-      </div>
-
       {/*
-        Card stack - all cards absolute, stacked at the same position.
-        z-index: card 0 highest - starts on top visually.
-        Cards i > 0 are hidden behind the envelope (y 62vh) until animated.
-        overflow: visible so exiting/entering cards are not clipped.
+        stageRef: sticky viewport-height stage.
+        position:sticky + top:0 + height:100vh = stays fixed in the viewport
+        while the parent div scrolls through its full height above/below.
+        overflow:visible so cards can slide beyond the top/bottom bounds.
       */}
       <div
-        className="absolute left-0 w-full"
+        ref={stageRef}
+        className="w-full bg-[#FBEAEA]"
         style={{
-          top: "clamp(52px, 12vh, 84px)",
-          height: "clamp(290px, 56vh, 450px)",
-          zIndex: 10,
+          position: "sticky",
+          top: 0,
+          height: "100vh",
           overflow: "visible",
         }}
       >
-        {events.map((event, i) => (
-          <div
-            key={event.id}
-            ref={(el) => { cardRefs.current[i] = el; }}
-            className="absolute bg-white rounded-3xl shadow-xl flex flex-col items-center text-center"
+        {/* Section label */}
+        <div
+          className="absolute top-0 left-0 w-full flex justify-center"
+          style={{ paddingTop: "clamp(20px, 5vh, 40px)", zIndex: 10 }}
+        >
+          <p
+            className="uppercase tracking-[0.3em] text-[#9B4B32]/55"
             style={{
-              inset: "0 20px",
-              zIndex: events.length - i,
-              padding: "clamp(18px, 3.5vh, 32px) 20px",
-              opacity: i === 0 ? 1 : 0,
-              transform: i === 0 ? "translateY(0px)" : "translateY(62vh)",
-              willChange: "transform, opacity",
+              fontFamily: "var(--font-body), sans-serif",
+              fontSize: "clamp(9px, 2.8cqi, 12px)",
             }}
           >
-            <h3
-              className="font-normal text-[#9B4B32] leading-tight"
-              style={{
-                fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
-                fontSize: "clamp(24px, 8cqi, 46px)",
-                marginBottom: "clamp(6px, 1.2vh, 12px)",
-              }}
-            >
-              {event.title}
-            </h3>
+            Event Schedule
+          </p>
+        </div>
 
-            <p
-              className="font-bold text-[#7A2E1F]"
-              style={{
-                fontFamily: "var(--font-body), sans-serif",
-                fontSize: "clamp(11px, 3.4cqi, 15px)",
-                marginTop: "clamp(4px, 0.8vh, 8px)",
-              }}
-            >
-              {event.dateTime}
-            </p>
-
-            <p
-              className="font-medium text-[#7A2E1F]"
-              style={{
-                fontFamily: "var(--font-body), sans-serif",
-                fontSize: "clamp(10px, 3.2cqi, 14px)",
-                marginTop: "clamp(6px, 1vh, 10px)",
-                maxWidth: "85%",
-              }}
-            >
-              {event.location}
-            </p>
-
-            <p
-              className="italic text-[#9B4B32]/70"
-              style={{
-                fontFamily: "var(--font-display), Georgia, serif",
-                fontSize: "clamp(10px, 3cqi, 13px)",
-                marginTop: "clamp(8px, 1.2vh, 14px)",
-              }}
-            >
-              Dress Code: {event.dressCode}
-            </p>
-
+        {/*
+          Card stack.
+          All cards: absolute, same position, stacked on each other.
+          z-index: card 0 is highest (starts on top).
+          Cards i > 0 start at y = 58vh (behind envelope) via initial inline style.
+          overflow:visible so animating cards go outside this box freely.
+        */}
+        <div
+          className="absolute left-0 w-full"
+          style={{
+            top: "clamp(54px, 12vh, 86px)",
+            height: "clamp(280px, 52vh, 420px)",
+            zIndex: 10,
+            overflow: "visible",
+          }}
+        >
+          {events.map((event, i) => (
             <div
-              className="bg-[#9B4B32]/20"
-              style={{ width: 40, height: 1, marginTop: "clamp(10px, 1.5vh, 16px)" }}
-            />
-
-            <a
-              href={event.mapLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold uppercase tracking-widest border-b border-[#7A2E1F] text-[#7A2E1F]"
+              key={event.id}
+              ref={(el) => { cardRefs.current[i] = el; }}
+              className="absolute bg-white rounded-3xl shadow-xl flex flex-col items-center text-center"
               style={{
-                fontFamily: "var(--font-body), sans-serif",
-                fontSize: "clamp(8px, 2.6cqi, 12px)",
-                marginTop: "clamp(8px, 1.3vh, 14px)",
-                paddingBottom: 3,
-                position: "relative",
-                zIndex: 100,
+                inset: "0 20px",
+                zIndex: events.length - i,
+                padding: "clamp(18px, 3.5vh, 30px) 20px",
+                // Match initial state to GSAP set() to prevent flash
+                opacity: i === 0 ? 1 : 0,
+                transform: i === 0 ? "translateY(0px)" : "translateY(58vh)",
+                willChange: "transform, opacity",
               }}
             >
-              Get Directions
-            </a>
-          </div>
-        ))}
-      </div>
+              <h3
+                className="font-normal text-[#9B4B32] leading-tight"
+                style={{
+                  fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
+                  fontSize: "clamp(24px, 7.5cqi, 44px)",
+                  marginBottom: "clamp(6px, 1.2vh, 12px)",
+                }}
+              >
+                {event.title}
+              </h3>
 
-      {/*
-        Static envelope illustration - never moves.
-        Anchored to the bottom of the pinned section (absolute bottom-0).
-        zIndex: 40 - sits ABOVE all cards (cards max z = events.length).
-        Cards parked at y=62vh are hidden behind this layer.
-        As each card animates to y:0 it rises above this overlay into view -
-        the "letter being pulled from the envelope" moment.
-        pointer-events-none keeps card links clickable.
-      */}
-      <div
-        className="absolute bottom-0 left-0 w-full pointer-events-none select-none"
-        style={{ height: "46%", zIndex: 40 }}
-      >
-        <Image
-          src={BottomCard}
-          alt="Red envelope illustration"
-          fill
-          priority
-          className="object-cover object-top"
-        />
+              <p
+                className="font-bold text-[#7A2E1F]"
+                style={{
+                  fontFamily: "var(--font-body), sans-serif",
+                  fontSize: "clamp(11px, 3.4cqi, 15px)",
+                  marginTop: "clamp(4px, 0.8vh, 8px)",
+                }}
+              >
+                {event.dateTime}
+              </p>
+
+              <p
+                className="font-medium text-[#7A2E1F]"
+                style={{
+                  fontFamily: "var(--font-body), sans-serif",
+                  fontSize: "clamp(10px, 3.2cqi, 14px)",
+                  marginTop: "clamp(6px, 1vh, 10px)",
+                  maxWidth: "85%",
+                }}
+              >
+                {event.location}
+              </p>
+
+              <p
+                className="italic text-[#9B4B32]/70"
+                style={{
+                  fontFamily: "var(--font-display), Georgia, serif",
+                  fontSize: "clamp(10px, 3cqi, 13px)",
+                  marginTop: "clamp(8px, 1.2vh, 14px)",
+                }}
+              >
+                Dress Code: {event.dressCode}
+              </p>
+
+              <div
+                style={{
+                  width: 40,
+                  height: 1,
+                  background: "rgba(155,75,50,0.2)",
+                  marginTop: "clamp(10px, 1.5vh, 16px)",
+                }}
+              />
+
+              <a
+                href={event.mapLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold uppercase tracking-widest border-b border-[#7A2E1F] text-[#7A2E1F]"
+                style={{
+                  fontFamily: "var(--font-body), sans-serif",
+                  fontSize: "clamp(8px, 2.6cqi, 12px)",
+                  marginTop: "clamp(8px, 1.3vh, 14px)",
+                  paddingBottom: 3,
+                  position: "relative",
+                  zIndex: 100,
+                }}
+              >
+                Get Directions
+              </a>
+            </div>
+          ))}
+        </div>
+
+        {/*
+          Static envelope illustration - never moves.
+          Absolutely anchored to the BOTTOM of the sticky stage.
+          zIndex: 40 - above all cards (max card z = events.length = 5).
+
+          FIX for "envelope not showing fully":
+          - Use object-contain (not object-cover) to display the whole image
+          - Height 50% of viewport shows the full envelope proportionally
+          - object-position: bottom ensures the base is always visible
+
+          The envelope conceals cards at y=58vh:
+          those cards sit behind this layer and are invisible.
+          As each card animates to y:0 it rises INTO view above the envelope.
+          pointer-events-none keeps card links clickable.
+        */}
+        <div
+          className="absolute bottom-0 left-0 w-full pointer-events-none select-none"
+          style={{ height: "50%", zIndex: 40 }}
+        >
+          <Image
+            src={BottomCard}
+            alt="Red envelope illustration"
+            fill
+            priority
+            className="object-contain"
+            style={{ objectPosition: "bottom center" }}
+          />
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
