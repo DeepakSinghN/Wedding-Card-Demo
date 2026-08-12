@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -69,6 +69,7 @@ const positionClasses = {
 
 export default function Collage() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -90,10 +91,13 @@ export default function Collage() {
       const scroller = containerRef.current.closest("#card-scroll-container");
       if (!scroller) return;
 
-      // ── Initial State Setup ───────────────────────────────────────────────
-      // We set starting states for cards: scaled up slightly, transparent, and blurred
-      const cards = gsap.utils.toArray(".gallery-card") as HTMLElement[];
-      gsap.set(cards, {
+      const wrappers = gsap.utils.toArray(".gallery-card-wrapper") as HTMLElement[];
+      const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
+      if (wrappers.length === 0 || cards.length === 0) return;
+
+      // ── Entrance Batch Animation (on wrappers) ───────────────────────────
+      // We set starting states for card wrappers: scaled up slightly, transparent, and blurred
+      gsap.set(wrappers, {
         opacity: 0,
         scale: 1.08,
         // Disable blur filter on mobile to prevent performance jank (performance rule)
@@ -104,14 +108,13 @@ export default function Collage() {
       const chars = gsap.utils.toArray(".caption-char") as HTMLElement[];
       gsap.set(chars, { opacity: 0, y: 10 });
 
-      // ── ScrollTrigger.batch() entrance reveal ─────────────────────────────
-      // Batches cards as they scroll into view to avoid lag spikes
-      ScrollTrigger.batch(cards, {
+      // Batches card wrapper reveals as they scroll into view to avoid lag spikes
+      ScrollTrigger.batch(wrappers, {
         scroller,
         start: "top 85%",
         once: true, // Only animate once
         onEnter: (batch) => {
-          // 1. Animate card opacity, scaling, and sharpening
+          // 1. Animate wrapper opacity, scaling, and sharpening
           gsap.to(batch, {
             opacity: 1,
             scale: 1,
@@ -127,8 +130,8 @@ export default function Collage() {
           });
 
           // 2. Animate character stagger inside this batch
-          batch.forEach((card) => {
-            const cardChars = card.querySelectorAll(".caption-char");
+          batch.forEach((wrapper) => {
+            const cardChars = wrapper.querySelectorAll(".caption-char");
             if (cardChars.length > 0) {
               gsap.to(cardChars, {
                 opacity: 1,
@@ -141,6 +144,26 @@ export default function Collage() {
             }
           });
         },
+      });
+
+      // ── Parallax Stacking Animation (on cards) ───────────────────────────
+      // Each card moves vertically at a rate proportional to its index.
+      // Card 0 moves the slowest, Card 4 moves the fastest, causing them to
+      // overlap as the scroll proceeds.
+      // ease: "none" is critical for scrub sync (GSAP skill rule)
+      cards.forEach((card, idx) => {
+        gsap.to(card, {
+          y: -100 * idx, // higher index cards move faster and overlap the ones above them
+          ease: "none",
+          scrollScale: 1,
+          scrollTrigger: {
+            trigger: wrappers[idx],
+            scroller,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true,
+          },
+        });
       });
 
       // Refresh ScrollTrigger positions after layout settles
@@ -181,49 +204,54 @@ export default function Collage() {
         {photos.map((photo, i) => (
           <div
             key={i}
-            className="gallery-card bg-white shadow-[0_12px_36px_rgba(155,75,50,0.12)] border border-[#9B4B32]/5 flex flex-col overflow-hidden"
-            style={{
-              borderRadius: "24px",
-              padding: "16px 16px 16px 16px", // Thin cream/white border frame
-              transform: `rotate(${photo.rotate}deg)`,
-              transformOrigin: "center",
-            }}
+            className="gallery-card-wrapper w-full overflow-visible"
           >
-            {/* Portrait Photo Container */}
-            <div className="w-full aspect-[3/4] relative rounded-[16px] overflow-hidden bg-[#FAF6F0]">
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                fill
-                sizes="(max-width: 480px) 100vw, 360px"
-                className="object-cover pointer-events-none select-none"
-                priority={i < 2}
-              />
+            <div
+              ref={(el) => { cardRefs.current[i] = el; }}
+              className="gallery-card bg-white shadow-[0_12px_36px_rgba(155,75,50,0.12)] border border-[#9B4B32]/5 flex flex-col overflow-hidden"
+              style={{
+                borderRadius: "28px",
+                padding: "16px 16px 16px 16px", // Thin cream/white border frame
+                transform: `rotate(${photo.rotate}deg)`,
+                transformOrigin: "center",
+                willChange: "transform",
+              }}
+            >
+              {/* Portrait Photo Container */}
+              <div className="w-full aspect-[3/4] relative rounded-[16px] overflow-hidden bg-[#FAF6F0]">
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  sizes="(max-width: 480px) 100vw, 360px"
+                  className="object-cover pointer-events-none select-none"
+                  priority={i < 2}
+                />
 
-              {/* ── Overlay Cursive Caption ──────────────────────────────── */}
-              {/* Positioned according to the configurable captionPos option */}
-              <div
-                className={`absolute z-10 pointer-events-none ${positionClasses[photo.captionPos]}`}
-              >
-                <p
-                  className="text-white font-normal drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)]"
-                  style={{
-                    fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
-                    fontSize: "clamp(1.8rem, 7cqi, 2.5rem)",
-                    whiteSpace: "nowrap",
-                  }}
+                {/* ── Overlay Cursive Caption ──────────────────────────────── */}
+                <div
+                  className={`absolute z-10 pointer-events-none ${positionClasses[photo.captionPos]}`}
                 >
-                  {/* Split string into letters for clean stagger animation */}
-                  {photo.caption.split("").map((char, charIdx) => (
-                    <span
-                      key={charIdx}
-                      className="caption-char inline-block"
-                      style={{ willChange: "transform, opacity" }}
-                    >
-                      {char === " " ? "\u00A0" : char}
-                    </span>
-                  ))}
-                </p>
+                  <p
+                    className="text-white font-normal drop-shadow-[0_2px_8px_rgba(0,0,0,0.65)]"
+                    style={{
+                      fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
+                      fontSize: "clamp(1.8rem, 7cqi, 2.5rem)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {/* Split string into letters for clean stagger animation */}
+                    {photo.caption.split("").map((char, charIdx) => (
+                      <span
+                        key={charIdx}
+                        className="caption-char inline-block"
+                        style={{ willChange: "transform, opacity" }}
+                      >
+                        {char === " " ? "\u00A0" : char}
+                      </span>
+                    ))}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
