@@ -120,7 +120,14 @@ export default function EventDetails() {
       ScrollTrigger.create({
         trigger: triggerElement,
         scroller: scrollerElement,
-        start: "top -321vh",
+        start: () => {
+          const card4 = contentRefs.current[4];
+          if (card4) {
+            const card4Offset = card4.offsetTop + 0.01 * window.innerHeight;
+            return `top ${0.12 * window.innerHeight - card4Offset}px`;
+          }
+          return `top ${-3.21 * window.innerHeight}px`;
+        },
         end: "max",
         onToggle: (self) => {
           contentRefs.current.forEach((card) => {
