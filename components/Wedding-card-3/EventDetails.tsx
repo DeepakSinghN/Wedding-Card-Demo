@@ -5,8 +5,6 @@ import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
-
-// Import bottom-card from Events-section-resources
 import BottomCard from "./Events-section-resources/bottom-card.svg";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -65,7 +63,9 @@ const events: WeddingEvent[] = [
 
 export default function EventDetails() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const contentRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const stickyRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   const [mounted, setMounted] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -91,103 +91,117 @@ export default function EventDetails() {
   useGSAP(
     () => {
       if (prefersReducedMotion) return;
+      if (!sectionRef.current) return;
 
-      const triggerElement = sectionRef.current;
-      if (!triggerElement) return;
+      const scrollerEl = sectionRef.current.closest("#card-scroll-container");
+      if (!scrollerEl) return;
 
-      const scrollerElement = triggerElement.closest("#card-scroll-container");
-      if (!scrollerElement) return;
+      const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
+      if (cards.length === 0) return;
 
-      // Pin the section and animate cards sequentially based on scroll scrub
+      // Parked distance: cards start below the envelope — about 60% of the viewport height
+      // so they are hidden behind the envelope illustration at the bottom.
+      const parkedY = () => window.innerHeight * 0.62;
+
+      // Set initial state: Card 0 visible, all others parked below/behind envelope.
+      gsap.set(cards[0], { y: 0, opacity: 1 });
+      gsap.set(cards.slice(1), { y: parkedY, opacity: 0 });
+
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: triggerElement,
-          scroller: scrollerElement,
+          trigger: sectionRef.current,
+          scroller: scrollerEl,
           start: "top top",
-          end: "+=300%",
-          scrub: true,
-          pin: true,
+          end: "bottom bottom",
+          scrub: isMobile ? 0.3 : 1,
           invalidateOnRefresh: true,
-        }
+          snap: isMobile
+            ? {
+                snapTo: 1 / (cards.length - 1),
+                duration: { min: 0.2, max: 0.4 },
+                ease: "power2.inOut",
+                inertia: false,
+              }
+            : undefined,
+        },
       });
 
-      // Animate Card 1, Card 2, Card 3, and Card 4 sliding up into view one by one
-      for (let i = 1; i < events.length; i++) {
-        const card = contentRefs.current[i];
-        if (card) {
-          tl.fromTo(
-            card,
-            { y: () => 0.88 * window.innerHeight },
-            {
-              y: 0,
-              ease: "sine.inOut",
-              duration: 1,
-            },
-            `card-${i}`
-          );
-        }
-      }
+      cards.forEach((card, i) => {
+        if (i === 0) return;
 
-      // Refresh ScrollTrigger after layouts render and settle (e.g. 1.2s delay)
-      const refreshTimeout = setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 1200);
+        // Each card swap occupies an equal fraction of total scroll distance.
+        const segmentStart = (i - 1) / (cards.length - 1);
 
-      return () => clearTimeout(refreshTimeout);
+        // OUTGOING: previous card slides UP and exits upward.
+        tl.to(
+          cards[i - 1],
+          {
+            y: isMobile ? -window.innerHeight * 0.75 : -window.innerHeight * 0.85,
+            opacity: 0,
+            duration: 0.4,
+            ease: "power2.in",
+          },
+          segmentStart
+        );
+
+        // INCOMING: this card rises UP from behind the envelope to y:0.
+        tl.fromTo(
+          cards[i],
+          { y: parkedY, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            ease: "power2.out",
+          },
+          segmentStart + 0.05
+        );
+      });
+
+      // Refresh ScrollTrigger after layout settles.
+      const t = setTimeout(() => ScrollTrigger.refresh(), 1200);
+      return () => clearTimeout(t);
     },
-    { scope: sectionRef, dependencies: [prefersReducedMotion] }
+    {
+      scope: sectionRef,
+      dependencies: [prefersReducedMotion, isMobile],
+    }
   );
 
-  // Prevent hydration mismatches by returning null during server-side rendering
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
 
-  // Fallback for accessibility or reduced-motion
+  // ── REDUCED MOTION FALLBACK ──────────────────────────────────────────────
   if (prefersReducedMotion) {
     return (
-      <div className="relative w-full py-[6vh] px-6 bg-[#FCEAEA] flex flex-col gap-[4vh] text-center flex-shrink-0 ">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src={BottomCard}
-            alt=""
-            fill
-            className="object-cover opacity-20 pointer-events-none"
-          />
+      <div className="w-full flex flex-col gap-6 py-10 px-6 bg-[#FBEAEA]">
+        <div className="w-full h-[30vh] relative pointer-events-none mb-4">
+          <Image src={BottomCard} alt="" fill className="object-cover" priority />
         </div>
-
-        <h2
-          className="relative z-10 text-[10cqi] text-[#9B4B32] font-normal mb-2"
-          style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
-        >
-          Event Schedule
-        </h2>
-
         {events.map((event) => (
           <div
             key={event.id}
-            className="relative z-10 py-6 border-b border-[#9B4B32]/20 last:border-0 flex flex-col items-center"
+            className="bg-white rounded-3xl shadow-xl px-6 py-10 flex flex-col items-center text-center"
           >
             <h3
-              className="text-[8cqi] font-normal text-[#9B4B32] mb-3"
+              className="text-[9cqi] font-normal text-[#9B4B32] mb-3"
               style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
             >
               {event.title}
             </h3>
             <p
-              className="text-[3.6cqi] font-medium text-[#9B4B32]"
+              className="text-[3.6cqi] font-semibold text-[#7A2E1F]"
               style={{ fontFamily: "var(--font-body), sans-serif" }}
             >
               {event.dateTime}
             </p>
             <p
-              className="text-[3.4cqi] text-[#9B4B32]/80 mt-2 max-w-[80%]"
+              className="text-[3.4cqi] font-medium text-[#7A2E1F] mt-3"
               style={{ fontFamily: "var(--font-body), sans-serif" }}
             >
               {event.location}
             </p>
             <p
-              className="text-[3.2cqi] italic text-[#9B4B32]/65 mt-2"
+              className="text-[3.2cqi] italic text-[#9B4B32]/70 mt-4"
               style={{ fontFamily: "var(--font-display), Georgia, serif" }}
             >
               Dress Code: {event.dressCode}
@@ -196,7 +210,7 @@ export default function EventDetails() {
               href={event.mapLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 text-[3cqi] uppercase tracking-widest border-b border-[#9B4B32] text-[#9B4B32] pb-1 font-semibold"
+              className="mt-6 text-[3cqi] font-bold uppercase tracking-widest border-b border-[#7A2E1F] text-[#7A2E1F] pb-1"
               style={{ fontFamily: "var(--font-body), sans-serif" }}
             >
               Get Directions
@@ -207,93 +221,118 @@ export default function EventDetails() {
     );
   }
 
+  // ── ANIMATED LAYOUT ──────────────────────────────────────────────────────
   return (
-    <section ref={sectionRef} className="relative w-full h-screen bg-[#FCEAEA] overflow-hidden">
-      {/* Base Illustrated Card Frame (includes red envelope flap and bow) */}
-      <div className="envelope-base-frame absolute top-0 left-0 w-full h-full z-0">
-        <Image
-          src={BottomCard}
-          alt="Event Base Card"
-          fill
-          priority
-          className="object-cover pointer-events-none select-none"
-        />
-      </div>
+    /**
+     * sectionRef: tall scroll-distance wrapper.
+     * Height = events.length × scroll-distance-per-card so each event gets
+     * its own full scroll window. On mobile we shorten to 70vh per event.
+     */
+    <section
+      ref={sectionRef}
+      className="relative w-full flex-shrink-0"
+      style={{ height: `${events.length * (isMobile ? 70 : 100)}vh` }}
+    >
+      {/**
+       * stickyRef: viewport-height sticky layer — the "stage".
+       * Everything visible lives here; it stays pinned to the top
+       * while the user scrolls through the tall parent section.
+       */}
+      <div
+        ref={stickyRef}
+        className="sticky top-0 h-screen w-full flex flex-col items-center justify-start overflow-hidden bg-[#FBEAEA]"
+        style={{ paddingTop: "clamp(28px, 7vh, 56px)" }}
+      >
+        {/* Section label */}
+        <p
+          className="text-[3cqi] uppercase tracking-[0.25em] text-[#9B4B32]/60 mb-4"
+          style={{ fontFamily: "var(--font-body), sans-serif" }}
+        >
+          Event Schedule
+        </p>
 
-      {/* Content area — sits in the cream space above the envelope flap */}
-      <div className="absolute left-0 w-full h-full z-20 cards-scrolling-container">
-        {events.map((event, i) => (
-          <div
-            key={event.id}
-            ref={(el) => {
-              contentRefs.current[i] = el;
-            }}
-            className="absolute w-[86%] h-[38vh] left-[7%] flex items-center justify-center flex-shrink-0"
-            style={{
-              top: "12vh",
-              zIndex: 20 + i,
-              transform: i === 0 ? "none" : "translateY(88vh)"
-            }}
-          >
-            {/* Card Background - solid white background to hide the stacked card beneath */}
-            <div className="absolute inset-0 bg-[#FFFDFE] border border-[#9B4B32]/15 rounded-2xl shadow-[0_8px_24px_rgba(155,75,50,0.06)]" />
-
-            {/* Text Content */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-[5cqi] text-center z-20">
+        {/**
+         * Card stack: all cards absolutely overlap at the same position.
+         * z-index: first card (i=0) has the highest z so it starts on top.
+         * Cards below are hidden by the envelope z-40 layer at the bottom.
+         */}
+        <div className="relative w-full px-6" style={{ height: "clamp(260px, 52vh, 420px)" }}>
+          {events.map((event, i) => (
+            <div
+              key={event.id}
+              ref={(el) => { cardRefs.current[i] = el; }}
+              className="absolute inset-x-6 top-0 bg-white rounded-3xl shadow-xl px-6 py-8 flex flex-col items-center text-center"
+              style={{ zIndex: events.length - i }}
+            >
+              {/* Script title */}
               <h3
-                className="text-[9cqi] font-normal text-[#9B4B32] mb-3"
+                className="text-[9cqi] font-normal text-[#9B4B32] mb-3 leading-tight"
                 style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
               >
                 {event.title}
               </h3>
 
+              {/* Date / time */}
               <p
-                className="text-[3.6cqi] font-semibold text-[#9B4B32] tracking-wide"
+                className="text-[3.6cqi] font-bold text-[#7A2E1F]"
                 style={{ fontFamily: "var(--font-body), sans-serif" }}
               >
                 {event.dateTime}
               </p>
 
+              {/* Venue */}
               <p
-                className="text-[3.4cqi] text-[#9B4B32]/85 mt-2 max-w-[80%] font-medium"
+                className="text-[3.4cqi] font-medium text-[#7A2E1F] mt-3 max-w-[85%]"
                 style={{ fontFamily: "var(--font-body), sans-serif" }}
               >
                 {event.location}
               </p>
 
+              {/* Dress code */}
               <p
-                className="text-[3.2cqi] italic text-[#9B4B32]/70 mt-3"
+                className="text-[3.2cqi] italic text-[#9B4B32]/70 mt-4"
                 style={{ fontFamily: "var(--font-display), Georgia, serif" }}
               >
                 Dress Code: {event.dressCode}
               </p>
 
+              {/* Thin divider */}
+              <div className="mt-5 w-10 h-px bg-[#9B4B32]/25" />
+
+              {/* Get Directions link */}
               <a
                 href={event.mapLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-5 text-[3cqi] uppercase tracking-widest border-b border-[#9B4B32] text-[#9B4B32] pb-1 font-semibold"
+                className="mt-4 text-[3cqi] font-bold uppercase tracking-widest border-b border-[#7A2E1F] text-[#7A2E1F] pb-1"
                 style={{ fontFamily: "var(--font-body), sans-serif" }}
               >
                 Get Directions
               </a>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
 
-      {/* Front flap overlay — duplicates the bottom card but clips the top to let cards stack behind the red flap */}
-      <div
-        className="envelope-front-flap absolute top-0 left-0 w-full h-full z-30 pointer-events-none"
-        style={{ clipPath: "polygon(0 57%, 100% 57%, 100% 100%, 0 100%)" }}
-      >
-        <Image
-          src={BottomCard}
-          alt=""
-          fill
-          priority
-          className="object-cover pointer-events-none select-none"
-        />
+        {/**
+         * STATIC ENVELOPE ILLUSTRATION — never moves.
+         * z-40: sits ABOVE the lower portion of every card.
+         * Cards parked at y≈62vh are completely hidden behind this.
+         * As each card animates to y:0 it rises INTO VIEW above the envelope,
+         * creating the "letter being pulled from the envelope" illusion.
+         * pointer-events-none so links inside cards remain clickable.
+         */}
+        <div
+          className="absolute bottom-0 left-0 w-full pointer-events-none select-none"
+          style={{ height: "46%", zIndex: 40 }}
+        >
+          <Image
+            src={BottomCard}
+            alt="Red envelope illustration"
+            fill
+            priority
+            className="object-cover object-top"
+          />
+        </div>
       </div>
     </section>
   );
