@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -122,7 +122,7 @@ export default function Collage() {
               }}
             >
               {/* Portrait Photo Container */}
-              <div className="w-full aspect-[3/4] relative rounded-[16px] overflow-hidden bg-[#FAF6F0]">
+              <div className="w-full aspect-[2/3] relative rounded-[16px] overflow-hidden bg-[#FAF6F0]">
                 <Image
                   src={photo.src}
                   alt={photo.alt}
