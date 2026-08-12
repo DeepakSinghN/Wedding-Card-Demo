@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -15,207 +15,267 @@ import PhotoBottom from "./Gallery-section-resources/virat-anuskha-5.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const photos = [
+  { src: PhotoTop, alt: "Moment 1" },
+  { src: PhotoMidLeft, alt: "Moment 2" },
+  { src: PhotoMidCenter, alt: "Moment 3" },
+  { src: PhotoMidRight, alt: "Moment 4" },
+  { src: PhotoBottom, alt: "Moment 5" },
+];
+
 export default function Collage() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const outerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const photoRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const strokeRefs = useRef<(SVGSVGElement | null)[]>([]);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(motionQuery.matches);
-    const motionListener = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    motionQuery.addEventListener("change", motionListener);
-
-    const mobileQuery = window.matchMedia("(max-width: 768px)");
-    setIsMobile(mobileQuery.matches);
-    const mobileListener = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mobileQuery.addEventListener("change", mobileListener);
-
-    return () => {
-      motionQuery.removeEventListener("change", motionListener);
-      mobileQuery.removeEventListener("change", mobileListener);
-    };
+    setMounted(true);
   }, []);
 
   useGSAP(
     () => {
-      if (prefersReducedMotion) return;
+      // Guard: always check prefers-reduced-motion (GSAP skill rule)
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (!outerRef.current || !stageRef.current || !trackRef.current) return;
 
-      const triggerElement = sectionRef.current;
-      if (!triggerElement) return;
+      // Pass custom Lenis scroller explicitly (GSAP skill: Lenis section)
+      const scroller = outerRef.current.closest("#card-scroll-container");
+      if (!scroller) return;
 
-      const scrollerElement = triggerElement.closest("#card-scroll-container");
-      if (!scrollerElement) return;
+      const items = photoRefs.current.filter(Boolean) as HTMLDivElement[];
+      const strokes = strokeRefs.current.filter(Boolean) as SVGSVGElement[];
+      if (items.length === 0) return;
 
-      // 1. Set starting states for cell animations (hidden + shifted down + scaled up)
-      const cells = gsap.utils.toArray(".collage-cell") as HTMLElement[];
-      gsap.set(cells, { opacity: 0, y: 30 });
-      gsap.set(".collage-heading", { opacity: 0, y: -20 });
+      const imageWidth = 260; // width of each image container in px
+      const gap = 32;        // gap between images in px
+      const step = imageWidth + gap;
 
-      // Set initial clip-path wipe states
-      gsap.set(".cell-top img", { clipPath: "inset(0% 100% 0% 0%)", scale: 1.15 });
-      gsap.set(".cell-mid-left img", { clipPath: "inset(0% 0% 100% 0%)", scale: 1.15 });
-      gsap.set(".cell-mid-center img", { clipPath: "inset(100% 0% 0% 0%)", scale: 1.15 });
-      gsap.set(".cell-mid-right img", { clipPath: "inset(0% 0% 100% 0%)", scale: 1.15 });
-      gsap.set(".cell-bottom img", { clipPath: "inset(0% 0% 0% 100%)", scale: 1.15 });
+      // Calculate total translation needed to scroll from first image center to last image center
+      const totalDist = (items.length - 1) * step;
 
-      gsap.set([".cell-text-1", ".cell-text-2"], { letterSpacing: "0.01em" });
+      // ── Initial States ───────────────────────────────────────────────────
+      // First image is active (scale 1.08, opacity 1, gold brushstroke visible)
+      // Other images are inactive (scale 0.9, opacity 0.45, gold brushstroke scaleX 0)
+      gsap.set(items[0], { scale: 1.08, opacity: 1 });
+      gsap.set(strokes[0], { scaleX: 1 });
+      
+      if (items.length > 1) {
+        gsap.set(items.slice(1), { scale: 0.9, opacity: 0.45 });
+        gsap.set(strokes.slice(1), { scaleX: 0 });
+      }
 
-      // Create entrance timeline
+      // ── Pinned Horizontal Timeline ───────────────────────────────────────
+      // Trigger: outerRef (tall scroll space, e.g., 400vh)
+      // Pin: stageRef via CSS position:sticky (robust for Lenis custom scroller)
+      // ease: "none" is REQUIRED for smooth scrub scroll-sync (GSAP skill rule)
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: triggerElement,
-          scroller: scrollerElement,
-          start: "top 20%", // Animates when top of section hits 20% from the top of the viewport (80% scrolled into view)
-          toggleActions: "play none none none"
-        }
+          trigger: outerRef.current,
+          scroller,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
       });
 
-      // Stagger entrance row-by-row with custom timings & spacing for text beats
-      tl.to(".collage-heading", { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" }, 0.0)
+      // 1. Animate horizontal slide of the track
+      tl.to(
+        trackRef.current,
+        {
+          x: -totalDist,
+          ease: "none",
+        },
+        0
+      );
 
-        // Row 1: Top Landscape photo (left-to-right wipe)
-        .to(".cell-top", { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.15)
-        .to(".cell-top img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 1.4, ease: "power2.out" }, 0.15)
+      // 2. Animate scale, opacity, and brushstrokes for each active index
+      const segmentDuration = 1 / (items.length - 1);
 
-        // Row 2: Text 1
-        .to(".cell-text-1", { opacity: 1, y: 0, letterSpacing: "0.03em", duration: 1.2, ease: "power2.out" }, 0.35)
+      items.forEach((_, i) => {
+        if (i === 0) return;
 
-        // Row 3: Middle 3 Square photos
-        // Left (top-to-bottom wipe)
-        .to(".cell-mid-left", { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.55)
-        .to(".cell-mid-left img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 1.4, ease: "power2.out" }, 0.55)
+        const startProgress = (i - 1) * segmentDuration;
+        const endProgress = i * segmentDuration;
 
-        // Center (bottom-to-top wipe)
-        .to(".cell-mid-center", { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.67)
-        .to(".cell-mid-center img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 1.4, ease: "power2.out" }, 0.67)
+        // OUTGOING image (scale down, fade out, hide brushstroke)
+        tl.to(
+          items[i - 1],
+          { scale: 0.9, opacity: 0.45, ease: "none", duration: segmentDuration },
+          startProgress
+        );
+        tl.to(
+          strokes[i - 1],
+          { scaleX: 0, ease: "none", duration: segmentDuration },
+          startProgress
+        );
 
-        // Right (top-to-bottom wipe)
-        .to(".cell-mid-right", { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 0.79)
-        .to(".cell-mid-right img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 1.4, ease: "power2.out" }, 0.79)
+        // INCOMING image (scale up, fade in, reveal brushstroke)
+        tl.to(
+          items[i],
+          { scale: 1.08, opacity: 1, ease: "none", duration: segmentDuration },
+          startProgress
+        );
+        tl.to(
+          strokes[i],
+          { scaleX: 1, ease: "none", duration: segmentDuration },
+          startProgress
+        );
+      });
 
-        // Row 4: Text 2
-        .to(".cell-text-2", { opacity: 1, y: 0, letterSpacing: "0.03em", duration: 1.2, ease: "power2.out" }, 0.99)
-
-        // Row 5: Bottom Landscape photo (right-to-left wipe)
-        .to(".cell-bottom", { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 1.19)
-        .to(".cell-bottom img", { clipPath: "inset(0% 0% 0% 0%)", scale: 1.0, duration: 1.4, ease: "power2.out" }, 1.19);
-
-      // Refresh ScrollTrigger after layouts render
-      const refreshTimeout = setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 1200);
-
-      return () => clearTimeout(refreshTimeout);
+      // Refresh ScrollTrigger positions after layout renders
+      const t = setTimeout(() => ScrollTrigger.refresh(), 800);
+      return () => clearTimeout(t);
     },
-    { scope: sectionRef, dependencies: [prefersReducedMotion, isMobile] }
+    { scope: outerRef }
   );
 
+  if (!mounted) return null;
+
   return (
-    <section
-      ref={sectionRef}
-      className="relative w-full h-content flex-shrink-0 bg-[#FCEAEA] select-none overflow-hidden flex flex-col items-center justify-start mt-20 pt-6 pb-6"
+    // outerRef: tall scroll-distance wrapper (400vh)
+    <div
+      ref={outerRef}
+      className="relative w-full flex-shrink-0"
+      style={{ height: `${photos.length * 80}vh` }}
     >
-      {/* Section Heading */}
-      <h2
-        className="collage-heading text-[12cqi] text-[#9D2C2D] bg-[#FCEAEA] font-normal z-20 mb-16"
-        style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
-      >
-        Our moments
-      </h2>
-
+      {/* stageRef: viewport-height sticky stage */}
       <div
-        ref={containerRef}
-        className="w-full flex-1 max-h-[90vh] flex flex-col justify-between bg-[#FCEAEA]"
+        ref={stageRef}
+        className="w-full bg-[#FCEAEA] flex flex-col items-center justify-between"
+        style={{
+          position: "sticky",
+          top: 0,
+          height: "100vh",
+          overflow: "hidden",
+          paddingTop: "clamp(20px, 6vh, 44px)",
+          paddingBottom: "clamp(24px, 7vh, 52px)",
+        }}
       >
-        {/* 1. Top Landscape Photo */}
-        <div className="collage-cell cell-top w-[89%] aspect-[1/1] relative overflow-hidden mx-auto shadow-sm">
-          <div className="w-full h-full overflow-hidden transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03]">
-            <Image
-              src={PhotoTop}
-              alt="Couple moments top"
-              fill
-              sizes="(max-width: 480px) 90vw, 420px"
-              className="object-cover"
-              priority
-            />
-          </div>
-        </div>
-
-        {/* 2. Text Block 1 */}
-        <div className="collage-cell cell-text-1 text-center px-4">
+        {/* Section header */}
+        <div className="flex flex-col items-center gap-1 z-10">
           <p
-            className="font-serif italic text-[#9D2C2D] text-[3.5cqi] leading-[1.8] font-medium py-4"
-            style={{ fontFamily: "Georgia, serif" }}
+            className="tracking-[2px] text-[#9B4B32]/70"
+            style={{
+              fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
+              fontSize: "clamp(2rem, 8cqi, 3rem)",
+            }}
           >
-            A little glimpse into our journey
+            Our Moments
           </p>
+          <div
+            className="w-24 h-0.5"
+            style={{
+              background: "linear-gradient(to right, transparent, #C9A84C, transparent)",
+            }}
+          />
         </div>
 
-        {/* 3. Middle Squares Row */}
-        <div className="w-[89%] grid grid-cols-3 gap-[3%] mx-auto">
-          {/* Left Square */}
-          <div className="collage-cell cell-mid-left aspect-square relative overflow-hidden rounded-xl shadow-sm">
-            <div className="w-full h-full overflow-hidden transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03]">
-              <Image
-                src={PhotoMidLeft}
-                alt="Couple moments left"
-                fill
-                sizes="(max-width: 480px) 30vw, 140px"
-                className="object-cover"
-              />
-            </div>
-          </div>
-          {/* Center Square */}
-          <div className="collage-cell cell-mid-center aspect-square relative overflow-hidden rounded-xl shadow-sm">
-            <div className="w-full h-full overflow-hidden transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03]">
-              <Image
-                src={PhotoMidCenter}
-                alt="Couple moments center"
-                fill
-                sizes="(max-width: 480px) 30vw, 140px"
-                className="object-cover"
-              />
-            </div>
-          </div>
-          {/* Right Square */}
-          <div className="collage-cell cell-mid-right aspect-square relative overflow-hidden rounded-xl shadow-sm">
-            <div className="w-full h-full overflow-hidden transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03]">
-              <Image
-                src={PhotoMidRight}
-                alt="Couple moments right"
-                fill
-                sizes="(max-width: 480px) 30vw, 140px"
-                className="object-cover"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 4. Text Block 2 */}
-        <div className="collage-cell cell-text-2 text-center px-4">
-          <p
-            className="font-serif italic text-[#9D2C2D] text-[3.5cqi] leading-[1.8] font-medium py-4"
-            style={{ fontFamily: "Georgia, serif" }}
+        {/* ── Fixed Center Overlay Text ─────────────────────────────────── */}
+        {/* z-20 sits on top of film strip cards. pointer-events-none keeps scrolling active */}
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none select-none z-20"
+          style={{ transform: "translateY(clamp(-10px, -2vh, -30px))" }}
+        >
+          <h2
+            className="text-white drop-shadow-[0_4px_16px_rgba(122,46,31,0.5)] font-normal text-center"
+            style={{
+              fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
+              fontSize: "clamp(3.8rem, 15cqi, 5.2rem)",
+              lineHeight: 1.1,
+            }}
           >
-            from where it started to where we are now.
-          </p>
+            I said yes!
+          </h2>
         </div>
 
-        {/* 5. Bottom Landscape Photo */}
-        <div className="collage-cell cell-bottom w-[89%] aspect-[1/1] relative overflow-hidden  mx-auto shadow-sm">
-          <div className="w-full h-full overflow-hidden transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.03]">
-            <Image
-              src={PhotoBottom}
-              alt="Couple moments bottom"
-              fill
-              sizes="(max-width: 480px) 90vw, 420px"
-              className="object-cover"
+        {/* ── Horizontal Film Strip Container ────────────────────────────── */}
+        {/* Centered vertically, width is dynamically scaled */}
+        <div
+          className="w-full relative flex items-center"
+          style={{ height: "400px", overflow: "visible" }}
+        >
+          <div
+            ref={trackRef}
+            className="absolute flex items-center"
+            style={{
+              // Start position: the center of the first card (at index 0) aligned with the viewport center
+              left: "50%",
+              transform: "translateX(-130px)", // Translate by half of W (260/2)
+              gap: "32px",
+              overflow: "visible",
+            }}
+          >
+            {photos.map((photo, i) => (
+              <div
+                key={i}
+                ref={(el) => { photoRefs.current[i] = el; }}
+                className="flex flex-col items-center flex-shrink-0"
+                style={{
+                  width: "260px",
+                  willChange: "transform, opacity",
+                }}
+              >
+                {/* Image card wrapper */}
+                <div
+                  className="w-full aspect-[3/4] bg-white shadow-[0_12px_36px_rgba(155,75,50,0.12)] relative overflow-hidden"
+                  style={{
+                    borderRadius: "24px",
+                    border: "6px solid white",
+                  }}
+                >
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    fill
+                    sizes="260px"
+                    className="object-cover pointer-events-none select-none"
+                    priority={i === 0}
+                  />
+                </div>
+
+                {/* ── Under-Image Gold Brushstroke ────────────────────────── */}
+                {/* scaleX is animated by GSAP. transformOrigin center makes it draw from inside out */}
+                <svg
+                  ref={(el) => { strokeRefs.current[i] = el; }}
+                  viewBox="0 0 100 10"
+                  preserveAspectRatio="none"
+                  className="w-32 h-3 mt-4 text-[#C9A84C]"
+                  style={{
+                    transformOrigin: "center",
+                    willChange: "transform",
+                  }}
+                >
+                  <path
+                    d="M5,5 Q30,2 50,8 T95,5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Small footer pagination indicator dots */}
+        <div className="flex justify-center gap-2.5 z-10">
+          {photos.map((_, i) => (
+            <div
+              key={i}
+              className="w-2 h-2 rounded-full bg-[#9B4B32]/25"
+              style={{
+                background: i === 0 ? "#C9A84C" : undefined,
+                opacity: i === 0 ? 1 : 0.4,
+              }}
             />
-          </div>
+          ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

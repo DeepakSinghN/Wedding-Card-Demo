@@ -70,15 +70,21 @@ export default function EventDetails() {
       {/* Header section */}
       <div className="flex flex-col items-center gap-2">
         <p
-          className="uppercase tracking-[0.3em] text-[#9B4B32]/70 font-semibold"
+          className=" tracking-[2px] text-[#9B4B32]/70"
           style={{
-            fontFamily: "var(--font-body), sans-serif",
-            fontSize: "clamp(10px, 3cqi, 13px)",
+            fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
+            fontSize: "3rem",
           }}
         >
-          The Celebrations
+          Celebrations
         </p>
-        <div className="w-16 h-0.5 bg-[#C9A84C]" />
+        {/* Gold horizontal line */}
+        <div
+          className="w-24 h-0.5 mt-2"
+          style={{
+            background: "linear-gradient(to right, transparent, #C9A84C, transparent)",
+          }}
+        />
       </div>
 
       {/* Cards List */}
@@ -91,7 +97,7 @@ export default function EventDetails() {
               borderRadius: "28px",
               padding: "10px 24px 44px 24px",
               minHeight: "540px",
-              transform: i % 2 === 0 ? "rotate(9deg)" : "rotate(-9deg)",
+              transform: i % 2 === 0 ? "rotate(3deg)" : "rotate(-3deg)",
               transformOrigin: "center",
             }}
           >
