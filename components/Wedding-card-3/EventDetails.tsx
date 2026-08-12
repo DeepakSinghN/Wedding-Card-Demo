@@ -116,6 +116,27 @@ export default function EventDetails() {
         }
       );
 
+      // 2. ScrollTrigger to lock the cards container when Card 4 is fully stacked
+      ScrollTrigger.create({
+        trigger: triggerElement,
+        scroller: scrollerElement,
+        start: "top -321vh",
+        end: "max",
+        onToggle: (self) => {
+          contentRefs.current.forEach((card) => {
+            if (card) {
+              if (self.isActive) {
+                card.style.position = "absolute";
+                card.style.top = "332vh";
+              } else {
+                card.style.position = "sticky";
+                card.style.top = "12vh";
+              }
+            }
+          });
+        },
+      });
+
       // Refresh ScrollTrigger after layouts render and settle (e.g. 1.2s delay)
       const refreshTimeout = setTimeout(() => {
         ScrollTrigger.refresh();
@@ -216,7 +237,7 @@ export default function EventDetails() {
       {/* Content area — sits in the cream space above the envelope flap */}
       <div
         className="absolute left-0 w-full flex flex-col items-center z-20 cards-scrolling-container"
-        style={{ top: "1vh", paddingBottom: "50vh" }}
+        style={{ top: "1vh", paddingBottom: "50vh", height: "415vh" }}
       >
         {events.map((event, i) => (
           <div
