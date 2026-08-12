@@ -22,7 +22,7 @@ const events: WeddingEvent[] = [
   {
     id: "sangeet",
     title: "Sangeet Night",
-    dateTime: "Friday, Nov 27 • 7:00 PM Onwards",
+    dateTime: "Friday, Nov 27 � 7:00 PM Onwards",
     location: "Grand Ballroom, The Oberoi Amarvilas",
     dressCode: "Indo-Western Ethnic / Bling",
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
@@ -30,7 +30,7 @@ const events: WeddingEvent[] = [
   {
     id: "haldi",
     title: "Haldi Ceremony",
-    dateTime: "Saturday, Nov 28 • 10:00 AM Onwards",
+    dateTime: "Saturday, Nov 28 � 10:00 AM Onwards",
     location: "Lawn Area, The Oberoi Amarvilas",
     dressCode: "Yellow Traditional Wear",
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
@@ -38,7 +38,7 @@ const events: WeddingEvent[] = [
   {
     id: "cocktail",
     title: "Cocktail Party",
-    dateTime: "Saturday, Nov 28 • 7:00 PM Onwards",
+    dateTime: "Saturday, Nov 28 � 7:00 PM Onwards",
     location: "Poolside Club, The Oberoi Amarvilas",
     dressCode: "Cocktail Chic / Evening Gown",
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
@@ -46,7 +46,7 @@ const events: WeddingEvent[] = [
   {
     id: "wedding",
     title: "Wedding Ceremony",
-    dateTime: "Sunday, Nov 29 • 11:00 AM Onwards",
+    dateTime: "Sunday, Nov 29 � 11:00 AM Onwards",
     location: "Main Hall, The Oberoi Amarvilas",
     dressCode: "Traditional Formal",
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
@@ -54,285 +54,251 @@ const events: WeddingEvent[] = [
   {
     id: "reception",
     title: "Grand Reception",
-    dateTime: "Monday, Nov 30 • 7:00 PM Onwards",
+    dateTime: "Monday, Nov 30 � 7:00 PM Onwards",
     location: "Grand Lawn, The Oberoi Amarvilas",
     dressCode: "Western Formal / Tuxedo",
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
   },
 ];
 
+// 4 transitions for 5 events ? 400% extra scroll distance
+const SCROLL_MULTIPLIER = events.length - 1;
+
 export default function EventDetails() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const stickyRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-
   const [mounted, setMounted] = useState(false);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(motionQuery.matches);
-    const motionListener = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    motionQuery.addEventListener("change", motionListener);
-
-    const mobileQuery = window.matchMedia("(max-width: 768px)");
-    setIsMobile(mobileQuery.matches);
-    const mobileListener = (e: MediaQueryListEvent) => setIsMobile(e.matches);
-    mobileQuery.addEventListener("change", mobileListener);
-
-    return () => {
-      motionQuery.removeEventListener("change", motionListener);
-      mobileQuery.removeEventListener("change", mobileListener);
-    };
   }, []);
 
   useGSAP(
     () => {
-      if (prefersReducedMotion) return;
+      // -- Skill rule: always guard with prefers-reduced-motion --------------
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       if (!sectionRef.current) return;
 
-      const scrollerEl = sectionRef.current.closest("#card-scroll-container");
-      if (!scrollerEl) return;
+      // -- Skill rule: pass custom Lenis scroller explicitly -----------------
+      const scroller = sectionRef.current.closest("#card-scroll-container");
+      if (!scroller) return;
 
       const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
       if (cards.length === 0) return;
 
-      // Parked distance: cards start below the envelope — about 60% of the viewport height
-      // so they are hidden behind the envelope illustration at the bottom.
+      // Parked offset: 62% of viewport height hides cards fully behind the
+      // 46%-tall envelope overlay sitting at the bottom of the section.
       const parkedY = () => window.innerHeight * 0.62;
+      const exitY   = () => -window.innerHeight * 0.8;
 
-      // Set initial state: Card 0 visible, all others parked below/behind envelope.
+      // -- Initial states ----------------------------------------------------
+      // Skill rule: only animate transform + opacity (GPU-composited)
       gsap.set(cards[0], { y: 0, opacity: 1 });
       gsap.set(cards.slice(1), { y: parkedY, opacity: 0 });
 
+      // -- Pinned scrub timeline ---------------------------------------------
+      // Skill recipe (Pinned Timeline):
+      //   pin: true  ? pins the trigger element (sectionRef) at top:0
+      //   scrub: 1   ? smooth 1-second lag scrubbing
+      //   ease: none ? REQUIRED for scrub; easing breaks scroll sync
+      //   anticipatePin: 1 ? prevents pin jump
+      //   invalidateOnRefresh: true ? recalculates on resize
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
-          scroller: scrollerEl,
+          scroller,
+          pin: true,
+          pinSpacing: true,
+          anticipatePin: 1,
           start: "top top",
-          end: "bottom bottom",
-          scrub: isMobile ? 0.3 : 1,
+          end: `+=${SCROLL_MULTIPLIER * 100}%`,
+          scrub: 1,
           invalidateOnRefresh: true,
-          snap: isMobile
-            ? {
-                snapTo: 1 / (cards.length - 1),
-                duration: { min: 0.2, max: 0.4 },
-                ease: "power2.inOut",
-                inertia: false,
-              }
-            : undefined,
         },
       });
 
-      cards.forEach((card, i) => {
+      // Each swap occupies 1 unit of timeline duration.
+      // total timeline duration = SCROLL_MULTIPLIER units.
+      cards.forEach((_, i) => {
         if (i === 0) return;
 
-        // Each card swap occupies an equal fraction of total scroll distance.
-        const segmentStart = (i - 1) / (cards.length - 1);
+        const pos = i - 1; // timeline position: 0, 1, 2, 3
 
-        // OUTGOING: previous card slides UP and exits upward.
+        // OUTGOING: current card exits upward
         tl.to(
           cards[i - 1],
-          {
-            y: isMobile ? -window.innerHeight * 0.75 : -window.innerHeight * 0.85,
-            opacity: 0,
-            duration: 0.4,
-            ease: "power2.in",
-          },
-          segmentStart
+          { y: exitY, opacity: 0, duration: 0.45, ease: "none" },
+          pos
         );
 
-        // INCOMING: this card rises UP from behind the envelope to y:0.
+        // INCOMING: next card rises from behind envelope (slight overlap +0.05)
         tl.fromTo(
           cards[i],
           { y: parkedY, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.5,
-            ease: "power2.out",
-          },
-          segmentStart + 0.05
+          { y: 0, opacity: 1, duration: 0.55, ease: "none" },
+          pos + 0.05
         );
       });
 
-      // Refresh ScrollTrigger after layout settles.
-      const t = setTimeout(() => ScrollTrigger.refresh(), 1200);
+      // Skill rule: refresh after layout settles
+      const t = setTimeout(() => ScrollTrigger.refresh(), 1000);
       return () => clearTimeout(t);
     },
-    {
-      scope: sectionRef,
-      dependencies: [prefersReducedMotion, isMobile],
-    }
+    { scope: sectionRef }
   );
 
   if (!mounted) return null;
 
-  // ── REDUCED MOTION FALLBACK ──────────────────────────────────────────────
-  if (prefersReducedMotion) {
-    return (
-      <div className="w-full flex flex-col gap-6 py-10 px-6 bg-[#FBEAEA]">
-        <div className="w-full h-[30vh] relative pointer-events-none mb-4">
-          <Image src={BottomCard} alt="" fill className="object-cover" priority />
-        </div>
-        {events.map((event) => (
+  return (
+    /*
+     * sectionRef = GSAP pin trigger.
+     * height: 100vh ? normal viewport-height section.
+     * GSAP adds pinSpacing below so the next page section follows correctly.
+     * overflow: visible ? cards must be able to animate above/below the clip boundary.
+     */
+    <section
+      ref={sectionRef}
+      className="relative w-full flex-shrink-0 bg-[#FBEAEA]"
+      style={{ height: "100vh", overflow: "visible" }}
+    >
+      {/* -- Section label ------------------------------------------------- */}
+      <div
+        className="absolute top-0 left-0 w-full flex justify-center z-10"
+        style={{ paddingTop: "clamp(18px, 4.5vh, 36px)" }}
+      >
+        <p
+          className="uppercase tracking-[0.3em] text-[#9B4B32]/55"
+          style={{
+            fontFamily: "var(--font-body), sans-serif",
+            fontSize: "clamp(9px, 2.8cqi, 12px)",
+          }}
+        >
+          Event Schedule
+        </p>
+      </div>
+
+      {/*
+       * -- Card stack ------------------------------------------------------
+       * All cards are absolute, stacked at the same (top, inset-x) position.
+       * z-index: card 0 highest ? starts on top visually.
+       * Cards i > 0 are hidden behind the envelope (y � 62vh) until animated.
+       * overflow: visible so exiting/entering cards are not clipped.
+       */}
+      <div
+        className="absolute left-0 w-full"
+        style={{
+          top: "clamp(52px, 12vh, 84px)",
+          height: "clamp(290px, 56vh, 450px)",
+          zIndex: 10,
+          overflow: "visible",
+        }}
+      >
+        {events.map((event, i) => (
           <div
             key={event.id}
-            className="bg-white rounded-3xl shadow-xl px-6 py-10 flex flex-col items-center text-center"
+            ref={(el) => { cardRefs.current[i] = el; }}
+            className="absolute bg-white rounded-3xl shadow-xl flex flex-col items-center text-center"
+            style={{
+              inset: "0 20px",
+              zIndex: events.length - i,
+              padding: "clamp(18px, 3.5vh, 32px) 20px",
+              // Pre-set initial state to avoid flash before GSAP runs
+              opacity: i === 0 ? 1 : 0,
+              transform: i === 0 ? "translateY(0px)" : "translateY(62vh)",
+              willChange: "transform, opacity",
+            }}
           >
             <h3
-              className="text-[9cqi] font-normal text-[#9B4B32] mb-3"
-              style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
+              className="font-normal text-[#9B4B32] leading-tight"
+              style={{
+                fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
+                fontSize: "clamp(24px, 8cqi, 46px)",
+                marginBottom: "clamp(6px, 1.2vh, 12px)",
+              }}
             >
               {event.title}
             </h3>
+
             <p
-              className="text-[3.6cqi] font-semibold text-[#7A2E1F]"
-              style={{ fontFamily: "var(--font-body), sans-serif" }}
+              className="font-bold text-[#7A2E1F]"
+              style={{
+                fontFamily: "var(--font-body), sans-serif",
+                fontSize: "clamp(11px, 3.4cqi, 15px)",
+                marginTop: "clamp(4px, 0.8vh, 8px)",
+              }}
             >
               {event.dateTime}
             </p>
+
             <p
-              className="text-[3.4cqi] font-medium text-[#7A2E1F] mt-3"
-              style={{ fontFamily: "var(--font-body), sans-serif" }}
+              className="font-medium text-[#7A2E1F]"
+              style={{
+                fontFamily: "var(--font-body), sans-serif",
+                fontSize: "clamp(10px, 3.2cqi, 14px)",
+                marginTop: "clamp(6px, 1vh, 10px)",
+                maxWidth: "85%",
+              }}
             >
               {event.location}
             </p>
+
             <p
-              className="text-[3.2cqi] italic text-[#9B4B32]/70 mt-4"
-              style={{ fontFamily: "var(--font-display), Georgia, serif" }}
+              className="italic text-[#9B4B32]/70"
+              style={{
+                fontFamily: "var(--font-display), Georgia, serif",
+                fontSize: "clamp(10px, 3cqi, 13px)",
+                marginTop: "clamp(8px, 1.2vh, 14px)",
+              }}
             >
               Dress Code: {event.dressCode}
             </p>
+
+            <div
+              className="bg-[#9B4B32]/20"
+              style={{ width: 40, height: 1, marginTop: "clamp(10px, 1.5vh, 16px)" }}
+            />
+
             <a
               href={event.mapLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 text-[3cqi] font-bold uppercase tracking-widest border-b border-[#7A2E1F] text-[#7A2E1F] pb-1"
-              style={{ fontFamily: "var(--font-body), sans-serif" }}
+              className="font-bold uppercase tracking-widest border-b border-[#7A2E1F] text-[#7A2E1F]"
+              style={{
+                fontFamily: "var(--font-body), sans-serif",
+                fontSize: "clamp(8px, 2.6cqi, 12px)",
+                marginTop: "clamp(8px, 1.3vh, 14px)",
+                paddingBottom: 3,
+                position: "relative",
+                zIndex: 100,
+              }}
             >
               Get Directions
             </a>
           </div>
         ))}
       </div>
-    );
-  }
 
-  // ── ANIMATED LAYOUT ──────────────────────────────────────────────────────
-  return (
-    /**
-     * sectionRef: tall scroll-distance wrapper.
-     * Height = events.length × scroll-distance-per-card so each event gets
-     * its own full scroll window. On mobile we shorten to 70vh per event.
-     */
-    <section
-      ref={sectionRef}
-      className="relative w-full flex-shrink-0"
-      style={{ height: `${events.length * (isMobile ? 70 : 100)}vh` }}
-    >
-      {/**
-       * stickyRef: viewport-height sticky layer — the "stage".
-       * Everything visible lives here; it stays pinned to the top
-       * while the user scrolls through the tall parent section.
+      {/*
+       * -- Static envelope illustration ------------------------------------
+       * Anchored to the bottom of the pinned section (absolute bottom-0).
+       * zIndex: 40 ? sits ABOVE all cards (cards max z � events.length + 10).
+       * This is what conceals cards parked at y�62vh:
+       *   they sit physically below this layer and are not visible.
+       * As each card animates to y:0 it rises above this overlay into view �
+       *   the "letter being pulled from the envelope" moment.
+       * pointer-events-none keeps card links clickable.
        */}
       <div
-        ref={stickyRef}
-        className="sticky top-0 h-screen w-full flex flex-col items-center justify-start overflow-hidden bg-[#FBEAEA]"
-        style={{ paddingTop: "clamp(28px, 7vh, 56px)" }}
+        className="absolute bottom-0 left-0 w-full pointer-events-none select-none"
+        style={{ height: "46%", zIndex: 40 }}
       >
-        {/* Section label */}
-        <p
-          className="text-[3cqi] uppercase tracking-[0.25em] text-[#9B4B32]/60 mb-4"
-          style={{ fontFamily: "var(--font-body), sans-serif" }}
-        >
-          Event Schedule
-        </p>
-
-        {/**
-         * Card stack: all cards absolutely overlap at the same position.
-         * z-index: first card (i=0) has the highest z so it starts on top.
-         * Cards below are hidden by the envelope z-40 layer at the bottom.
-         */}
-        <div className="relative w-full px-6" style={{ height: "clamp(260px, 52vh, 420px)" }}>
-          {events.map((event, i) => (
-            <div
-              key={event.id}
-              ref={(el) => { cardRefs.current[i] = el; }}
-              className="absolute inset-x-6 top-0 bg-white rounded-3xl shadow-xl px-6 py-8 flex flex-col items-center text-center"
-              style={{ zIndex: events.length - i }}
-            >
-              {/* Script title */}
-              <h3
-                className="text-[9cqi] font-normal text-[#9B4B32] mb-3 leading-tight"
-                style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
-              >
-                {event.title}
-              </h3>
-
-              {/* Date / time */}
-              <p
-                className="text-[3.6cqi] font-bold text-[#7A2E1F]"
-                style={{ fontFamily: "var(--font-body), sans-serif" }}
-              >
-                {event.dateTime}
-              </p>
-
-              {/* Venue */}
-              <p
-                className="text-[3.4cqi] font-medium text-[#7A2E1F] mt-3 max-w-[85%]"
-                style={{ fontFamily: "var(--font-body), sans-serif" }}
-              >
-                {event.location}
-              </p>
-
-              {/* Dress code */}
-              <p
-                className="text-[3.2cqi] italic text-[#9B4B32]/70 mt-4"
-                style={{ fontFamily: "var(--font-display), Georgia, serif" }}
-              >
-                Dress Code: {event.dressCode}
-              </p>
-
-              {/* Thin divider */}
-              <div className="mt-5 w-10 h-px bg-[#9B4B32]/25" />
-
-              {/* Get Directions link */}
-              <a
-                href={event.mapLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 text-[3cqi] font-bold uppercase tracking-widest border-b border-[#7A2E1F] text-[#7A2E1F] pb-1"
-                style={{ fontFamily: "var(--font-body), sans-serif" }}
-              >
-                Get Directions
-              </a>
-            </div>
-          ))}
-        </div>
-
-        {/**
-         * STATIC ENVELOPE ILLUSTRATION — never moves.
-         * z-40: sits ABOVE the lower portion of every card.
-         * Cards parked at y≈62vh are completely hidden behind this.
-         * As each card animates to y:0 it rises INTO VIEW above the envelope,
-         * creating the "letter being pulled from the envelope" illusion.
-         * pointer-events-none so links inside cards remain clickable.
-         */}
-        <div
-          className="absolute bottom-0 left-0 w-full pointer-events-none select-none"
-          style={{ height: "46%", zIndex: 40 }}
-        >
-          <Image
-            src={BottomCard}
-            alt="Red envelope illustration"
-            fill
-            priority
-            className="object-cover object-top"
-          />
-        </div>
+        <Image
+          src={BottomCard}
+          alt="Red envelope illustration"
+          fill
+          priority
+          className="object-cover object-top"
+        />
       </div>
     </section>
   );
