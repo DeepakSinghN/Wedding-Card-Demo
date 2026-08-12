@@ -61,55 +61,46 @@ const events: WeddingEvent[] = [
   },
 ];
 
-// 4 transitions for 5 events
 const SCROLL_MULTIPLIER = events.length - 1;
 
+// ── Styles (Ancient Manuscript / Scroll Reveal) ───────────────────────────────
+const COLORS = {
+  bgTop:       "#F5C842",   // saffron
+  bgBottom:    "#FDF6E3",   // cream
+  scrollBar:   "#EDE0C4",   // parchment ivory for scroll ends
+  titleText:   "#3B1E00",   // deep sepia
+  labelText:   "#7A4A1A",   // warm ochre for small-cap labels
+  valueText:   "#2E1A00",   // near-black sepia for values
+  divider:     "#C9A84C",   // antique gold
+  envelopeBand:"#8B0000",   // deep red band on flap
+  dirBtn:      "#6B2A00",   // dark sienna for Get Directions
+};
+
 export default function EventDetails() {
-  const outerRef = useRef<HTMLDivElement>(null);  // tall scroll-distance wrapper
-  const stageRef = useRef<HTMLDivElement>(null);  // sticky viewport-height stage
+  const outerRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
   const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => { setMounted(true); }, []);
 
   useGSAP(
     () => {
-      // GSAP skill rule: always guard with prefers-reduced-motion
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       if (!outerRef.current || !stageRef.current) return;
 
-      // GSAP skill (Lenis): pass custom Lenis wrapper as scroller
       const scroller = outerRef.current.closest("#card-scroll-container");
       if (!scroller) return;
 
       const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
       if (cards.length === 0) return;
 
-      // IMPORTANT: With a custom div scroller, GSAP pin:true does NOT use
-      // position:fixed -- it uses transforms which breaks inside Lenis.
-      // The CORRECT pattern for custom scrollers is:
-      //   - CSS position:sticky on stageRef handles the visual pin
-      //   - GSAP ScrollTrigger scrubs the animation progress (no pin:true)
-      // This is the most reliable approach per GSAP docs for custom scrollers.
-
-      // Parked position: cards start 58vh below their resting point.
-      // The envelope is ~50% of the viewport height (set below).
-      // 58vh puts parked cards behind/below the top edge of the envelope.
       const PARKED_Y = () => window.innerHeight * 0.58;
       const EXIT_Y   = () => -window.innerHeight * 0.82;
 
-      // Initial states (GSAP skill: only animate transform + opacity)
       gsap.set(cards[0], { y: 0, opacity: 1 });
       gsap.set(cards.slice(1), { y: PARKED_Y, opacity: 0 });
 
-      // Scrub timeline - NO pin:true, CSS sticky handles it
-      // GSAP skill recipe (Pinned Timeline variant for custom scroller):
-      //   trigger: outerRef (tall scroll-distance wrapper)
-      //   start/end: "top top" / "bottom bottom" maps full section scroll
-      //   scrub: 1 - smooth 1-second lag scrub
-      //   ease: "none" REQUIRED - easing breaks scroll sync in scrub
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: outerRef.current,
@@ -121,22 +112,15 @@ export default function EventDetails() {
         },
       });
 
-      // Card swap sequence
-      // Each swap = 1/(N-1) of total timeline progress
       cards.forEach((_, i) => {
         if (i === 0) return;
+        const pos = i - 1;
 
-        const pos = i - 1; // 0, 1, 2, 3
-
-        // OUTGOING: prev card slides up and fades out
-        // ease: "none" per GSAP skill rule for scrub animations
         tl.to(
           cards[i - 1],
           { y: EXIT_Y, opacity: 0, duration: 0.45, ease: "none" },
           pos
         );
-
-        // INCOMING: next card rises from behind envelope to resting position
         tl.fromTo(
           cards[i],
           { y: PARKED_Y, opacity: 0 },
@@ -145,7 +129,6 @@ export default function EventDetails() {
         );
       });
 
-      // GSAP skill: refresh after layout settles
       const t = setTimeout(() => ScrollTrigger.refresh(), 800);
       return () => clearTimeout(t);
     },
@@ -155,58 +138,64 @@ export default function EventDetails() {
   if (!mounted) return null;
 
   return (
-    // outerRef: tall section that provides the scroll distance.
-    // Height = (events.length) * 100vh so each card gets a full viewport of scroll.
-    // CSS sticky on stageRef (the child) handles the visual pin - no GSAP pin needed.
+    // Tall outer wrapper — provides scroll distance for GSAP scrub
     <div
       ref={outerRef}
       className="relative w-full flex-shrink-0"
       style={{ height: `${events.length * 100}vh` }}
     >
-      {/*
-        stageRef: sticky viewport-height stage.
-        position:sticky + top:0 + height:100vh = stays fixed in the viewport
-        while the parent div scrolls through its full height above/below.
-        overflow:visible so cards can slide beyond the top/bottom bounds.
-      */}
+      {/* Sticky stage — CSS sticky keeps this in view while parent scrolls */}
       <div
         ref={stageRef}
-        className="w-full bg-[#FBEAEA]"
+        className="w-full"
         style={{
           position: "sticky",
           top: 0,
           height: "100vh",
           overflow: "visible",
+          // Saffron-to-cream background (the Ancient Manuscript gradient)
+          background: `linear-gradient(to bottom, ${COLORS.bgTop} 0%, ${COLORS.bgBottom} 100%)`,
         }}
       >
-        {/* Section label */}
+
+        {/* ── "The Celebrations" label ───────────────────────────────────── */}
         <div
-          className="absolute top-0 left-0 w-full flex justify-center"
-          style={{ paddingTop: "clamp(20px, 5vh, 40px)", zIndex: 10 }}
+          className="absolute top-0 left-0 w-full flex flex-col items-center"
+          style={{ paddingTop: "clamp(18px, 4.5vh, 36px)", zIndex: 10 }}
         >
+          {/* Small ornamental top line */}
+          <div style={{
+            width: 48,
+            height: 1.5,
+            background: COLORS.divider,
+            marginBottom: 8,
+          }} />
           <p
-            className="uppercase tracking-[0.3em] text-[#9B4B32]/55"
             style={{
-              fontFamily: "var(--font-body), sans-serif",
-              fontSize: "clamp(9px, 2.8cqi, 12px)",
+              fontFamily: "var(--font-display), Georgia, serif",
+              fontSize: "clamp(8px, 2.4cqi, 11px)",
+              fontVariant: "small-caps",
+              letterSpacing: "0.35em",
+              color: COLORS.labelText,
+              textTransform: "uppercase",
             }}
           >
-            Event Schedule
+            The Celebrations
           </p>
+          <div style={{
+            width: 48,
+            height: 1.5,
+            background: COLORS.divider,
+            marginTop: 8,
+          }} />
         </div>
 
-        {/*
-          Card stack.
-          All cards: absolute, same position, stacked on each other.
-          z-index: card 0 is highest (starts on top).
-          Cards i > 0 start at y = 58vh (behind envelope) via initial inline style.
-          overflow:visible so animating cards go outside this box freely.
-        */}
+        {/* ── Card Stack ────────────────────────────────────────────────── */}
         <div
           className="absolute left-0 w-full"
           style={{
-            top: "clamp(54px, 12vh, 86px)",
-            height: "clamp(280px, 52vh, 420px)",
+            top: "clamp(60px, 13vh, 90px)",
+            height: "clamp(270px, 52vh, 410px)",
             zIndex: 10,
             overflow: "visible",
           }}
@@ -215,110 +204,242 @@ export default function EventDetails() {
             <div
               key={event.id}
               ref={(el) => { cardRefs.current[i] = el; }}
-              className="absolute bg-white rounded-3xl shadow-xl flex flex-col items-center text-center"
+              className="absolute"
               style={{
-                inset: "0 20px",
+                inset: "0 16px",
                 zIndex: events.length - i,
-                padding: "clamp(18px, 3.5vh, 30px) 20px",
-                // Match initial state to GSAP set() to prevent flash
                 opacity: i === 0 ? 1 : 0,
                 transform: i === 0 ? "translateY(0px)" : "translateY(58vh)",
                 willChange: "transform, opacity",
+                // Scroll shape: no border-radius, shadow gives depth
+                borderRadius: 0,
+                boxShadow: "0 8px 32px rgba(90,40,0,0.18), 0 2px 6px rgba(90,40,0,0.10)",
+                background: COLORS.bgBottom,
+                display: "flex",
+                flexDirection: "column",
               }}
             >
-              <h3
-                className="font-normal text-[#9B4B32] leading-tight"
-                style={{
-                  fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
-                  fontSize: "clamp(24px, 7.5cqi, 44px)",
-                  marginBottom: "clamp(6px, 1.2vh, 12px)",
-                }}
-              >
-                {event.title}
-              </h3>
-
-              <p
-                className="font-bold text-[#7A2E1F]"
-                style={{
-                  fontFamily: "var(--font-body), sans-serif",
-                  fontSize: "clamp(11px, 3.4cqi, 15px)",
-                  marginTop: "clamp(4px, 0.8vh, 8px)",
-                }}
-              >
-                {event.dateTime}
-              </p>
-
-              <p
-                className="font-medium text-[#7A2E1F]"
-                style={{
-                  fontFamily: "var(--font-body), sans-serif",
-                  fontSize: "clamp(10px, 3.2cqi, 14px)",
-                  marginTop: "clamp(6px, 1vh, 10px)",
-                  maxWidth: "85%",
-                }}
-              >
-                {event.location}
-              </p>
-
-              <p
-                className="italic text-[#9B4B32]/70"
-                style={{
+              {/* ── TOP SCROLL BAR (rolled parchment end) ─────────────── */}
+              <div style={{
+                height: "clamp(14px, 2.2vh, 20px)",
+                background: COLORS.scrollBar,
+                borderBottom: `1.5px solid ${COLORS.divider}`,
+                flexShrink: 0,
+                position: "relative",
+                // Subtle horizontal ribbing to suggest rolled paper
+                backgroundImage: `repeating-linear-gradient(
+                  to right,
+                  transparent 0px,
+                  transparent 18px,
+                  rgba(180,140,80,0.12) 18px,
+                  rgba(180,140,80,0.12) 19px
+                )`,
+              }}>
+                {/* Event counter — Roman numeral style */}
+                <span style={{
+                  position: "absolute",
+                  right: "clamp(10px, 4cqi, 18px)",
+                  top: "50%",
+                  transform: "translateY(-50%)",
                   fontFamily: "var(--font-display), Georgia, serif",
-                  fontSize: "clamp(10px, 3cqi, 13px)",
-                  marginTop: "clamp(8px, 1.2vh, 14px)",
-                }}
-              >
-                Dress Code: {event.dressCode}
-              </p>
+                  fontSize: "clamp(8px, 2.2cqi, 11px)",
+                  fontVariant: "small-caps",
+                  letterSpacing: "0.2em",
+                  color: COLORS.labelText,
+                }}>
+                  {["I","II","III","IV","V"][i]} / V
+                </span>
+              </div>
 
-              <div
-                style={{
-                  width: 40,
+              {/* ── CARD BODY ─────────────────────────────────────────── */}
+              <div style={{
+                flex: 1,
+                padding: "clamp(14px, 3vh, 26px) clamp(16px, 5cqi, 28px)",
+                display: "flex",
+                flexDirection: "column",
+              }}>
+
+                {/* Gold divider above title */}
+                <div style={{
+                  width: "100%",
                   height: 1,
-                  background: "rgba(155,75,50,0.2)",
-                  marginTop: "clamp(10px, 1.5vh, 16px)",
-                }}
-              />
+                  background: `linear-gradient(to right, transparent, ${COLORS.divider}, transparent)`,
+                  marginBottom: "clamp(10px, 1.8vh, 16px)",
+                }} />
 
-              <a
-                href={event.mapLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-bold uppercase tracking-widest border-b border-[#7A2E1F] text-[#7A2E1F]"
-                style={{
-                  fontFamily: "var(--font-body), sans-serif",
-                  fontSize: "clamp(8px, 2.6cqi, 12px)",
-                  marginTop: "clamp(8px, 1.3vh, 14px)",
-                  paddingBottom: 3,
-                  position: "relative",
-                  zIndex: 100,
-                }}
-              >
-                Get Directions
-              </a>
+                {/* Event title — bold condensed epigraphic serif */}
+                <h3 style={{
+                  fontFamily: "var(--font-display), Georgia, 'Times New Roman', serif",
+                  fontSize: "clamp(22px, 7cqi, 38px)",
+                  fontWeight: 900,
+                  fontStretch: "condensed",
+                  letterSpacing: "-0.01em",
+                  lineHeight: 1.1,
+                  color: COLORS.titleText,
+                  textAlign: "center",
+                  marginBottom: "clamp(10px, 1.8vh, 18px)",
+                  textTransform: "uppercase",
+                }}>
+                  {event.title}
+                </h3>
+
+                {/* Gold divider below title */}
+                <div style={{
+                  width: "100%",
+                  height: 1,
+                  background: `linear-gradient(to right, transparent, ${COLORS.divider}, transparent)`,
+                  marginBottom: "clamp(10px, 1.8vh, 16px)",
+                }} />
+
+                {/* ── Two-column manuscript grid ─────────────────────── */}
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: "auto 1fr",
+                  columnGap: "clamp(10px, 3cqi, 18px)",
+                  rowGap: "clamp(6px, 1.1vh, 10px)",
+                  lineHeight: 1.35,
+                }}>
+                  {/* Date */}
+                  <span style={{
+                    fontFamily: "var(--font-body), sans-serif",
+                    fontSize: "clamp(8px, 2.4cqi, 11px)",
+                    fontVariant: "small-caps",
+                    letterSpacing: "0.12em",
+                    color: COLORS.labelText,
+                    textTransform: "uppercase",
+                    whiteSpace: "nowrap",
+                    paddingTop: "0.1em",
+                  }}>
+                    When
+                  </span>
+                  <span style={{
+                    fontFamily: "var(--font-display), Georgia, serif",
+                    fontSize: "clamp(10px, 3cqi, 13px)",
+                    fontWeight: 600,
+                    color: COLORS.valueText,
+                  }}>
+                    {event.dateTime}
+                  </span>
+
+                  {/* Venue */}
+                  <span style={{
+                    fontFamily: "var(--font-body), sans-serif",
+                    fontSize: "clamp(8px, 2.4cqi, 11px)",
+                    fontVariant: "small-caps",
+                    letterSpacing: "0.12em",
+                    color: COLORS.labelText,
+                    textTransform: "uppercase",
+                    whiteSpace: "nowrap",
+                    paddingTop: "0.1em",
+                  }}>
+                    Where
+                  </span>
+                  <span style={{
+                    fontFamily: "var(--font-display), Georgia, serif",
+                    fontSize: "clamp(10px, 3cqi, 13px)",
+                    fontWeight: 600,
+                    color: COLORS.valueText,
+                  }}>
+                    {event.location}
+                  </span>
+
+                  {/* Dress code */}
+                  <span style={{
+                    fontFamily: "var(--font-body), sans-serif",
+                    fontSize: "clamp(8px, 2.4cqi, 11px)",
+                    fontVariant: "small-caps",
+                    letterSpacing: "0.12em",
+                    color: COLORS.labelText,
+                    textTransform: "uppercase",
+                    whiteSpace: "nowrap",
+                    paddingTop: "0.1em",
+                  }}>
+                    Attire
+                  </span>
+                  <span style={{
+                    fontFamily: "var(--font-display), Georgia, serif",
+                    fontSize: "clamp(10px, 3cqi, 13px)",
+                    fontStyle: "italic",
+                    color: COLORS.valueText,
+                  }}>
+                    {event.dressCode}
+                  </span>
+                </div>
+
+                {/* Spacer */}
+                <div style={{ flex: 1 }} />
+
+                {/* Gold divider */}
+                <div style={{
+                  width: "100%",
+                  height: 1,
+                  background: `linear-gradient(to right, transparent, ${COLORS.divider}, transparent)`,
+                  marginTop: "clamp(10px, 1.5vh, 14px)",
+                  marginBottom: "clamp(8px, 1.2vh, 12px)",
+                }} />
+
+                {/* Get Directions link */}
+                <a
+                  href={event.mapLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: "block",
+                    textAlign: "center",
+                    fontFamily: "var(--font-body), sans-serif",
+                    fontSize: "clamp(8px, 2.4cqi, 11px)",
+                    fontVariant: "small-caps",
+                    letterSpacing: "0.25em",
+                    textTransform: "uppercase",
+                    color: COLORS.dirBtn,
+                    textDecoration: "none",
+                    borderBottom: `1px solid ${COLORS.divider}`,
+                    paddingBottom: 2,
+                    width: "fit-content",
+                    margin: "0 auto",
+                    position: "relative",
+                    zIndex: 100,
+                  }}
+                >
+                  Get Directions
+                </a>
+              </div>
+
+              {/* ── BOTTOM SCROLL BAR (rolled parchment end) ──────────── */}
+              <div style={{
+                height: "clamp(14px, 2.2vh, 20px)",
+                background: COLORS.scrollBar,
+                borderTop: `1.5px solid ${COLORS.divider}`,
+                flexShrink: 0,
+                backgroundImage: `repeating-linear-gradient(
+                  to right,
+                  transparent 0px,
+                  transparent 18px,
+                  rgba(180,140,80,0.12) 18px,
+                  rgba(180,140,80,0.12) 19px
+                )`,
+              }} />
             </div>
           ))}
         </div>
 
-        {/*
-          Static envelope illustration - never moves.
-          Absolutely anchored to the BOTTOM of the sticky stage.
-          zIndex: 40 - above all cards (max card z = events.length = 5).
-
-          FIX for "envelope not showing fully":
-          - Use object-contain (not object-cover) to display the whole image
-          - Height 50% of viewport shows the full envelope proportionally
-          - object-position: bottom ensures the base is always visible
-
-          The envelope conceals cards at y=58vh:
-          those cards sit behind this layer and are invisible.
-          As each card animates to y:0 it rises INTO view above the envelope.
-          pointer-events-none keeps card links clickable.
-        */}
+        {/* ── Static envelope illustration ──────────────────────────────── */}
+        {/* Height raised to 55% as specified, with deep red decorative band overlay */}
         <div
           className="absolute bottom-0 left-0 w-full pointer-events-none select-none"
-          style={{ height: "50%", zIndex: 40 }}
+          style={{ height: "55%", zIndex: 40 }}
         >
+          {/* Deep red decorative band across the envelope flap area */}
+          <div style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: "clamp(10px, 1.8vh, 16px)",
+            background: COLORS.envelopeBand,
+            zIndex: 2,
+          }} />
+
           <Image
             src={BottomCard}
             alt="Red envelope illustration"
@@ -327,6 +448,26 @@ export default function EventDetails() {
             className="object-contain"
             style={{ objectPosition: "bottom center" }}
           />
+        </div>
+
+        {/* ── Scroll progress indicator — 5 gold ticks ──────────────────── */}
+        {/* These are purely decorative; GSAP drives the real animation */}
+        <div
+          className="absolute right-0 top-0 h-full flex flex-col items-center justify-center"
+          style={{ paddingRight: "clamp(8px, 2cqi, 14px)", zIndex: 50, gap: 6 }}
+        >
+          {events.map((_, i) => (
+            <div
+              key={i}
+              style={{
+                width: 3,
+                height: "clamp(14px, 2.5vh, 22px)",
+                background: COLORS.divider,
+                opacity: i === 0 ? 1 : 0.3,
+                borderRadius: 2,
+              }}
+            />
+          ))}
         </div>
       </div>
     </div>
