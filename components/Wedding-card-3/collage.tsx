@@ -96,33 +96,31 @@ export default function Collage() {
       if (wrappers.length === 0 || cards.length === 0) return;
 
       // ── Entrance Batch Animation (on wrappers) ───────────────────────────
-      // We set starting states for card wrappers: scaled up slightly, transparent, and blurred
+      // We set starting states for card wrappers: scaled up slightly, transparent
+      // Note: We avoid animating the heavy CSS 'blur' filter as it causes GPU repaint lag.
       gsap.set(wrappers, {
         opacity: 0,
-        scale: 1.08,
-        // Disable blur filter on mobile to prevent performance jank (performance rule)
-        filter: isMobile ? "none" : "blur(6px)",
+        scale: 1.05,
       });
 
       // Characters are hidden initially
       const chars = gsap.utils.toArray(".caption-char") as HTMLElement[];
-      gsap.set(chars, { opacity: 0, y: 10 });
+      gsap.set(chars, { opacity: 0, y: 8 });
 
       // Batches card wrapper reveals as they scroll into view to avoid lag spikes
       ScrollTrigger.batch(wrappers, {
         scroller,
-        start: "top 85%",
+        start: "top 90%",
         once: true, // Only animate once
         onEnter: (batch) => {
-          // 1. Animate wrapper opacity, scaling, and sharpening
+          // 1. Animate wrapper opacity and scaling (GPU-accelerated transform/opacity only)
           gsap.to(batch, {
             opacity: 1,
             scale: 1,
-            filter: "none",
-            duration: 0.8,
+            duration: 0.6,
             ease: "power2.out",
-            stagger: 0.15,
-            willChange: "transform, filter",
+            stagger: 0.1,
+            willChange: "transform, opacity",
             onComplete: function () {
               // Remove will-change after animation to free up GPU memory
               gsap.set(this.targets(), { clearProps: "willChange" });
@@ -137,9 +135,9 @@ export default function Collage() {
                 opacity: 1,
                 y: 0,
                 stagger: 0.03, // tight stagger for quick flourish
-                duration: 0.5,
+                duration: 0.4,
                 ease: "power2.out",
-                delay: 0.35, // starts slightly after card finishes scaling
+                delay: 0.25, // starts slightly after card finishes scaling
               });
             }
           });
@@ -153,9 +151,8 @@ export default function Collage() {
       // ease: "none" is critical for scrub sync (GSAP skill rule)
       cards.forEach((card, idx) => {
         gsap.to(card, {
-          y: -100 * idx, // higher index cards move faster and overlap the ones above them
+          y: -140 * idx, // higher index cards move faster and overlap the ones above them
           ease: "none",
-          scrollScale: 1,
           scrollTrigger: {
             trigger: wrappers[idx],
             scroller,
@@ -167,7 +164,7 @@ export default function Collage() {
       });
 
       // Refresh ScrollTrigger positions after layout settles
-      const t = setTimeout(() => ScrollTrigger.refresh(), 800);
+      const t = setTimeout(() => ScrollTrigger.refresh(), 600);
       return () => clearTimeout(t);
     },
     { scope: containerRef, dependencies: [isMobile] }
@@ -200,18 +197,20 @@ export default function Collage() {
       </div>
 
       {/* Cards List */}
-      <div className="w-full max-w-[360px] flex flex-col gap-12 py-6 overflow-visible">
+      <div className="w-full max-w-[340px] flex flex-col py-6 overflow-visible">
         {photos.map((photo, i) => (
           <div
             key={i}
-            className="gallery-card-wrapper w-full overflow-visible"
+            // Use negative top margin on cards i > 0 so they overlap at start
+            className={`gallery-card-wrapper w-full overflow-visible ${i > 0 ? "-mt-28" : ""}`}
+            style={{ zIndex: i + 1 }}
           >
             <div
               ref={(el) => { cardRefs.current[i] = el; }}
-              className="gallery-card bg-white shadow-[0_12px_36px_rgba(155,75,50,0.12)] border border-[#9B4B32]/5 flex flex-col overflow-hidden"
+              className="gallery-card bg-white shadow-[0_12px_36px_rgba(155,75,50,0.15)] border border-[#9B4B32]/5 flex flex-col overflow-hidden"
               style={{
                 borderRadius: "28px",
-                padding: "16px 16px 16px 16px", // Thin cream/white border frame
+                padding: "16px 16px 16px 16px", // Thin border frame
                 transform: `rotate(${photo.rotate}deg)`,
                 transformOrigin: "center",
                 willChange: "transform",
@@ -223,7 +222,7 @@ export default function Collage() {
                   src={photo.src}
                   alt={photo.alt}
                   fill
-                  sizes="(max-width: 480px) 100vw, 360px"
+                  sizes="(max-width: 480px) 100vw, 340px"
                   className="object-cover pointer-events-none select-none"
                   priority={i < 2}
                 />
