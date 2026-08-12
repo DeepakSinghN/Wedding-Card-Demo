@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -86,15 +86,16 @@ export default function EventDetails() {
         {events.map((event, i) => (
           <div
             key={event.id}
-            className="bg-white shadow-[0_10px_30px_rgba(155,75,50,0.1)] hover:shadow-[0_15px_40px_rgba(155,75,50,0.15)] transition-shadow duration-300 flex flex-col items-center text-center relative border border-[#9B4B32]/5"
+            className="bg-white shadow-[0_10px_30px_rgba(155,75,50,0.1)] hover:shadow-[0_15px_40px_rgba(155,75,50,0.15)] transition-shadow duration-300 flex flex-col items-center justify-between text-center relative border border-[#9B4B32]/5"
             style={{
               borderRadius: "28px",
-              padding: "24px 20px 28px 20px",
+              padding: "40px 24px 44px 24px",
+              minHeight: "480px",
             }}
           >
             {/* Event Number Badge */}
             <div
-              className="absolute top-4 right-5 text-[#9B4B32]/40 font-medium"
+              className="absolute top-5 right-6 text-[#9B4B32]/40 font-medium"
               style={{
                 fontFamily: "var(--font-body), sans-serif",
                 fontSize: "clamp(10px, 3cqi, 12px)",
@@ -105,17 +106,17 @@ export default function EventDetails() {
 
             {/* Ganesh Ji Icon */}
             <div
-              className="flex items-center justify-center mb-4"
+              className="flex items-center justify-center mb-2"
               style={{
-                height: "60px",
+                height: "90px",
                 width: "100%",
               }}
             >
               <Image
                 src={GaneshJi}
                 alt="Lord Ganesha"
-                width={50}
-                height={50}
+                width={70}
+                height={90}
                 style={{
                   height: "100%",
                   width: "auto",
