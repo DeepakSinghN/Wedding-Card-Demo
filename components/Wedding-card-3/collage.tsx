@@ -151,7 +151,7 @@ export default function Collage() {
       // ease: "none" is critical for scrub sync (GSAP skill rule)
       cards.forEach((card, idx) => {
         gsap.to(card, {
-          y: -140 * idx, // higher index cards move faster and overlap the ones above them
+          y: -240 * idx, // higher index cards move faster and overlap the ones above them
           ease: "none",
           scrollTrigger: {
             trigger: wrappers[idx],
@@ -202,7 +202,7 @@ export default function Collage() {
           <div
             key={i}
             // Use negative top margin on cards i > 0 so they overlap at start
-            className={`gallery-card-wrapper w-full overflow-visible ${i > 0 ? "-mt-28" : ""}`}
+            className={`gallery-card-wrapper w-full overflow-visible ${i > 0 ? "-mt-44" : ""}`}
             style={{ zIndex: i + 1 }}
           >
             <div
