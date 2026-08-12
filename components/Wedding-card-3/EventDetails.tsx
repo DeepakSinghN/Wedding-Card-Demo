@@ -66,7 +66,7 @@ export default function EventDetails() {
   if (!mounted) return null;
 
   return (
-    <section className="w-full bg-[#FCEAEA] py-12 px-6 flex flex-col items-center gap-10">
+    <section className="w-full bg-[#FCEAEA] py-12 px-6 flex flex-col items-center gap-10 mt-20">
       {/* Header section */}
       <div className="flex flex-col items-center gap-2">
         <p
@@ -82,15 +82,17 @@ export default function EventDetails() {
       </div>
 
       {/* Cards List */}
-      <div className="w-full max-w-[420px] flex flex-col gap-8">
+      <div className="w-full max-w-[360px] flex flex-col gap-12 py-6">
         {events.map((event, i) => (
           <div
             key={event.id}
-            className="bg-white shadow-[0_10px_30px_rgba(155,75,50,0.1)] hover:shadow-[0_15px_40px_rgba(155,75,50,0.15)] transition-shadow duration-300 flex flex-col items-center justify-between text-center relative border border-[#9B4B32]/5"
+            className="bg-white shadow-[0_10px_30px_rgba(155,75,50,0.1)] hover:shadow-[0_15px_40px_rgba(155,75,50,0.15)] transition-all duration-300 flex flex-col items-center justify-between text-center relative border border-[#9B4B32]/5"
             style={{
               borderRadius: "28px",
               padding: "10px 24px 44px 24px",
               minHeight: "540px",
+              transform: i % 2 === 0 ? "rotate(9deg)" : "rotate(-9deg)",
+              transformOrigin: "center",
             }}
           >
             {/* Event Number Badge */}
@@ -108,7 +110,7 @@ export default function EventDetails() {
             <div className="flex flex-col items-center w-full">
               {/* Ganesh Ji Icon */}
               <div
-                className="flex items-center justify-center mb-1"
+                className="flex items-center justify-center"
                 style={{
                   height: "90px",
                   width: "100%",
@@ -129,25 +131,27 @@ export default function EventDetails() {
               </div>
 
               {/* Divider */}
-              <div className="w-2/3 h-[1px] bg-gradient-to-r from-transparent via-[#9B4B32]/20 to-transparent mb-4" />
+              <div className="w-2/3 h-[1px] bg-gradient-to-r from-transparent via-[#9B4B32]/20 to-transparent mb-5" />
 
-              {/* Title */}
-              <h3
-                style={{
-                  fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
-                  fontSize: "clamp(26px, 9cqi, 48px)",
-                  fontWeight: 400,
-                  color: "#7A2E1F",
-                  lineHeight: 1.2,
-                  marginBottom: "8px",
-                }}
-              >
-                {event.title}
-              </h3>
 
-              {/* Tiny ornament */}
-              <div className="w-16 h-0.5 bg-[#C9A84C] mb-4" />
             </div>
+
+            {/* Title */}
+            <h3
+              style={{
+                fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
+                fontSize: "clamp(26px, 9cqi, 48px)",
+                fontWeight: 400,
+                color: "#7A2E1F",
+                lineHeight: 1.2,
+                marginBottom: "8px",
+              }}
+            >
+              {event.title}
+            </h3>
+
+            {/* Tiny ornament */}
+            <div className="w-16 h-0.5 bg-[#C9A84C] mb-1" />
 
             {/* Content stack */}
             <div className="flex flex-col gap-3 w-full">
