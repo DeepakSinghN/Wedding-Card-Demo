@@ -38,12 +38,19 @@ export default function WeddingCardThreePage() {
       lenis.raf(time * 1000);
     };
 
-    lenis.on("scroll", ScrollTrigger.update);
+    const updateScroll = () => {
+      ScrollTrigger.update();
+    };
+
+    lenis.on("scroll", updateScroll);
+    wrapper.addEventListener("scroll", updateScroll, { passive: true });
+    
     gsap.ticker.add(updateLenis);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
       gsap.ticker.remove(updateLenis);
+      wrapper.removeEventListener("scroll", updateScroll);
       lenis.destroy();
     };
   }, [isRevealed]);

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -204,7 +204,7 @@ export default function Collage() {
             style={{
               // Start position: the center of the first card (at index 0) aligned with the viewport center
               left: "50%",
-              transform: "translateX(-130px)", // Translate by half of W (260/2)
+              marginLeft: "-130px", // Use margin-left to align the first card's center (260/2) with the screen center
               gap: "32px",
               overflow: "visible",
             }}
