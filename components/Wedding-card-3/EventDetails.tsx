@@ -1,4 +1,4 @@
-"use client";
+ï»¿"use client";
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -22,7 +22,7 @@ const events: WeddingEvent[] = [
   {
     id: "sangeet",
     title: "Sangeet Night",
-    dateTime: "Friday, Nov 27 • 7:00 PM Onwards",
+    dateTime: "Friday, Nov 27 - 7:00 PM Onwards",
     location: "Grand Ballroom, The Oberoi Amarvilas",
     dressCode: "Indo-Western Ethnic / Bling",
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
@@ -30,7 +30,7 @@ const events: WeddingEvent[] = [
   {
     id: "haldi",
     title: "Haldi Ceremony",
-    dateTime: "Saturday, Nov 28 • 10:00 AM Onwards",
+    dateTime: "Saturday, Nov 28 - 10:00 AM Onwards",
     location: "Lawn Area, The Oberoi Amarvilas",
     dressCode: "Yellow Traditional Wear",
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
@@ -38,7 +38,7 @@ const events: WeddingEvent[] = [
   {
     id: "cocktail",
     title: "Cocktail Party",
-    dateTime: "Saturday, Nov 28 • 7:00 PM Onwards",
+    dateTime: "Saturday, Nov 28 - 7:00 PM Onwards",
     location: "Poolside Club, The Oberoi Amarvilas",
     dressCode: "Cocktail Chic / Evening Gown",
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
@@ -46,7 +46,7 @@ const events: WeddingEvent[] = [
   {
     id: "wedding",
     title: "Wedding Ceremony",
-    dateTime: "Sunday, Nov 29 • 11:00 AM Onwards",
+    dateTime: "Sunday, Nov 29 - 11:00 AM Onwards",
     location: "Main Hall, The Oberoi Amarvilas",
     dressCode: "Traditional Formal",
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
@@ -54,14 +54,14 @@ const events: WeddingEvent[] = [
   {
     id: "reception",
     title: "Grand Reception",
-    dateTime: "Monday, Nov 30 • 7:00 PM Onwards",
+    dateTime: "Monday, Nov 30 - 7:00 PM Onwards",
     location: "Grand Lawn, The Oberoi Amarvilas",
     dressCode: "Western Formal / Tuxedo",
     mapLink: "https://www.google.com/maps/search/?api=1&query=The+Oberoi+Amarvilas+Agra",
   },
 ];
 
-// 4 transitions for 5 events ? 400% extra scroll distance
+// 4 transitions for 5 events = 400% extra scroll distance
 const SCROLL_MULTIPLIER = events.length - 1;
 
 export default function EventDetails() {
@@ -75,34 +75,31 @@ export default function EventDetails() {
 
   useGSAP(
     () => {
-      // -- Skill rule: always guard with prefers-reduced-motion --------------
+      // Guard: always check prefers-reduced-motion (GSAP skill rule)
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       if (!sectionRef.current) return;
 
-      // -- Skill rule: pass custom Lenis scroller explicitly -----------------
+      // Pass custom Lenis scroller explicitly (GSAP skill: Lenis section)
       const scroller = sectionRef.current.closest("#card-scroll-container");
       if (!scroller) return;
 
       const cards = cardRefs.current.filter(Boolean) as HTMLDivElement[];
       if (cards.length === 0) return;
 
-      // Parked offset: 62% of viewport height hides cards fully behind the
-      // 46%-tall envelope overlay sitting at the bottom of the section.
+      // Parked offset: 62vh hides cards fully behind the 46%-tall envelope overlay
       const parkedY = () => window.innerHeight * 0.62;
-      const exitY   = () => -window.innerHeight * 0.8;
+      const exitY = () => -window.innerHeight * 0.8;
 
-      // -- Initial states ----------------------------------------------------
-      // Skill rule: only animate transform + opacity (GPU-composited)
+      // Initial states - only animate transform + opacity (GPU-composited, GSAP skill rule)
       gsap.set(cards[0], { y: 0, opacity: 1 });
       gsap.set(cards.slice(1), { y: parkedY, opacity: 0 });
 
-      // -- Pinned scrub timeline ---------------------------------------------
-      // Skill recipe (Pinned Timeline):
-      //   pin: true  ? pins the trigger element (sectionRef) at top:0
-      //   scrub: 1   ? smooth 1-second lag scrubbing
-      //   ease: none ? REQUIRED for scrub; easing breaks scroll sync
-      //   anticipatePin: 1 ? prevents pin jump
-      //   invalidateOnRefresh: true ? recalculates on resize
+      // Pinned scrub timeline (GSAP skill recipe: Pinned Timeline)
+      // - pin: true   pins the trigger element at top:0
+      // - scrub: 1    smooth 1-second lag scrubbing
+      // - ease: none  REQUIRED for scrub - easing breaks scroll sync
+      // - anticipatePin: 1  prevents pin jump
+      // - invalidateOnRefresh: true  recalculates on resize
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -117,8 +114,7 @@ export default function EventDetails() {
         },
       });
 
-      // Each swap occupies 1 unit of timeline duration.
-      // total timeline duration = SCROLL_MULTIPLIER units.
+      // Card swap sequence - each swap gets 1 unit of timeline duration
       cards.forEach((_, i) => {
         if (i === 0) return;
 
@@ -131,7 +127,7 @@ export default function EventDetails() {
           pos
         );
 
-        // INCOMING: next card rises from behind envelope (slight overlap +0.05)
+        // INCOMING: next card rises from behind envelope (slight overlap)
         tl.fromTo(
           cards[i],
           { y: parkedY, opacity: 0 },
@@ -140,7 +136,7 @@ export default function EventDetails() {
         );
       });
 
-      // Skill rule: refresh after layout settles
+      // Refresh after layout settles (GSAP skill rule)
       const t = setTimeout(() => ScrollTrigger.refresh(), 1000);
       return () => clearTimeout(t);
     },
@@ -150,18 +146,16 @@ export default function EventDetails() {
   if (!mounted) return null;
 
   return (
-    /*
-     * sectionRef = GSAP pin trigger.
-     * height: 100vh ? normal viewport-height section.
-     * GSAP adds pinSpacing below so the next page section follows correctly.
-     * overflow: visible ? cards must be able to animate above/below the clip boundary.
-     */
+    // sectionRef = GSAP pin trigger
+    // height: 100vh - normal viewport-height section
+    // GSAP pinSpacing adds spacer below so next section follows correctly
+    // overflow: visible - cards must animate above/below clip boundary
     <section
       ref={sectionRef}
       className="relative w-full flex-shrink-0 bg-[#FBEAEA]"
       style={{ height: "100vh", overflow: "visible" }}
     >
-      {/* -- Section label ------------------------------------------------- */}
+      {/* Section label */}
       <div
         className="absolute top-0 left-0 w-full flex justify-center z-10"
         style={{ paddingTop: "clamp(18px, 4.5vh, 36px)" }}
@@ -178,12 +172,11 @@ export default function EventDetails() {
       </div>
 
       {/*
-       * -- Card stack ------------------------------------------------------
-       * All cards are absolute, stacked at the same (top, inset-x) position.
-       * z-index: card 0 highest ? starts on top visually.
-       * Cards i > 0 are hidden behind the envelope (y ˜ 62vh) until animated.
-       * overflow: visible so exiting/entering cards are not clipped.
-       */}
+        Card stack - all cards absolute, stacked at the same position.
+        z-index: card 0 highest - starts on top visually.
+        Cards i > 0 are hidden behind the envelope (y 62vh) until animated.
+        overflow: visible so exiting/entering cards are not clipped.
+      */}
       <div
         className="absolute left-0 w-full"
         style={{
@@ -202,7 +195,6 @@ export default function EventDetails() {
               inset: "0 20px",
               zIndex: events.length - i,
               padding: "clamp(18px, 3.5vh, 32px) 20px",
-              // Pre-set initial state to avoid flash before GSAP runs
               opacity: i === 0 ? 1 : 0,
               transform: i === 0 ? "translateY(0px)" : "translateY(62vh)",
               willChange: "transform, opacity",
@@ -279,15 +271,14 @@ export default function EventDetails() {
       </div>
 
       {/*
-       * -- Static envelope illustration ------------------------------------
-       * Anchored to the bottom of the pinned section (absolute bottom-0).
-       * zIndex: 40 ? sits ABOVE all cards (cards max z ˜ events.length + 10).
-       * This is what conceals cards parked at y˜62vh:
-       *   they sit physically below this layer and are not visible.
-       * As each card animates to y:0 it rises above this overlay into view —
-       *   the "letter being pulled from the envelope" moment.
-       * pointer-events-none keeps card links clickable.
-       */}
+        Static envelope illustration - never moves.
+        Anchored to the bottom of the pinned section (absolute bottom-0).
+        zIndex: 40 - sits ABOVE all cards (cards max z = events.length).
+        Cards parked at y=62vh are hidden behind this layer.
+        As each card animates to y:0 it rises above this overlay into view -
+        the "letter being pulled from the envelope" moment.
+        pointer-events-none keeps card links clickable.
+      */}
       <div
         className="absolute bottom-0 left-0 w-full pointer-events-none select-none"
         style={{ height: "46%", zIndex: 40 }}
