@@ -115,11 +115,16 @@ export default function EventDetails() {
       for (let i = 1; i < events.length; i++) {
         const card = contentRefs.current[i];
         if (card) {
-          tl.to(card, {
-            y: "0vh",
-            ease: "sine.inOut",
-            duration: 1,
-          }, `card-${i}`);
+          tl.fromTo(
+            card,
+            { y: () => 0.88 * window.innerHeight },
+            {
+              y: 0,
+              ease: "sine.inOut",
+              duration: 1,
+            },
+            `card-${i}`
+          );
         }
       }
 
