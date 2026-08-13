@@ -1,97 +1,185 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState, useEffect } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+
+// Import closing section resources
+import CoupleImages from "./Closing-section-resources/Couple-images.svg";
+import BottomCenterFlower from "./Closing-section-resources/Bottom-center-flower.svg";
+import BottomCornerFlower from "./Closing-section-resources/Bottom-corner-flower.svg";
+import SideFlowerBranches from "./Closing-section-resources/Side-flower-branches.svg";
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Closing() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(motionQuery.matches);
-    const motionListener = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    motionQuery.addEventListener("change", motionListener);
-    return () => motionQuery.removeEventListener("change", motionListener);
+    setMounted(true);
   }, []);
 
   useGSAP(
     () => {
-      if (prefersReducedMotion) return;
+      // Guard: always check prefers-reduced-motion (GSAP skill rule)
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (!sectionRef.current) return;
 
-      const triggerElement = sectionRef.current;
-      if (!triggerElement) return;
+      const scroller = sectionRef.current.closest("#card-scroll-container");
+      if (!scroller) return;
 
-      const scrollerElement = triggerElement.closest("#card-scroll-container");
-      if (!scrollerElement) return;
-
-      // Set starting states
-      gsap.set(".closing-heading", { opacity: 0, y: 30 });
-      gsap.set(".closing-line", { scaleX: 0 });
-      gsap.set(".closing-text", { opacity: 0, y: 20 });
+      // ── Initial State Setup ───────────────────────────────────────────────
+      gsap.set(".branch-left", { opacity: 0, x: -60, rotate: -15 });
+      gsap.set(".branch-right", { opacity: 0, x: 60, rotate: 15 });
+      gsap.set(".text-block-1", { opacity: 0, y: 30 });
+      gsap.set(".text-block-2", { opacity: 0, y: 30 });
+      gsap.set(".couple-img", { opacity: 0, y: 80 });
+      gsap.set(".bottom-flowers-wrap", { opacity: 0, y: 100 });
 
       // Create entrance timeline
       const tl = gsap.timeline({
         scrollTrigger: {
-          trigger: triggerElement,
-          scroller: scrollerElement,
-          start: "top 40%", // Animates when section top is 40% from top of screen (60% scrolled into view)
-          toggleActions: "play none none none"
-        }
+          trigger: sectionRef.current,
+          scroller,
+          start: "top 65%", // Trigger when section top enters viewport
+          toggleActions: "play none none none",
+        },
       });
 
-      tl.to(".closing-heading", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" })
-        .to(".closing-line", { scaleX: 1, duration: 1.0, ease: "power3.out" }, "-=0.4")
-        .to(".closing-text", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", stagger: 0.2 }, "-=0.6");
+      tl.to(".branch-left", { opacity: 1, x: 0, rotate: 0, duration: 1.0, ease: "power2.out" }, 0.0)
+        .to(".branch-right", { opacity: 1, x: 0, rotate: 0, duration: 1.0, ease: "power2.out" }, 0.1)
+        .to(".text-block-1", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.3)
+        .to(".text-block-2", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.4)
+        .to(".couple-img", { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" }, 0.2)
+        .to(".bottom-flowers-wrap", { opacity: 1, y: 0, duration: 1.4, ease: "power2.out" }, 0.3);
 
-      // Refresh ScrollTrigger after layouts render
-      const refreshTimeout = setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 1200);
-
-      return () => clearTimeout(refreshTimeout);
+      // Refresh ScrollTrigger positions after layout settles
+      const t = setTimeout(() => ScrollTrigger.refresh(), 800);
+      return () => clearTimeout(t);
     },
-    { scope: sectionRef, dependencies: [prefersReducedMotion] }
+    { scope: sectionRef }
   );
+
+  if (!mounted) return null;
 
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen flex-shrink-0 bg-[#FCEDEC] select-none overflow-hidden flex flex-col items-center justify-center p-6 text-center"
+      className="relative w-full h-screen flex-shrink-0 bg-[#FCEAEA] select-none overflow-hidden flex flex-col justify-between"
     >
-      {/* Decorative Muted Gold Borders */}
-      <div className="absolute inset-[6%] border border-[#C5A880]/30 pointer-events-none rounded-3xl" />
-      <div className="absolute inset-[6.8%] border border-[#C5A880]/15 pointer-events-none rounded-[22px]" />
-
-      <div className="relative z-10 max-w-[84%] flex flex-col items-center">
-        {/* Cursive heading */}
-        <h2
-          className="closing-heading text-[10cqi] text-[#C5A880] font-normal mb-2"
-          style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
+      {/* ── UPPER ZONE: Message + Floral Accents (58%) ─────────────────── */}
+      <div className="relative w-full h-[58%] overflow-visible">
+        {/* Left Cherry Blossom Branch (Upper Left) */}
+        <div
+          className="branch-left absolute top-8 left-[-16px] w-[190px] h-[130px] pointer-events-none"
+          style={{ transformOrigin: "left top" }}
         >
-          We look forward to
-        </h2>
-        <h2
-          className="closing-heading text-[10cqi] text-[#C5A880] font-normal mb-16"
-          style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
-        >
-          celebrating with you
-        </h2>
+          <Image
+            src={SideFlowerBranches}
+            alt=""
+            fill
+            className="object-contain object-left-top"
+          />
+        </div>
 
-        {/* Separator line */}
-        <div className="closing-line w-24 h-[1px] bg-[#C5A880]/40 mb-8 origin-center" />
-
-        {/* Signatures */}
-        <p
-          className="closing-text text-[11cqi] text-[#A02C2D] font-normal tracking-[2px] leading-[5rem]"
-          style={{ fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive" }}
+        {/* Right Cherry Blossom Branch (Mid Right - Flipped) */}
+        <div
+          className="branch-right absolute top-[36%] right-[-16px] w-[190px] h-[130px] pointer-events-none scale-x-[-1]"
+          style={{ transformOrigin: "right center" }}
         >
-          Daniel <br /> & <br /> Maria
-        </p>
+          <Image
+            src={SideFlowerBranches}
+            alt=""
+            fill
+            className="object-contain object-right-top"
+          />
+        </div>
+
+        {/* Text Block 1 (Upper Right) */}
+        <div
+          className="text-block-1 absolute top-[10%] right-[6%] w-[52%] text-[#9B4B32] text-center"
+        >
+          <h2
+            style={{
+              fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
+              fontSize: "clamp(1.9rem, 7cqi, 2.7rem)",
+              lineHeight: 1.25,
+            }}
+          >
+            We looking<br />forward to
+          </h2>
+        </div>
+
+        {/* Text Block 2 (Mid Left) */}
+        <div
+          className="text-block-2 absolute top-[44%] left-[6%] w-[52%] text-[#9B4B32] text-center"
+        >
+          <h2
+            style={{
+              fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
+              fontSize: "clamp(1.9rem, 7cqi, 2.7rem)",
+              lineHeight: 1.25,
+            }}
+          >
+            celebrate with<br />you
+          </h2>
+        </div>
+      </div>
+
+      {/* ── LOWER ZONE: Couple + Floral Border (42%) ───────────────────── */}
+      <div className="relative w-full h-[42%] overflow-visible flex justify-center items-end">
+        {/* Couple Illustration */}
+        {/* Positioned slightly raised so they nestle inside the bottom flowers */}
+        <div
+          className="couple-img absolute bottom-[14%] w-[75%] h-[80%] max-w-[280px] z-0 pointer-events-none"
+        >
+          <Image
+            src={CoupleImages}
+            alt="Bride and Groom Illustration"
+            fill
+            className="object-contain object-bottom"
+            priority
+          />
+        </div>
+
+        {/* ── Dense Bottom Floral Border ───────────────────────────────── */}
+        {/* z-10 overlays the bottom portion of the couple for nesting effect */}
+        <div
+          className="bottom-flowers-wrap absolute bottom-0 left-0 w-full h-[42%] z-10 flex items-end justify-center pointer-events-none"
+        >
+          {/* Left Corner Flowers */}
+          <div className="absolute bottom-0 left-0 w-[55%] h-full">
+            <Image
+              src={BottomCornerFlower}
+              alt=""
+              fill
+              className="object-contain object-left-bottom"
+            />
+          </div>
+
+          {/* Right Corner Flowers (Flipped horizontally) */}
+          <div className="absolute bottom-0 right-0 w-[55%] h-full scale-x-[-1]">
+            <Image
+              src={BottomCornerFlower}
+              alt=""
+              fill
+              className="object-contain object-left-bottom"
+            />
+          </div>
+
+          {/* Center Flowers (On top of corner flowers) */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[85%] h-[92%]">
+            <Image
+              src={BottomCenterFlower}
+              alt=""
+              fill
+              className="object-contain object-bottom"
+            />
+          </div>
+        </div>
       </div>
     </section>
   );
