@@ -32,31 +32,43 @@ export default function Closing() {
       if (!scroller) return;
 
       // ── Initial State Setup ───────────────────────────────────────────────
+      // 1. Top heading: normal reveal (hidden initially)
       gsap.set(".top-heading-wrap", { opacity: 0, y: -20 });
-      gsap.set(".branch-left", { opacity: 0, x: -60, rotate: -15 });
-      gsap.set(".branch-right", { opacity: 0, x: 60, rotate: 15 });
-      gsap.set(".text-block-1", { opacity: 0, y: 30 });
-      gsap.set(".text-block-2", { opacity: 0, y: 30 });
-      gsap.set(".couple-img", { opacity: 0, y: 80 });
-      gsap.set(".bottom-flowers-wrap", { opacity: 0, y: 100 });
+      // 2 & 3. Cherry blossom branches (hidden and shifted out to left/right sides)
+      gsap.set(".branch-left", { opacity: 0, x: -200, rotate: -15 });
+      gsap.set(".branch-right", { opacity: 0, x: 200, rotate: 15 });
+      // 4. Text Blocks: hidden (reveals after branches)
+      gsap.set([".text-block-1", ".text-block-2"], { opacity: 0, y: 30 });
+      // 5. Couple Illustration: hidden and slightly scaled down
+      gsap.set(".couple-img", { opacity: 0, scale: 0.95 });
+      // 6, 7 & 8. Bottom flowers: hidden and shifted out from bottom-left, bottom-right, and bottom
+      gsap.set(".flower-left", { opacity: 0, x: -120, y: 120 });
+      gsap.set(".flower-right", { opacity: 0, x: 120, y: 120 });
+      gsap.set(".flower-center", { opacity: 0, y: 200 });
 
-      // Create entrance timeline
+      // Create entrance timeline with 60% screen scrolltrigger
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
           scroller,
-          start: "top 65%", // Trigger when section top enters viewport
+          start: "top 60%", // Trigger when section top hits 60% of viewport height
           toggleActions: "play none none none",
         },
       });
 
+      // ── Staggered Reveal Sequence ─────────────────────────────────────────
       tl.to(".top-heading-wrap", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.0)
-        .to(".branch-left", { opacity: 1, x: 0, rotate: 0, duration: 1.0, ease: "power2.out" }, 0.1)
-        .to(".branch-right", { opacity: 1, x: 0, rotate: 0, duration: 1.0, ease: "power2.out" }, 0.2)
-        .to(".text-block-1", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.4)
-        .to(".text-block-2", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.5)
-        .to(".couple-img", { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" }, 0.3)
-        .to(".bottom-flowers-wrap", { opacity: 1, y: 0, duration: 1.4, ease: "power2.out" }, 0.4);
+        // Branches slide in from the left and right sides
+        .to(".branch-left", { opacity: 1, x: 0, rotate: 0, duration: 1.2, ease: "power2.out" }, 0.1)
+        .to(".branch-right", { opacity: 1, x: 0, rotate: 0, duration: 1.2, ease: "power2.out" }, 0.1)
+        // Couple illustration fades in from center
+        .to(".couple-img", { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, 0.2)
+        // Flowers slide up from left-bottom, right-bottom, and center-bottom
+        .to(".flower-left", { opacity: 1, x: 0, y: 0, duration: 1.2, ease: "power2.out" }, 0.3)
+        .to(".flower-right", { opacity: 1, x: 0, y: 0, duration: 1.2, ease: "power2.out" }, 0.3)
+        .to(".flower-center", { opacity: 1, y: 0, duration: 1.4, ease: "power2.out" }, 0.4)
+        // Text blocks reveal sequentially after branches complete their animation (around 1.3s mark)
+        .to([".text-block-1", ".text-block-2"], { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power2.out" }, 1.35);
 
       // Refresh ScrollTrigger positions after layout settles
       const t = setTimeout(() => ScrollTrigger.refresh(), 800);
@@ -70,30 +82,25 @@ export default function Closing() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full h-screen flex-shrink-0 bg-[#FCEAEA] select-none overflow-hidden flex flex-col justify-between"
+      className="relative w-full h-screen flex-shrink-0 bg-[#FCEAEA] select-none overflow-hidden flex flex-col justify-between mt-20"
     >
       {/* Top heading */}
       <div
-        className="top-heading-wrap absolute top-0 left-0 w-full text-center z-20"
+        className="top-heading-wrap flex justify-center items-center absolute top-0 left-0 w-full text-center z-20"
         style={{ paddingTop: "clamp(24px, 6vh, 48px)" }}
       >
         <h1
           style={{
             fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
-            fontSize: "clamp(1.7rem, 6cqi, 2.4rem)",
+            fontSize: "clamp(1.7rem, 9cqi, 2.4rem)",
             color: "#9B4B32",
-            lineHeight: 1.2,
+            lineHeight: 1.6,
             padding: "0 16px",
           }}
+          className="max-w-[90%]"
         >
           We looking forwards to celebrate with you
         </h1>
-        <div
-          className="w-20 h-[1.5px] mx-auto mt-2"
-          style={{
-            background: "linear-gradient(to right, transparent, #C9A84C, transparent)",
-          }}
-        />
       </div>
 
       {/* ── UPPER ZONE: Message + Floral Accents (58%) ─────────────────── */}
@@ -191,7 +198,7 @@ export default function Closing() {
           className="bottom-flowers-wrap absolute bottom-0 left-0 w-full h-[100%] z-10 flex items-end justify-center pointer-events-none"
         >
           {/* Left Corner Flowers */}
-          <div className="absolute bottom-[-20%] left-[-10%] w-[70%] h-[70%]">
+          <div className="flower-left absolute bottom-[-20%] left-[-10%] w-[70%] h-[70%]">
             <Image
               src={BottomCornerFlower}
               alt=""
@@ -201,7 +208,7 @@ export default function Closing() {
           </div>
 
           {/* Right Corner Flowers (Flipped horizontally) */}
-          <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] scale-x-[-1]">
+          <div className="flower-right absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] scale-x-[-1]">
             <Image
               src={BottomCornerFlower}
               alt=""
@@ -211,7 +218,7 @@ export default function Closing() {
           </div>
 
           {/* Center Flowers (On top of corner flowers) */}
-          <div className="absolute bottom-[-50%] left-1/2 -translate-x-1/2 w-[200%] h-[150%]">
+          <div className="flower-center absolute bottom-[-50%] left-1/2 -translate-x-1/2 w-[200%] h-[150%]">
             <Image
               src={BottomCenterFlower}
               alt=""
