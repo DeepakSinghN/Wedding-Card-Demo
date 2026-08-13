@@ -46,12 +46,12 @@ export default function Closing() {
       gsap.set(".flower-right", { opacity: 0, x: 120, y: 120 });
       gsap.set(".flower-center", { opacity: 0, y: 200 });
 
-      // Create entrance timeline with 60% screen scrolltrigger
+      // Create entrance timeline with 95% screen scrolltrigger
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
           scroller,
-          start: "top 60%", // Trigger when section top hits 60% of viewport height
+          start: "top 95%", // Trigger when section top is 95% down viewport (just entering the screen)
           toggleActions: "play none none none",
         },
       });
@@ -70,7 +70,8 @@ export default function Closing() {
         // Text blocks reveal sequentially after branches complete their animation (around 1.3s mark)
         .to([".text-block-1", ".text-block-2"], { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power2.out" }, 1.35);
 
-      // Refresh ScrollTrigger positions after layout settles
+      // Force an immediate refresh and another one after images/layout settle
+      ScrollTrigger.refresh();
       const t = setTimeout(() => ScrollTrigger.refresh(), 800);
       return () => clearTimeout(t);
     },
