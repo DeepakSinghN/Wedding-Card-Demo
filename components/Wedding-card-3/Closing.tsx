@@ -46,12 +46,12 @@ export default function Closing() {
       gsap.set(".flower-right", { opacity: 0, x: 120, y: 120 });
       gsap.set(".flower-center", { opacity: 0, y: 200 });
 
-      // Create entrance timeline with 95% screen scrolltrigger
+      // Create entrance timeline with top bottom scrolltrigger
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: sectionRef.current,
           scroller,
-          start: "top 95%", // Trigger when section top is 95% down viewport (just entering the screen)
+          start: "top bottom", // Trigger as soon as the top of the section enters the bottom of the screen
           toggleActions: "play none none none",
         },
       });
@@ -60,25 +60,36 @@ export default function Closing() {
       tl.to(".top-heading-wrap", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.0)
         // Branches slide in from the left and right sides
         .to(".branch-left", { opacity: 1, x: 0, rotate: 0, duration: 1.2, ease: "power2.out" }, 0.1)
-        .to(".branch-right", { opacity: 1, x: 0, rotate: 0, duration: 1.2, ease: "power2.out" }, 0.1)
+        .to(".branch-right", { opacity: 1, x: 0, rotate: 0, duration: 1.2, ease: "power2.out" }, 0.2)
         // Couple illustration fades in from center
-        .to(".couple-img", { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, 0.2)
+        .to(".couple-img", { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, 0.3)
         // Flowers slide up from left-bottom, right-bottom, and center-bottom
-        .to(".flower-left", { opacity: 1, x: 0, y: 0, duration: 1.2, ease: "power2.out" }, 0.3)
-        .to(".flower-right", { opacity: 1, x: 0, y: 0, duration: 1.2, ease: "power2.out" }, 0.3)
-        .to(".flower-center", { opacity: 1, y: 0, duration: 1.4, ease: "power2.out" }, 0.4)
+        .to(".flower-left", { opacity: 1, x: 0, y: 0, duration: 1.2, ease: "power2.out" }, 0.4)
+        .to(".flower-right", { opacity: 1, x: 0, y: 0, duration: 1.2, ease: "power2.out" }, 0.4)
+        .to(".flower-center", { opacity: 1, y: 0, duration: 1.4, ease: "power2.out" }, 0.5)
         // Text blocks reveal sequentially after branches complete their animation (around 1.3s mark)
         .to([".text-block-1", ".text-block-2"], { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power2.out" }, 1.35);
 
-      // Force an immediate refresh and another one after images/layout settle
+      // Force multiple refreshes as layout/images load
       ScrollTrigger.refresh();
-      const t = setTimeout(() => ScrollTrigger.refresh(), 800);
-      return () => clearTimeout(t);
+      const t1 = setTimeout(() => ScrollTrigger.refresh(), 500);
+      const t2 = setTimeout(() => ScrollTrigger.refresh(), 1500);
+      const t3 = setTimeout(() => ScrollTrigger.refresh(), 3000);
+      
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
     },
     { scope: sectionRef }
   );
 
   if (!mounted) return null;
+
+  const handleImageLoad = () => {
+    ScrollTrigger.refresh();
+  };
 
   return (
     <section
@@ -116,6 +127,7 @@ export default function Closing() {
             alt=""
             fill
             className="object-contain object-left-top"
+            onLoad={handleImageLoad}
           />
         </div>
 
@@ -129,6 +141,7 @@ export default function Closing() {
             alt=""
             fill
             className="object-contain object-right-top"
+            onLoad={handleImageLoad}
           />
         </div>
 
@@ -190,6 +203,7 @@ export default function Closing() {
             fill
             className="object-contain object-bottom"
             priority
+            onLoad={handleImageLoad}
           />
         </div>
 
@@ -205,6 +219,7 @@ export default function Closing() {
               alt=""
               fill
               className="object-contain object-left-bottom"
+              onLoad={handleImageLoad}
             />
           </div>
 
@@ -215,6 +230,7 @@ export default function Closing() {
               alt=""
               fill
               className="object-contain object-left-bottom"
+              onLoad={handleImageLoad}
             />
           </div>
 
@@ -225,6 +241,7 @@ export default function Closing() {
               alt=""
               fill
               className="object-contain object-bottom"
+              onLoad={handleImageLoad}
             />
           </div>
         </div>
