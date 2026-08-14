@@ -4,16 +4,20 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import WineGlassSVG from "./WineGlassSVG";
 
-// Register DrawSVGPlugin
-gsap.registerPlugin(DrawSVGPlugin);
+// Register Plugins
+gsap.registerPlugin(DrawSVGPlugin, ScrollTrigger);
 
 export default function SaveTheDate() {
     const containerRef = useRef<HTMLDivElement>(null);
 
     useGSAP(() => {
         if (!containerRef.current) return;
+
+        const scroller = containerRef.current.closest("#card-scroll-container");
+        if (!scroller) return;
 
         // 1. Setup starting states for mask paths (hiding them)
         const maskPaths = [
@@ -41,12 +45,19 @@ export default function SaveTheDate() {
         // 3. Set starting states for text elements (fade + y-slide)
         gsap.set([".std-title", ".std-names", ".std-date", ".std-footnote"], {
             opacity: 0,
-            y: 12
+            y: 12,
+            force3D: true
         });
 
-        // 4. Create unified timeline
+        // 4. Create unified timeline bound to ScrollTrigger
         const tl = gsap.timeline({
-            defaults: { ease: "power2.inOut" }
+            defaults: { ease: "power2.inOut" },
+            scrollTrigger: {
+                trigger: containerRef.current,
+                scroller,
+                start: "top 90%", // Trigger when section top enters 90% down the screen
+                toggleActions: "play none none none"
+            }
         });
 
         // Glass Outline Sequence
@@ -68,12 +79,16 @@ export default function SaveTheDate() {
         tl.to(".mask-bow-right-tail", { drawSVG: "100%", duration: 0.5 }, 2.8);
 
         // Typography Sequence (starts shortly after bow begins drawing)
-        tl.to(".std-title", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 2.6);
-        tl.to(".std-names", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 2.9);
-        tl.to(".underline-flourish", { drawSVG: "100%", duration: 0.6 }, 3.3);
-        tl.to(".std-date", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 3.5);
-        tl.to(".std-footnote", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 3.8);
+        tl.to(".std-title", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", force3D: true }, 2.6);
+        tl.to(".std-names", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", force3D: true }, 2.9);
+        tl.to(".underline-flourish", { drawSVG: "100%", duration: 0.6, force3D: true }, 3.3);
+        tl.to(".std-date", { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", force3D: true }, 3.5);
+        tl.to(".std-footnote", { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", force3D: true }, 3.8);
 
+        // Force a layout calculation refresh for ScrollTrigger
+        ScrollTrigger.refresh();
+        const t = setTimeout(() => ScrollTrigger.refresh(), 800);
+        return () => clearTimeout(t);
     }, { scope: containerRef });
 
     return (
