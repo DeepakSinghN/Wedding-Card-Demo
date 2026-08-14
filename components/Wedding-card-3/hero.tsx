@@ -141,7 +141,7 @@ export default function Hero() {
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 1.2, ease: "easeOut", delay: 0.6 }}
                         >
-                            Daniel
+                            Vivek
                         </motion.h1>
 
                         <motion.span
@@ -161,7 +161,7 @@ export default function Hero() {
                             animate={{ y: 0, opacity: 1 }}
                             transition={{ duration: 1.2, ease: "easeOut", delay: 0.7 }}
                         >
-                            Maria
+                            Khushi
                         </motion.h1>
                     </div>
                 </motion.div>

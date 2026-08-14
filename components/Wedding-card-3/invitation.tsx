@@ -122,7 +122,7 @@ export default function Invitation() {
               className="text-[3.5cqi] italic font-semibold text-[#ac4052] opacity-90"
               style={{ fontFamily: "var(--font-display), Georgia, serif" }}
             >
-              - With love, Daniel & Maria
+              - With love, Vivek & Khushi
             </span>
           </div>
         </motion.div>

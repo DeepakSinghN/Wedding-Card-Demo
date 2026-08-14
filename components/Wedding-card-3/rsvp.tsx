@@ -190,7 +190,7 @@ export default function RSVP() {
 
                   {/* Couple Names */}
                   <h3 className="rsvp-animate-item text-[5.2cqi] text-[#9D2C2D] font-normal leading-tight mb-8" style={{ fontFamily: "Georgia, serif" }}>
-                    Daniel & Maria
+                    Vivek & Khushi
                   </h3>
 
                   {/* Form Fields */}

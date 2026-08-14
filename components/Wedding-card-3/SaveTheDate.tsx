@@ -102,7 +102,7 @@ export default function SaveTheDate() {
                     className="std-names text-[8cqi] font-normal leading-tight select-none my-1 mt-10"
                     style={{ fontFamily: "var(--font-anastasia), var(--font-script), cursive" }}
                 >
-                    Daniel & Maria
+                    Vivek & Khushi
                 </h3>
 
                 {/* 3. Decorative Underline Flourish */}
