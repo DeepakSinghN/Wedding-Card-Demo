@@ -7,10 +7,10 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
 // Import closing section resources
-import CoupleImages from "./Closing-section-resources/Couple-images.svg";
-import BottomCenterFlower from "./Closing-section-resources/Bottom-center-flower.svg";
-import BottomCornerFlower from "./Closing-section-resources/Bottom-corner-flower.svg";
-import SideFlowerBranches from "./Closing-section-resources/Side-flower-branches.svg";
+import CoupleImages from "./Closing-section-resources/Couple-images.png";
+import BottomCenterFlower from "./Closing-section-resources/Bottom-center-flower.png";
+import BottomCornerFlower from "./Closing-section-resources/Bottom-corner-flower.png";
+import SideFlowerBranches from "./Closing-section-resources/Side-flower-branches.png";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -128,6 +128,7 @@ export default function Closing() {
             src={SideFlowerBranches}
             alt=""
             fill
+            sizes="(max-width: 480px) 400px, 400px"
             className="object-contain object-left-top"
             onLoad={handleImageLoad}
           />
@@ -142,6 +143,7 @@ export default function Closing() {
             src={SideFlowerBranches}
             alt=""
             fill
+            sizes="(max-width: 480px) 400px, 400px"
             className="object-contain object-right-top"
             style={{ transform: "scale(-1, 1)" }}
             onLoad={handleImageLoad}
@@ -208,6 +210,7 @@ export default function Closing() {
             src={CoupleImages}
             alt="Bride and Groom Illustration"
             fill
+            sizes="(max-width: 480px) 280px, 280px"
             className="object-contain object-bottom"
             priority
             onLoad={handleImageLoad}
@@ -228,6 +231,7 @@ export default function Closing() {
               src={BottomCornerFlower}
               alt=""
               fill
+              sizes="(max-width: 480px) 336px, 336px"
               className="object-contain object-left-bottom"
               onLoad={handleImageLoad}
             />
@@ -242,6 +246,7 @@ export default function Closing() {
               src={BottomCornerFlower}
               alt=""
               fill
+              sizes="(max-width: 480px) 336px, 336px"
               className="object-contain object-left-bottom"
               onLoad={handleImageLoad}
             />
@@ -256,6 +261,7 @@ export default function Closing() {
               src={BottomCenterFlower}
               alt=""
               fill
+              sizes="(max-width: 480px) 960px, 960px"
               className="object-contain object-bottom"
               onLoad={handleImageLoad}
             />
