@@ -134,7 +134,7 @@ export default function Closing() {
 
         {/* Right Cherry Blossom Branch (Mid Right - Flipped) */}
         <div
-          className="branch-right absolute top-[65%] right-[50%] w-[400px] h-[300px] pointer-events-none scale-x-[-1]"
+          className="branch-right absolute top-[65%] right-[-20px] w-[400px] h-[300px] pointer-events-none scale-x-[-1]"
           style={{ transformOrigin: "right center" }}
         >
           <Image
