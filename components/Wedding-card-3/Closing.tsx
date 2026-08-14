@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -34,22 +34,22 @@ export default function Closing() {
 
       // ── Initial State Setup ───────────────────────────────────────────────
       // 1. Top heading: normal reveal (hidden initially)
-      gsap.set(".top-heading-wrap", { opacity: 0, y: -20 });
+      gsap.set(".top-heading-wrap", { opacity: 0, y: -20, force3D: true });
       // 2 & 3. Cherry blossom branches (hidden and shifted out to left/right sides)
-      gsap.set(".branch-left", { opacity: 0, x: -200, rotate: -15 });
-      gsap.set(".branch-right", { opacity: 0, x: 200, rotate: 15 });
+      gsap.set(".branch-left", { opacity: 0, x: -200, rotate: -15, force3D: true });
+      gsap.set(".branch-right", { opacity: 0, x: 200, rotate: 15, force3D: true });
       // 4. Text Blocks: hidden (reveals after branches)
-      gsap.set([".text-block-1", ".text-block-2"], { opacity: 0, y: 30 });
+      gsap.set([".text-block-1", ".text-block-2"], { opacity: 0, y: 30, force3D: true });
       // 5. Couple Illustration: hidden and slightly scaled down
-      gsap.set(".couple-img", { opacity: 0, scale: 0.95 });
+      gsap.set(".couple-img", { opacity: 0, scale: 0.95, force3D: true });
       // 6, 7 & 8. Bottom flowers: hidden and shifted out from bottom-left, bottom-right, and bottom
-      gsap.set(".flower-left", { opacity: 0, x: -120, y: 120 });
-      gsap.set(".flower-right", { opacity: 0, x: 120, y: 120 });
-      gsap.set(".flower-center", { opacity: 0, y: 200 });
+      gsap.set(".flower-left", { opacity: 0, x: -120, y: 120, force3D: true });
+      gsap.set(".flower-right", { opacity: 0, x: 120, y: 120, force3D: true });
+      gsap.set(".flower-center", { opacity: 0, y: 200, force3D: true });
 
       // Create entrance timeline with top bottom scrolltrigger
       const tl = gsap.timeline({
-        delay: 1, // 0.5s delay before playing the timeline sequence
+        delay: 1, // 1s delay before playing the timeline sequence
         scrollTrigger: {
           trigger: sectionRef.current,
           scroller,
@@ -59,18 +59,18 @@ export default function Closing() {
       });
 
       // ── Staggered Reveal Sequence ─────────────────────────────────────────
-      tl.to(".top-heading-wrap", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.0)
+      tl.to(".top-heading-wrap", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", force3D: true }, 0.0)
         // Branches slide in from the left and right sides
-        .to(".branch-left", { opacity: 1, x: 0, rotate: 0, duration: 1.2, ease: "power2.out" }, 0.1)
-        .to(".branch-right", { opacity: 1, x: 0, rotate: 0, duration: 1.2, ease: "power2.out" }, 0.2)
+        .to(".branch-left", { opacity: 1, x: 0, rotate: 0.01, duration: 1.2, ease: "power2.out", force3D: true }, 0.1)
+        .to(".branch-right", { opacity: 1, x: 0, rotate: 0.01, duration: 1.2, ease: "power2.out", force3D: true }, 0.2)
         // Couple illustration fades in from center
-        .to(".couple-img", { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out" }, 0.3)
+        .to(".couple-img", { opacity: 1, scale: 1, duration: 1.2, ease: "power2.out", force3D: true }, 0.3)
         // Flowers slide up from left-bottom, right-bottom, and center-bottom
-        .to(".flower-left", { opacity: 1, x: 0, y: 0, duration: 1.2, ease: "power2.out" }, 0.4)
-        .to(".flower-right", { opacity: 1, x: 0, y: 0, duration: 1.2, ease: "power2.out" }, 0.4)
-        .to(".flower-center", { opacity: 1, y: 0, duration: 1.4, ease: "power2.out" }, 0.5)
+        .to(".flower-left", { opacity: 1, x: 0, y: 0, duration: 1.2, ease: "power2.out", force3D: true }, 0.4)
+        .to(".flower-right", { opacity: 1, x: 0, y: 0, duration: 1.2, ease: "power2.out", force3D: true }, 0.4)
+        .to(".flower-center", { opacity: 1, y: 0, duration: 1.4, ease: "power2.out", force3D: true }, 0.5)
         // Text blocks reveal sequentially after branches complete their animation (around 1.3s mark)
-        .to([".text-block-1", ".text-block-2"], { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power2.out" }, 1.35);
+        .to([".text-block-1", ".text-block-2"], { opacity: 1, y: 0, duration: 0.8, stagger: 0.2, ease: "power2.out", force3D: true }, 1.35);
 
       // Force multiple refreshes as layout/images load
       ScrollTrigger.refresh();
@@ -101,7 +101,7 @@ export default function Closing() {
       {/* Top heading */}
       <div
         className="top-heading-wrap flex justify-center items-center absolute top-0 left-0 w-full text-center z-20"
-        style={{ paddingTop: "clamp(24px, 6vh, 48px)" }}
+        style={{ paddingTop: "clamp(24px, 6vh, 48px)", willChange: "transform, opacity" }}
       >
         <h1
           style={{
@@ -122,7 +122,7 @@ export default function Closing() {
         {/* Left Cherry Blossom Branch (Upper Left) */}
         <div
           className="branch-left absolute top-[30%] left-[-16px] w-[400px] h-[300px] pointer-events-none"
-          style={{ transformOrigin: "left top" }}
+          style={{ transformOrigin: "left top", willChange: "transform, opacity" }}
         >
           <Image
             src={SideFlowerBranches}
@@ -136,7 +136,7 @@ export default function Closing() {
         {/* Right Cherry Blossom Branch (Mid Right - Flipped) */}
         <div
           className="branch-right absolute top-[65%] right-[-53%] w-[400px] h-[300px] pointer-events-none"
-          style={{ transformOrigin: "right center" }}
+          style={{ transformOrigin: "right center", willChange: "transform, opacity" }}
         >
           <Image
             src={SideFlowerBranches}
@@ -151,6 +151,7 @@ export default function Closing() {
         {/* Text Block 1 (Upper Right) */}
         <div
           className="text-block-1 absolute top-[52%] right-[6%] w-[52%] text-[#9B4B32] text-center"
+          style={{ willChange: "transform, opacity" }}
         >
           <h2
             style={{
@@ -166,6 +167,7 @@ export default function Closing() {
         {/* Text Block 2 (Mid Left) */}
         <div
           className="text-block-2 absolute top-[73%] left-1/2 -translate-x-1/2 w-[52%] text-[#9B4B32] text-center"
+          style={{ willChange: "transform, opacity" }}
         >
           <h2
             style={{
@@ -180,6 +182,7 @@ export default function Closing() {
 
         <div
           className="text-block-2 absolute top-[93%] left-[1%] w-[52%] text-[#9B4B32] text-center"
+          style={{ willChange: "transform, opacity" }}
         >
           <h2
             style={{
@@ -199,6 +202,7 @@ export default function Closing() {
         {/* Positioned slightly raised so they nestle inside the bottom flowers */}
         <div
           className="couple-img absolute bottom-[7%] w-[90%] h-[100%] max-w-[280px] z-0 pointer-events-none"
+          style={{ willChange: "transform, opacity" }}
         >
           <Image
             src={CoupleImages}
@@ -216,7 +220,10 @@ export default function Closing() {
           className="bottom-flowers-wrap absolute bottom-0 left-0 w-full h-[100%] z-10 flex items-end justify-center pointer-events-none"
         >
           {/* Left Corner Flowers */}
-          <div className="flower-left absolute bottom-[-20%] left-[-10%] w-[70%] h-[70%]">
+          <div
+            className="flower-left absolute bottom-[-20%] left-[-10%] w-[70%] h-[70%]"
+            style={{ willChange: "transform, opacity" }}
+          >
             <Image
               src={BottomCornerFlower}
               alt=""
@@ -227,7 +234,10 @@ export default function Closing() {
           </div>
 
           {/* Right Corner Flowers (Flipped horizontally) */}
-          <div className="flower-right absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] scale-x-[-1]">
+          <div
+            className="flower-right absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] scale-x-[-1]"
+            style={{ willChange: "transform, opacity" }}
+          >
             <Image
               src={BottomCornerFlower}
               alt=""
@@ -238,7 +248,10 @@ export default function Closing() {
           </div>
 
           {/* Center Flowers (On top of corner flowers) */}
-          <div className="flower-center absolute bottom-[-50%] left-1/2 -translate-x-1/2 w-[200%] h-[150%]">
+          <div
+            className="flower-center absolute bottom-[-50%] left-1/2 -translate-x-1/2 w-[200%] h-[150%]"
+            style={{ willChange: "transform, opacity" }}
+          >
             <Image
               src={BottomCenterFlower}
               alt=""
