@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -76,7 +76,7 @@ export default function Closing() {
       const t1 = setTimeout(() => ScrollTrigger.refresh(), 500);
       const t2 = setTimeout(() => ScrollTrigger.refresh(), 1500);
       const t3 = setTimeout(() => ScrollTrigger.refresh(), 3000);
-      
+
       return () => {
         clearTimeout(t1);
         clearTimeout(t2);
@@ -134,7 +134,7 @@ export default function Closing() {
 
         {/* Right Cherry Blossom Branch (Mid Right - Flipped) */}
         <div
-          className="branch-right absolute top-[65%] right-[-20px] w-[400px] h-[300px] pointer-events-none"
+          className="branch-right absolute top-[65%] right-[-53%] w-[400px] h-[300px] pointer-events-none"
           style={{ transformOrigin: "right center" }}
         >
           <Image
@@ -142,7 +142,7 @@ export default function Closing() {
             alt=""
             fill
             className="object-contain object-right-top"
-            style={{ transform: "scaleX(-1)" }}
+            style={{ transform: "scale(-1, -1)" }}
             onLoad={handleImageLoad}
           />
         </div>
