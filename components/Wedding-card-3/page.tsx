@@ -22,36 +22,59 @@ export default function WeddingCardThreePage() {
   useEffect(() => {
     if (!isRevealed) return;
 
-    const wrapper = document.getElementById("card-scroll-container");
-    const content = document.getElementById("card-scroll-content");
-    if (!wrapper || !content) return;
+    let lenis: Lenis | null = null;
+    let cleanup = () => {};
+    let isCancelled = false;
 
-    const lenis = new Lenis({
-      wrapper: wrapper,
-      content: content,
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      syncTouch: false, // Use native touch scroll on mobile for buttery smooth inertial scrolling
-    });
+    const init = () => {
+      if (isCancelled) return;
 
-    const updateLenis = (time: number) => {
-      lenis.raf(time * 1000);
+      const wrapper = document.getElementById("card-scroll-container");
+      const content = document.getElementById("card-scroll-content");
+
+      if (!wrapper || !content) {
+        // Retry next frame if element is not in DOM yet due to AnimatePresence exit transition
+        requestAnimationFrame(init);
+        return;
+      }
+
+      lenis = new Lenis({
+        wrapper: wrapper,
+        content: content,
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        syncTouch: false, // Use native touch scroll on mobile for buttery smooth inertial scrolling
+      });
+
+      const updateLenis = (time: number) => {
+        lenis?.raf(time * 1000);
+      };
+
+      const updateScroll = () => {
+        ScrollTrigger.update();
+      };
+
+      lenis.on("scroll", updateScroll);
+      wrapper.addEventListener("scroll", updateScroll, { passive: true });
+      
+      gsap.ticker.add(updateLenis);
+      gsap.ticker.lagSmoothing(0);
+
+      // Force instant trigger updates on initialization
+      ScrollTrigger.refresh();
+
+      cleanup = () => {
+        gsap.ticker.remove(updateLenis);
+        wrapper.removeEventListener("scroll", updateScroll);
+        lenis?.destroy();
+      };
     };
 
-    const updateScroll = () => {
-      ScrollTrigger.update();
-    };
-
-    lenis.on("scroll", updateScroll);
-    wrapper.addEventListener("scroll", updateScroll, { passive: true });
-    
-    gsap.ticker.add(updateLenis);
-    gsap.ticker.lagSmoothing(0);
+    init();
 
     return () => {
-      gsap.ticker.remove(updateLenis);
-      wrapper.removeEventListener("scroll", updateScroll);
-      lenis.destroy();
+      isCancelled = true;
+      cleanup();
     };
   }, [isRevealed]);
 
