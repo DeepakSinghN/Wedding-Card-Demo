@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -49,6 +49,7 @@ export default function Closing() {
 
       // Create entrance timeline with top bottom scrolltrigger
       const tl = gsap.timeline({
+        delay: 1, // 0.5s delay before playing the timeline sequence
         scrollTrigger: {
           trigger: sectionRef.current,
           scroller,
