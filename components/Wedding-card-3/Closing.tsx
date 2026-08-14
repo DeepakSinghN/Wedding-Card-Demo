@@ -24,6 +24,7 @@ export default function Closing() {
 
   useGSAP(
     () => {
+      if (!mounted) return;
       // Guard: always check prefers-reduced-motion (GSAP skill rule)
       if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
       if (!sectionRef.current) return;
@@ -82,7 +83,7 @@ export default function Closing() {
         clearTimeout(t3);
       };
     },
-    { scope: sectionRef }
+    { scope: sectionRef, dependencies: [mounted] }
   );
 
   if (!mounted) return null;
