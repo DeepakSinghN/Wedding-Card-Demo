@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -97,7 +97,7 @@ export default function Collage() {
           scrollTrigger: {
             trigger: ".collage-header",
             scroller,
-            start: "top 90%", // Trigger when header enters lower screen
+            start: "top bottom", // Trigger exactly when header enters bottom of screen
             toggleActions: "play none none none",
           },
         }
@@ -125,7 +125,7 @@ export default function Collage() {
           scrollTrigger: {
             trigger: wrapper,
             scroller,
-            start: "top 92%", // Reveal slightly before the card locks sticky
+            start: "top bottom", // Reveal exactly as card wrapper enters bottom of screen
             toggleActions: "play none none none",
           },
         });
