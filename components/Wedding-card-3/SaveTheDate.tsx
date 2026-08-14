@@ -99,14 +99,14 @@ export default function SaveTheDate() {
 
                 {/* 2. Names: Lars & Rosa (Elegant cursive/script) */}
                 <h3
-                    className="std-names text-[8cqi] font-normal leading-tight select-none my-1 mt-10"
+                    className="std-names text-[8cqi] font-normal leading-tight select-none my-2 mt-10"
                     style={{ fontFamily: "var(--font-anastasia), var(--font-script), cursive" }}
                 >
-                    Vivek & Khushi
+                    Vivek <span className="text-[#B77B69] text-[5cqi] px-2">weds</span>  Khushi
                 </h3>
 
                 {/* 3. Decorative Underline Flourish */}
-                <div className="relative h-3 w-[70cqi] flex items-center justify-center mb-4">
+                <div className="relative h-2 w-[70cqi] flex items-center justify-center mb-4">
                     <svg viewBox="0 0 100 10" className="w-full h-full text-[#9D2C2D] opacity-80" preserveAspectRatio="none">
                         <path
                             className="underline-flourish"

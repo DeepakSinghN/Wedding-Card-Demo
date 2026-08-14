@@ -1,7 +1,10 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 
 // Import gallery photos
 import PhotoTop from "./Gallery-section-resources/virat-anuskha-6.jpg";
@@ -9,6 +12,8 @@ import PhotoMidLeft from "./Gallery-section-resources/virat-anuskha.jpg";
 import PhotoMidCenter from "./Gallery-section-resources/virat-anuskha-2.jpg";
 import PhotoMidRight from "./Gallery-section-resources/virat-anuskha-4.jpg";
 import PhotoBottom from "./Gallery-section-resources/virat-anuskha-5.jpg";
+
+gsap.registerPlugin(ScrollTrigger);
 
 type GalleryPhoto = {
   src: any;
@@ -63,20 +68,86 @@ const positionClasses = {
 };
 
 export default function Collage() {
+  const sectionRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useGSAP(
+    () => {
+      if (!mounted) return;
+      // Guard: always check prefers-reduced-motion (GSAP skill rule)
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (!sectionRef.current) return;
+
+      const scroller = sectionRef.current.closest("#card-scroll-container");
+      if (!scroller) return;
+
+      // 1. Header Animation (Fade in & Slide Up)
+      gsap.fromTo(
+        ".collage-header",
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.0,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: ".collage-header",
+            scroller,
+            start: "top 90%", // Trigger when header enters lower screen
+            toggleActions: "play none none none",
+          },
+        }
+      );
+
+      // 2. Polaroid Cards Reveal Animations
+      const wrappers = gsap.utils.toArray(".gallery-card-wrapper") as HTMLElement[];
+      wrappers.forEach((wrapper) => {
+        const card = wrapper.querySelector(".gallery-card") as HTMLElement;
+        if (!card) return;
+
+        const targetRotate = parseFloat(card.getAttribute("data-rotate") || "0");
+
+        // Initial state: hidden, scaled down, and unrotated
+        gsap.set(card, { opacity: 0, scale: 0.85, rotate: 0, force3D: true });
+
+        // Trigger reveal when card wrapper enters lower viewport
+        gsap.to(card, {
+          opacity: 1,
+          scale: 1,
+          rotate: targetRotate,
+          duration: 0.8,
+          ease: "back.out(1.2)", // Elegant snap-into-rotation bounce
+          force3D: true,
+          scrollTrigger: {
+            trigger: wrapper,
+            scroller,
+            start: "top 92%", // Reveal slightly before the card locks sticky
+            toggleActions: "play none none none",
+          },
+        });
+      });
+
+      // Refresh ScrollTrigger calculations
+      ScrollTrigger.refresh();
+      const t = setTimeout(() => ScrollTrigger.refresh(), 800);
+      return () => clearTimeout(t);
+    },
+    { scope: sectionRef, dependencies: [mounted] }
+  );
+
   if (!mounted) return null;
 
   return (
     <section
+      ref={sectionRef}
       className="relative w-full bg-[#FCEAEA] py-16 px-6 flex flex-col items-center select-none overflow-visible mt-12"
     >
       {/* Section Header */}
-      <div className="flex flex-col items-center gap-2 mb-12">
+      <div className="collage-header flex flex-col items-center gap-2 mb-12">
         <p
           className="tracking-[2px] text-[#9B4B32]/70"
           style={{
@@ -95,30 +166,28 @@ export default function Collage() {
       </div>
 
       {/* Cards List - CSS Sticky Stacking Container */}
-      {/* By using normal document flow with position: sticky on children,
-          cards naturally scroll up and stack on top of each other at top-offset heights. */}
       <div className="w-full max-w-[400px] flex flex-col gap-0 overflow-visible">
         {photos.map((photo, i) => (
           <div
             key={i}
-            className="w-full flex items-center justify-center overflow-visible"
+            className="gallery-card-wrapper w-full flex items-center justify-center overflow-visible"
             style={{
               position: "sticky",
-              // Incremental top offset so the top headers/edges of all stacked cards remain visible
               top: `${70 + i * 20}px`,
-              height: "85vh", // Height of the sticky viewport window per card
+              height: "85vh",
               zIndex: i + 1,
             }}
           >
             {/* Polaroid card */}
             <div
-              className="gallery-card bg-white shadow-[0_12px_36px_rgba(155,75,50,0.18)] border border-[#9B4B32]/5 flex flex-col overflow-hidden transition-all duration-300"
+              className="gallery-card bg-white shadow-[0_12px_36px_rgba(155,75,50,0.18)] border border-[#9B4B32]/5 flex flex-col overflow-hidden"
+              data-rotate={photo.rotate}
               style={{
                 borderRadius: "28px",
-                padding: "16px 16px 16px 16px", // White border frame
+                padding: "16px 16px 16px 16px",
                 width: "350px",
-                transform: `rotate(${photo.rotate}deg)`,
                 transformOrigin: "center",
+                willChange: "transform, opacity",
               }}
             >
               {/* Portrait Photo Container */}
