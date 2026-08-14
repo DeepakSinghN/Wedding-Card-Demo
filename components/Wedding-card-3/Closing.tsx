@@ -134,7 +134,7 @@ export default function Closing() {
 
         {/* Right Cherry Blossom Branch (Mid Right - Flipped) */}
         <div
-          className="branch-right absolute top-[65%] right-[-20px] w-[400px] h-[300px] pointer-events-none scale-x-[-1]"
+          className="branch-right absolute top-[65%] right-[-20px] w-[400px] h-[300px] pointer-events-none"
           style={{ transformOrigin: "right center" }}
         >
           <Image
@@ -142,6 +142,7 @@ export default function Closing() {
             alt=""
             fill
             className="object-contain object-right-top"
+            style={{ transform: "scaleX(-1)" }}
             onLoad={handleImageLoad}
           />
         </div>
