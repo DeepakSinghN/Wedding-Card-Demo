@@ -1,8 +1,14 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
 import GaneshJi from "./Events-section-resources/Ganesh jii.svg";
+
+gsap.registerPlugin(ScrollTrigger);
 
 type WeddingEvent = {
   id: string;
@@ -57,20 +63,83 @@ const events: WeddingEvent[] = [
 ];
 
 export default function EventDetails() {
+  const sectionRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useGSAP(
+    () => {
+      if (!mounted) return;
+      // Guard: always check prefers-reduced-motion (GSAP skill rule)
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      if (!sectionRef.current) return;
+
+      const scroller = sectionRef.current.closest("#card-scroll-container");
+      if (!scroller) return;
+
+      // ── Timeline Setup ────────────────────────────────────────────────────
+      const tl = gsap.timeline({
+        delay: 1.0, // 1 second delay when user enters the section
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          scroller,
+          start: "top 90%", // Trigger when section top enters 90% down viewport
+          toggleActions: "play none none none",
+        },
+      });
+
+      // 1. Header Reveal
+      tl.fromTo(
+        ".events-header",
+        { opacity: 0, y: 25 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", force3D: true }
+      );
+
+      // 2. Event Cards Staggered Slide-up from below
+      const cards = gsap.utils.toArray(".event-card") as HTMLElement[];
+      cards.forEach((card, i) => {
+        const targetRotate = parseFloat(card.getAttribute("data-rotate") || "0");
+
+        // Set initial state: card is hidden below (y: 50px) and straight (rotate: 0)
+        gsap.set(card, { opacity: 0, y: 50, rotate: 0, force3D: true });
+
+        // Add to timeline sequence with a staggered start overlap
+        tl.to(
+          card,
+          {
+            opacity: 1,
+            y: 0,
+            rotate: targetRotate,
+            duration: 0.8,
+            ease: "power2.out",
+            force3D: true,
+          },
+          i === 0 ? "-=0.2" : "-=0.55" // Start each subsequent card slightly before previous finishes
+        );
+      });
+
+      // Force positions refresh
+      ScrollTrigger.refresh();
+      const t = setTimeout(() => ScrollTrigger.refresh(), 800);
+      return () => clearTimeout(t);
+    },
+    { scope: sectionRef, dependencies: [mounted] }
+  );
+
   if (!mounted) return null;
 
   return (
-    <section className="w-full bg-[#FCEAEA] py-12 px-6 flex flex-col items-center gap-10 mt-20">
+    <section
+      ref={sectionRef}
+      className="w-full bg-[#FCEAEA] py-12 px-6 flex flex-col items-center gap-10 mt-20"
+    >
       {/* Header section */}
-      <div className="flex flex-col items-center gap-2">
+      <div className="events-header flex flex-col items-center gap-2" style={{ willChange: "transform, opacity" }}>
         <p
-          className=" tracking-[2px] text-[#9B4B32]/70"
+          className="tracking-[2px] text-[#9B4B32]/70"
           style={{
             fontFamily: "var(--font-amsterdam-four), var(--font-script), cursive",
             fontSize: "3rem",
@@ -92,13 +161,14 @@ export default function EventDetails() {
         {events.map((event, i) => (
           <div
             key={event.id}
-            className="bg-white shadow-[0_10px_30px_rgba(155,75,50,0.1)] hover:shadow-[0_15px_40px_rgba(155,75,50,0.15)] transition-all duration-300 flex flex-col items-center justify-between text-center relative border border-[#9B4B32]/5"
+            className="event-card bg-white shadow-[0_10px_30px_rgba(155,75,50,0.1)] hover:shadow-[0_15px_40px_rgba(155,75,50,0.15)] transition-all duration-300 flex flex-col items-center justify-between text-center relative border border-[#9B4B32]/5"
+            data-rotate={i % 2 === 0 ? 3 : -3}
             style={{
               borderRadius: "28px",
               padding: "10px 24px 44px 24px",
               minHeight: "540px",
-              transform: i % 2 === 0 ? "rotate(3deg)" : "rotate(-3deg)",
               transformOrigin: "center",
+              willChange: "transform, opacity",
             }}
           >
             {/* Event Number Badge */}
@@ -138,8 +208,6 @@ export default function EventDetails() {
 
               {/* Divider */}
               <div className="w-2/3 h-[1px] bg-gradient-to-r from-transparent via-[#9B4B32]/20 to-transparent mb-5" />
-
-
             </div>
 
             {/* Title */}
