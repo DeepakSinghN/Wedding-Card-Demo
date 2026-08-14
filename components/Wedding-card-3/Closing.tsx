@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -142,7 +142,7 @@ export default function Closing() {
             alt=""
             fill
             className="object-contain object-right-top"
-            style={{ transform: "scale(-1, -1)" }}
+            style={{ transform: "scale(-1, 1)" }}
             onLoad={handleImageLoad}
           />
         </div>
