@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
@@ -80,45 +80,49 @@ export default function EventDetails() {
       const scroller = sectionRef.current.closest("#card-scroll-container");
       if (!scroller) return;
 
-      // ── Timeline Setup ────────────────────────────────────────────────────
-      const tl = gsap.timeline({
-        delay: 1.0, // 1 second delay when user enters the section
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          scroller,
-          start: "top 90%", // Trigger when section top enters 90% down viewport
-          toggleActions: "play none none none",
-        },
-      });
-
-      // 1. Header Reveal
-      tl.fromTo(
+      // 1. Header Reveal (Triggers when header enters viewport)
+      gsap.fromTo(
         ".events-header",
         { opacity: 0, y: 25 },
-        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out", force3D: true }
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: "power2.out",
+          force3D: true,
+          scrollTrigger: {
+            trigger: ".events-header",
+            scroller,
+            start: "top 90%",
+            toggleActions: "play none none none",
+          },
+        }
       );
 
-      // 2. Event Cards Staggered Slide-up from below
+      // 2. Individual Event Cards Reveal Animations with a 1s delay on scroll
       const cards = gsap.utils.toArray(".event-card") as HTMLElement[];
-      cards.forEach((card, i) => {
+      cards.forEach((card) => {
         const targetRotate = parseFloat(card.getAttribute("data-rotate") || "0");
 
-        // Set initial state: card is hidden below (y: 50px) and straight (rotate: 0)
-        gsap.set(card, { opacity: 0, y: 50, rotate: 0, force3D: true });
+        // Set initial state: card is hidden below (y: 60px) and straight (rotate: 0)
+        gsap.set(card, { opacity: 0, y: 60, rotate: 0, force3D: true });
 
-        // Add to timeline sequence with a staggered start overlap
-        tl.to(
-          card,
-          {
-            opacity: 1,
-            y: 0,
-            rotate: targetRotate,
-            duration: 0.8,
-            ease: "power2.out",
-            force3D: true,
+        // Trigger reveal when this specific card enters the screen viewport
+        gsap.to(card, {
+          opacity: 1,
+          y: 0,
+          rotate: targetRotate,
+          duration: 0.8,
+          delay: 1.0, // 1 second delay when card enters the viewport display
+          ease: "power2.out",
+          force3D: true,
+          scrollTrigger: {
+            trigger: card,
+            scroller,
+            start: "top 90%", // Trigger when this card top crosses 90% viewport height
+            toggleActions: "play none none none",
           },
-          i === 0 ? "-=0.2" : "-=0.55" // Start each subsequent card slightly before previous finishes
-        );
+        });
       });
 
       // Force positions refresh
