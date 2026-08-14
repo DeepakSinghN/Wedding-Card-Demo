@@ -49,15 +49,10 @@ export default function SaveTheDate() {
             force3D: true
         });
 
-        // 4. Create unified timeline bound to ScrollTrigger
+        // 4. Create unified timeline playing automatically on mount
         const tl = gsap.timeline({
-            defaults: { ease: "power2.inOut" },
-            scrollTrigger: {
-                trigger: containerRef.current,
-                scroller,
-                start: "top 90%", // Trigger when section top enters 90% down the screen
-                toggleActions: "play none none none"
-            }
+            delay: 0.3, // Brief delay after hero exit transition ends
+            defaults: { ease: "power2.inOut" }
         });
 
         // Glass Outline Sequence
